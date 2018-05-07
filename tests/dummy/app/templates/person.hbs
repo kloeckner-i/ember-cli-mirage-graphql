@@ -1,0 +1,28 @@
+<main class="person">
+  <div class="person-full-name">
+    {{model.person.firstName}} {{model.person.lastName}}
+  </div>
+  <div class="person-age">
+    {{model.person.age}}
+  </div>
+  {{#if model.person.pets}}
+    <table class="person-pets">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each model.person.pets as |pet|}}
+          <tr>
+            <td>{{pet.type}}</td>
+            <td>{{pet.name}}</td>
+            <td>{{pet.age}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  {{/if}}
+</main>

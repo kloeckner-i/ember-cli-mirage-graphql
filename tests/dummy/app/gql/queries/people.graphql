@@ -1,0 +1,8 @@
+query($lastName: String, $pageSize: Int) {
+  people(lastName: $lastName, pageSize: $pageSize) {
+    id
+    age
+    firstName
+    lastName
+  }
+}

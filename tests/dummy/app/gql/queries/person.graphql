@@ -1,0 +1,12 @@
+query($id: ID!) {
+  person(id: $id) {
+    age
+    firstName
+    lastName
+    pets {
+      age
+      name
+      weight
+    }
+  }
+}

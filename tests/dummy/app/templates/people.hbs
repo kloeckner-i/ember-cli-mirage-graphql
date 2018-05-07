@@ -1,0 +1,22 @@
+{{#if model.people}}
+  <table class="people">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Age</th>
+        <th>Profile</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each model.people as |person|}}
+        <tr>
+          <td>{{person.firstName}}</td>
+          <td class="people-last-name">{{person.lastName}}</td>
+          <td>{{person.age}}</td>
+          <td>{{link-to "View Profile" "person" person.id}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/if}}
