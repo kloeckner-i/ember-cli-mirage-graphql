@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-mirage-graphql",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A library for mocking GraphQL with Ember CLI Mirage",
   "keywords": [
     "ember-addon"
@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "ember-cli-babel": "^6.6.0",
-    "ember-cli-mirage": "^0.4.6",
     "graphql": "^0.13.2",
     "graphql-tools": "^2.14.1"
   },
@@ -35,6 +34,7 @@
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-htmlbars-inline-precompile": "^1.0.0",
     "ember-cli-inject-live-reload": "^1.4.1",
+    "ember-cli-mirage": "^0.4.6",
     "ember-cli-qunit": "^4.1.1",
     "ember-cli-shims": "^1.2.0",
     "ember-cli-sri": "^2.1.0",

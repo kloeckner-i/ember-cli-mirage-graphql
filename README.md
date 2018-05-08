@@ -2,19 +2,18 @@
 
 [![Build Status](https://travis-ci.org/kloeckner-i/ember-cli-mirage-graphql.svg?branch=master)](https://travis-ci.org/kloeckner-i/ember-cli-mirage-graphql)
 
-This addon is for mocking GraphQL with Ember CLI Mirage. It works by providing you a simple way to create a GraphQL request handler for use with Mirage.
+This addon is for mocking GraphQL with Ember CLI Mirage.
 
 ## Installation
 
 ```sh
+ember install ember-cli-mirage
 ember install ember-cli-mirage-graphql
 ```
 
-Note: This addon will also install Mirage so you don't have to install it separately, if you don't want to or have'nt already.
-
 ## How It Works
 
-This addon creates a request handler for use with Mirage that takes your GraphQL scehma and creates mocks accordingly. In its simplest form, the mocks query data from Mirage's database by type and filter records, if need be, by matching query variables.
+This addon creates a request handler for use with Mirage that takes your GraphQL scehma and creates mocks accordingly. In its simplest form, the mocks query data from Mirage's database, by type, and optionally filter records by matching query variables.
 
 ## Example Usage
 
