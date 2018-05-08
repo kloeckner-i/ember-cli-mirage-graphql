@@ -1,8 +1,18 @@
 query($lastName: String, $pageSize: Int) {
   people(lastName: $lastName, pageSize: $pageSize) {
     id
+    address {
+      line1
+      line2
+      city
+      state
+      zip
+    }
     age
     firstName
     lastName
+    pets {
+      id
+    }
   }
 }

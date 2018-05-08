@@ -5,7 +5,8 @@
         <th>First Name</th>
         <th>Last Name</th>
         <th>Age</th>
-        <th>Profile</th>
+        <th>Address</th>
+        <th>Pet Count</th>
       </tr>
     </thead>
     <tbody>
@@ -14,7 +15,14 @@
           <td>{{person.firstName}}</td>
           <td class="people-last-name">{{person.lastName}}</td>
           <td>{{person.age}}</td>
-          <td>{{link-to "View Profile" "person" person.id}}</td>
+          <td>
+            <span class="people-address-line-1">{{person.address.line1}}</span>
+            <span class="people-address-line-2">{{person.address.line2}}</span>
+            <span class="people-address-city">{{person.address.city}}</span>
+            <span class="people-address-state">{{person.address.state}}</span>
+            <span class="people-address-zip">{{person.address.zip}}</span>
+          </td>
+          <td class="people-animal-count">{{person.pets.length}}</td>
         </tr>
       {{/each}}
     </tbody>

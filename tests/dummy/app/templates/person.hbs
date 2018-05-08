@@ -5,6 +5,13 @@
   <div class="person-age">
     {{model.person.age}}
   </div>
+  <div class="person-address">
+    <span class="person-address-line-1">{{model.person.address.line1}}</span>
+    <span class="person-address-line-2">{{model.person.address.line2}}</span>
+    <span class="person-address-city">{{model.person.address.city}}</span>
+    <span class="person-address-state">{{model.person.address.state}}</span>
+    <span class="person-address-zip">{{model.person.address.zip}}</span>
+  </div>
   {{#if model.person.pets}}
     <table class="person-pets">
       <thead>

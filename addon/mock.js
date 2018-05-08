@@ -24,7 +24,7 @@ const mockFn = (db, varsMap, fieldsMap = {}) => (root, vars, _, meta = {}) => {
   let typeName = camelize(type.name);
   let data = filterRecordsByVars(db, pluralize(typeName), vars, varsMap[type]);
 
-  getRelatedRecords(data, typeName, type._fields, fieldsMap[type], db);
+  data = getRelatedRecords(data, typeName, type._fields, fieldsMap[type], db);
 
   return isList ? data : data[0];
 };

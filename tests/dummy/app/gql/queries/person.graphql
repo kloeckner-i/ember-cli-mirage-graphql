@@ -1,5 +1,12 @@
 query($id: ID!) {
   person(id: $id) {
+    address {
+      line1
+      line2
+      city
+      state
+      zip
+    }
     age
     firstName
     lastName
