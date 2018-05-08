@@ -34,8 +34,12 @@ If you're like us, you'll want to create your handler aside from your Mirage con
 import createGraphQLHandler from 'ember-cli-mirage-graphql/handler';
 import schmea from 'app-name/path-to-your-schema';
 
-export default createGraphQLHandler(scehma);
+export default createGraphQLHandler(schema, /* options = {} */);
 ```
+
+Note: We use a simple command line tool to download our schema and then we wrap it in a template string and save it as a JavaScript module. The tool can be found here: [get-graphql-schema](https://www.npmjs.com/package/get-graphql-schema).
+
+---
 
 Then import your handler for use in your Mirage config:
 
