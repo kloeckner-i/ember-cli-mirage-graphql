@@ -99,6 +99,7 @@ You may pass in options when creating a request handler. The options take the fo
 
 ## TODO
 
+* Add ability for `fieldsMap` values to be functions. This would support mocking complex server logic where variables alone are insufficient.
 * Support mutations. As of now, the addon only supports queries. As we at Koeckner need to support mutations, this will be actively worked on per our use cases.
 
 ## Contributing
