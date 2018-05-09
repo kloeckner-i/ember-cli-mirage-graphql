@@ -3,13 +3,17 @@ import schema from 'dummy/gql/schema';
 
 const OPTIONS = {
   fieldsMap: {
+    peopleSameAgeAsDogYears: (people) => people.filter((person) =>
+      !!person.pets
+        .filter(({ type }) => type === 'dog')
+        .filter((dog) => dog.age * 7 === person.age).length),
     Person: {
       pets: 'animals'
     }
   },
   varsMap: {
     Person: {
-      pageSize: (records, _, pageSize) => records.slice(0, pageSize)
+      pageSize: (people, variableName, pageSize) => people.slice(0, pageSize)
     }
   }
 };

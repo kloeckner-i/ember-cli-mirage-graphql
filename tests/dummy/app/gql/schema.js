@@ -33,4 +33,6 @@ type RootQueryType {
   person(id: ID!): Person
 
   people(lastName: String, pageSize: Int): [Person]
+
+  peopleSameAgeAsDogYears: [Person]
 }`;

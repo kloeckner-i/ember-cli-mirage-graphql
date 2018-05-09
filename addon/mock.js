@@ -1,4 +1,7 @@
-import { filterRecordsByVars } from './filter-records';
+import {
+  filterRecordsByMappedField,
+  filterRecordsByVars
+} from './filter-records';
 import { getRelatedRecords } from './related-records';
 import { camelize, pluralize } from 'ember-cli-mirage/utils/inflector';
 import { get } from '@ember/object';
@@ -21,12 +24,15 @@ const mockField = (mockFields, db, varsMap, fieldsMap) => (field) =>
 const mockFn = (db, varsMap, fieldsMap = {}) => (root, vars, _, meta = {}) => {
   let isList = getIsList(meta);
   let type = getTypeFromMeta(meta, isList);
+  let { _fields: fields } = type;
   let typeName = camelize(type.name);
-  let data = filterRecordsByVars(db, pluralize(typeName), vars, varsMap[type]);
+  let records = db[pluralize(typeName)];
 
-  data = getRelatedRecords(data, typeName, type._fields, fieldsMap[type], db);
+  records = filterRecordsByVars(records, vars, varsMap[type]);
+  records = getRelatedRecords(records, typeName, fields, fieldsMap[type], db);
+  records = filterRecordsByMappedField(records, meta.fieldName, fieldsMap);
 
-  return isList ? data : data[0];
+  return isList ? records : records[0];
 };
 
 const getIsList = (meta) => !!get(meta, PROP_FOR_LIST_TYPE);

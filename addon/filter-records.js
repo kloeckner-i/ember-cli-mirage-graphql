@@ -1,8 +1,9 @@
 import { get } from '@ember/object';
 
-export function filterRecordsByVars(db, type, vars, varsMap) {
-  let records = db[type];
+export const filterRecordsByMappedField = (data, fieldName, fieldsMap) =>
+  isFunction(fieldsMap[fieldName]) ? fieldsMap[fieldName](data) : data;
 
+export function filterRecordsByVars(records, vars, varsMap) {
   Object.keys(vars)
     .map(mapVariables(vars, varsMap))
     .sort(sortMappedVariables)
@@ -22,7 +23,7 @@ const mapVariables = (vars, varsMap = {}) => (key) =>
 
 const sortMappedVariables = ([key]) => isFunction(key) ? 1 : -1;
 
-const isFunction = (obj) => typeof obj === 'function';
+const isFunction = (obj) => obj != null && typeof obj === 'function';
 
 const filterBy = (records, key, value) => records.filter((record) =>
   get(record, key) === value);
