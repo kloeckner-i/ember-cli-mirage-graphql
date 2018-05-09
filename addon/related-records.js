@@ -40,11 +40,11 @@ const mapRelatedFields = (fieldsMap) => ({ name: relatedField, type }) => ({
 const mapRelatedField = (field, map) => field in map ? map[field] : field;
 
 const filterRelatedByRecord = (table, record, type) =>
-  table.filter((related) => related[type].id === record.id);
+  table.filter((related) => related[type] && related[type].id === record.id);
 
 function lookUpRelatedRecords(db, fieldName, isList, record, type) {
-  let tableName = isList ? fieldName : pluralize(fieldName);
-  let relatedRecords = filterRelatedByRecord(db[tableName], record, type);
+  let relatedTable = isList ? fieldName : pluralize(fieldName);
+  let relatedRecords = filterRelatedByRecord(db[relatedTable], record, type);
 
   return isList ? relatedRecords : relatedRecords[0];
 }

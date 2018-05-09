@@ -1,0 +1,11 @@
+query {
+  peopleSameAgeAsDogYears {
+    age,
+    firstName,
+    lastName,
+    pets {
+      age,
+      name
+    }
+  }
+}

@@ -68,6 +68,13 @@ You may pass in options when creating a request handler. The options take the fo
 
     In this example the mapping is for a relationship; however, you
     may map any field type.
+
+    String values will be used to map field names from your query to
+    match those in your Mirage database.
+
+    Function values will be used to filter records and will run after
+    any variable filtering and related data fetching. This allows for
+    complex record filtering that can't be done with variables alone.
    */
   fieldsMap: {
     Person: { // fields are mapped on a per-type basis
@@ -99,7 +106,6 @@ You may pass in options when creating a request handler. The options take the fo
 
 ## TODO
 
-* Add ability for `fieldsMap` values to be functions. This would support mocking complex server logic where variables alone are insufficient.
 * Support mutations. As of now, the addon only supports queries. As we at Koeckner need to support mutations, this will be actively worked on per our use cases.
 
 ## Contributing
