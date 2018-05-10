@@ -106,7 +106,7 @@ You may pass in options when creating a request handler. The options take the fo
 
 ## TODO
 
-* Support mutations. As of now, the addon only supports queries. As we at Koeckner need to support mutations, this will be actively worked on per our use cases.
+* Support mutations. As of now, the addon only supports queries. Basic support for mutations should be available very soon.
 
 ## Contributing
 
