@@ -1,4 +1,5 @@
 import { get } from '@ember/object';
+import { isFunction } from './utils';
 
 export const filterRecordsByMappedField = (data, fieldName, fieldsMap) =>
   isFunction(fieldsMap[fieldName]) ? fieldsMap[fieldName](data) : data;
@@ -22,8 +23,6 @@ const mapVariables = (vars, varsMap = {}) => (key) =>
   [key in varsMap ? varsMap[key] : key, key, vars[key]];
 
 const sortMappedVariables = ([key]) => isFunction(key) ? 1 : -1;
-
-const isFunction = (obj) => obj != null && typeof obj === 'function';
 
 const filterBy = (records, key, value) => records.filter((record) =>
   get(record, key) === value);

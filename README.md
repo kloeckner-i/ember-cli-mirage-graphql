@@ -82,6 +82,25 @@ You may pass in options when creating a request handler. The options take the fo
     }
   },
   /*
+    mutations is an object used to mock mutation functionality you might expect
+    from the server. Each method maps directly to a named mutation from your
+    schema and accepts 3 arguments:
+
+    1. The table from Mirage's database that corresponds to the return type of
+    the mutation.
+    2. The mutation variables. These will be mapped per the varsMap option, by
+    the return type, if appropriate.
+    3. Mirage's database.
+
+    For now, this is the only way to mock mutations with this addon; however, we
+    will try to implement some form of default mutation functionality, if
+    feasible.
+   */
+  mutations: {
+    updatePerson: (people, { id, personAttributes }) =>
+      [ people.update(id, personAttributes) ]
+  },
+  /*
     varsMap is used if you need to map request variables defined
     in your GraphQL queries. The value you specify in the map can
     be a string or a function.
@@ -103,10 +122,6 @@ You may pass in options when creating a request handler. The options take the fo
   }
 }
 ```
-
-## TODO
-
-* Support mutations. As of now, the addon only supports queries. Basic support for mutations should be available very soon.
 
 ## Contributing
 
