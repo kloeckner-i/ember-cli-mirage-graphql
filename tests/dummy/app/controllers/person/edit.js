@@ -19,13 +19,11 @@ export default Controller.extend({
     savePerson(id, e) {
       e.preventDefault();
 
-      let attrs = getAttrsFromForm(e.target);
-
       this.get('apollo').mutate({
         mutation,
         variables: {
           id,
-          personAttributes: attrs
+          personAttributes: getAttrsFromForm(e.target)
         }
       });
     }
