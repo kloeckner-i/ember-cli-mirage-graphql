@@ -1,15 +1,14 @@
 import { addMockFunctionsToSchema, makeExecutableSchema } from 'graphql-tools';
-import { createMocksForSchema } from './mock';
+import { createMocksForSchema } from './mock/create';
 import { graphql } from 'graphql';
 
-const createGraphQLHandler = (rawSchema, options = {}) => ({ db }, request) => {
+const createGraphQLHandler = (rawSchema, options) => ({ db }, request) => {
   let schema = makeExecutableSchema({ typeDefs: rawSchema });
-  let { fieldsMap, varsMap } = options;
   let { query, variables } = JSON.parse(request.requestBody);
 
   addMockFunctionsToSchema({
     schema,
-    mocks: createMocksForSchema(schema, db, varsMap, fieldsMap),
+    mocks: createMocksForSchema(schema, db, options),
     preserveResolvers: false
   });
 

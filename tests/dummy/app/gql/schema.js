@@ -1,5 +1,6 @@
 export default `
 schema {
+  mutation: RootMutationType
   query: RootQueryType
 }
 
@@ -27,6 +28,16 @@ type Person {
   firstName: String!
   lastName: String!
   pets: [Pet]
+}
+
+input PersonAttributes {
+  firstName: String
+  lastName: String
+  age: Int
+}
+
+type RootMutationType {
+  updatePerson(id: ID!, personAttributes: PersonAttributes!): Person
 }
 
 type RootQueryType {

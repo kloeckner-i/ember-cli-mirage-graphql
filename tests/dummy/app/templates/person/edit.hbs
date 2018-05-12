@@ -1,0 +1,12 @@
+<form onsubmit={{action "savePerson" model.person.id}}>
+  <div>First Name: {{model.person.firstName}}</div>
+  <div>
+    <label for="person-last-name">Last Name:</label>
+    {{input id="person-last-name"
+            name="lastName"
+            value=lastName
+            class="person-last-name"}}
+  </div>
+  <div>Age: {{model.person.age}}</div>
+  <button type="submit" class="person-save">Save</button>
+</form>

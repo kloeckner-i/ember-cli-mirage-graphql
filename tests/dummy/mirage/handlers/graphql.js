@@ -11,6 +11,10 @@ const OPTIONS = {
       pets: 'animals'
     }
   },
+  mutations: {
+    updatePerson: (people, { id, personAttributes }) =>
+      [ people.update(id, personAttributes) ]
+  },
   varsMap: {
     Person: {
       pageSize: (people, variableName, pageSize) => people.slice(0, pageSize)
