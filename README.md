@@ -101,8 +101,11 @@ You may pass in options when creating a request handler. The options take the fo
     feasible.
    */
   mutations: {
-    updatePerson: (people, { id, personAttributes }) =>
-      [ people.update(id, personAttributes) ]
+    updatePerson: (people, vars, db) => {
+      let { id, personAttributes } = vars;
+
+      return [ people.update(id, personAttributes) ];
+    }
   },
   /*
     varsMap is used if you need to map request variables defined
