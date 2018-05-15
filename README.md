@@ -4,6 +4,10 @@
 
 This addon is for mocking GraphQL with Ember CLI Mirage.
 
+## Note
+
+This addon is very early in its development and the code currently supports limited use cases. If you would like to contribute, don't be afraid to trample any existing code. It's quite trampleable.
+
 ## Installation
 
 ```sh
