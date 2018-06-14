@@ -4,32 +4,45 @@ import { pluralize } from 'ember-cli-mirage/utils/inflector';
 
 const RELATED_PROP = 'type.ofType.astNode';
 
-export function getRelatedRecords(records, type, fields, fieldsMap, db) {
-  let relatedFields = getRelatedFields(fields).map(mapRelatedFields(fieldsMap));
-  let recordsWithRelatedData = [];
+export const getRelatedRecords = (db, { fieldsMap } = {}) =>
+  (mockQueryInfo) => {
+    let { records, mirageType, type } = mockQueryInfo;
+    let recordsWithRelatedData = [];
+    let relatedFields = getRelatedFieldsForType(type, fieldsMap);
 
-  records.forEach((record) => {
+    records.forEach(
+      getRelatedData(db, recordsWithRelatedData, relatedFields, mirageType)
+    );
+
+    mockQueryInfo.setRecords(recordsWithRelatedData);
+
+    return mockQueryInfo;
+  };
+
+const filterRelatedByRecord = (table, record, type) =>
+  table.filter((related) => related[type] && related[type].id === record.id);
+
+const getRelatedData = (db, records, relatedFields, mirageType) =>
+  (record) => {
     let recordCopy = Object.assign({}, record);
 
-    relatedFields.forEach(({ fieldName, mappedFieldName, isList }) =>
-      recordCopy[fieldName] = mappedFieldName in record
-        ? record[mappedFieldName]
-        : lookUpRelatedRecords(db, mappedFieldName, isList, record, type));
+    relatedFields.forEach(
+      getRelatedRecordsForField(db, record, recordCopy, mirageType)
+    );
 
-    recordsWithRelatedData.push(recordCopy);
-  });
-
-  return recordsWithRelatedData;
-}
+    records.push(recordCopy);
+  };
 
 const getRelatedFields = (fields) =>
   Object.keys(fields).reduce(reduceFieldsToRelatedFields(fields), []);
 
-const reduceFieldsToRelatedFields = (fields) => (relatedFields, fieldName) => {
-  let field = fields[fieldName];
+const getRelatedRecordsForField = (db, record, recordCopy, mirageType) =>
+  ({ fieldName, mappedFieldName, isList }) =>
+    recordCopy[fieldName] = mappedFieldName in record
+      ? record[mappedFieldName]
+      : lookUpRelatedRecords(db, mappedFieldName, isList, record, mirageType);
 
-  return get(field, RELATED_PROP) ? [...relatedFields, field] : relatedFields;
-};
+const mapRelatedField = (field, map) => field in map ? map[field] : field;
 
 const mapRelatedFields = (fieldsMap) => ({ name: relatedField, type }) => ({
   fieldName: relatedField,
@@ -37,10 +50,18 @@ const mapRelatedFields = (fieldsMap) => ({ name: relatedField, type }) => ({
   isList: type instanceof GraphQLList
 });
 
-const mapRelatedField = (field, map) => field in map ? map[field] : field;
+const reduceFieldsToRelatedFields = (fields) => (relatedFields, fieldName) => {
+  let field = fields[fieldName];
 
-const filterRelatedByRecord = (table, record, type) =>
-  table.filter((related) => related[type] && related[type].id === record.id);
+  return get(field, RELATED_PROP) ? [...relatedFields, field] : relatedFields;
+};
+
+function getRelatedFieldsForType(type, fieldsMap = {}) {
+  let { _fields: fields } = type;
+  let fieldsMapForType = fieldsMap[type.name];
+
+  return getRelatedFields(fields).map(mapRelatedFields(fieldsMapForType));
+}
 
 function lookUpRelatedRecords(db, fieldName, isList, record, type) {
   let relatedTable = isList ? fieldName : pluralize(fieldName);

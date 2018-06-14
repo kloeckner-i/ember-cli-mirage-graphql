@@ -1,6 +1,6 @@
 module.exports = {
   globals: {
-    server: true,
+    server: true
   },
   root: true,
   parserOptions: {
@@ -28,7 +28,8 @@ module.exports = {
         'testem.js',
         'blueprints/*/index.js',
         'config/**/*.js',
-        'tests/dummy/config/**/*.js'
+        'tests/dummy/config/**/*.js',
+        'lib/**/*.js'
       ],
       excludedFiles: [
         'addon/**',

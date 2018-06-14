@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-mirage-graphql",
-  "version": "0.0.4",
+  "version": "0.0.5-alpha",
   "description": "A library for mocking GraphQL with Ember CLI Mirage",
   "keywords": [
     "ember-addon"
@@ -22,7 +22,8 @@
   "dependencies": {
     "ember-cli-babel": "^6.6.0",
     "graphql": "^0.13.2",
-    "graphql-tools": "^2.14.1"
+    "graphql-tools": "^2.14.1",
+    "webpack": "^2.2.1"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
