@@ -1,23 +1,30 @@
+import MockQueryInfo from './query-info';
 import {
-  filterRecordsByMappedField,
-  filterRecordsByVars
+  filterRecordsByVars,
+  maybeFilterRecordsByMappedField
 } from '../filter-records';
-import { getIsList, getTableByType, getTypeFromMeta } from '../utils';
+import { getRecordsByType, getTableName } from '../db';
 import { getRelatedRecords } from '../related-records';
+import { pipe } from '../utils';
+import { maybeWrapForRelay, maybeUnwrapRelayType } from '../relay-pagination';
 
-const mockQueryFn = (db, options = {}) => (root, vars, _, meta) => {
-  let isList = getIsList(meta);
-  let type = getTypeFromMeta(meta, isList);
-  let { name: typeName } = type;
-  let { recordType, records } = getTableByType(db, type);
-  let { fieldsMap = {}, varsMap = {} } = options;
+const mockQueryFn = (db, options) =>
+  (_, vars, __, { fieldName, returnType }) => {
+    const mockFn = pipe(
+      maybeUnwrapRelayType,
+      getTableName,
+      getRecordsByType(db),
+      filterRecordsByVars(vars, options),
+      getRelatedRecords(db, options),
+      maybeFilterRecordsByMappedField(fieldName, options),
+      maybeWrapForRelay
+    );
 
-  records = filterRecordsByVars(records, vars, varsMap[typeName]);
-  records = getRelatedRecords(records, recordType, type._fields,
-    fieldsMap[typeName], db);
-  records = filterRecordsByMappedField(records, meta.fieldName, fieldsMap);
+    let mockQueryInfo = MockQueryInfo.create({ type: returnType });
 
-  return isList ? records : records[0];
-};
+    let result = mockFn(mockQueryInfo);
+
+    return result;
+  };
 
 export default mockQueryFn;
