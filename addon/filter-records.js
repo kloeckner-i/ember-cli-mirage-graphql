@@ -3,48 +3,48 @@ import { get } from '@ember/object';
 import { isFunction } from './utils';
 
 export const filterRecordsByVars = (vars, { varsMap = {} } = {}) =>
-  (mockQueryInfo) => {
-    let { hasRelay, records } = mockQueryInfo;
+  (mockInfo) => {
+    let { hasRelay, records, type } = mockInfo;
     let relayVars;
 
     if (hasRelay) {
       ({ relayVars, vars } = abstractRelayVars(vars));
     }
 
-    records = filterRecords(records, vars, varsMap);
+    records = filterRecords(records, vars, varsMap[type.name]);
 
     if (hasRelay) {
       records = filterByRelayVars(records, relayVars);
     }
 
-    mockQueryInfo.setRecords(records);
+    mockInfo.setRecords(records);
 
-    return mockQueryInfo;
+    return mockInfo;
   };
 
 export const maybeFilterRecordsByMappedField = (fieldName, options = {}) =>
-  (mockQueryInfo) => {
+  (mockInfo) => {
     let { fieldsMap = {} } = options;
-    let { records } = mockQueryInfo;
+    let { records } = mockInfo;
 
     if (isFunction(fieldsMap[fieldName])) {
       records = fieldsMap[fieldName](records);
     }
 
-    mockQueryInfo.setRecords(records);
+    mockInfo.setRecords(records);
 
-    return mockQueryInfo;
+    return mockInfo;
   };
 
 const filterBy = (records, key, value) => records.filter((record) =>
   get(record, key) === value);
 
-const mapVariables = (vars, varsMap = {}) => (key) =>
-  [key in varsMap ? varsMap[key] : key, key, vars[key]];
+const mapVariables = (vars, varsMap) =>
+  (key) => [key in varsMap ? varsMap[key] : key, key, vars[key]];
 
 const sortMappedVariables = ([key]) => isFunction(key) ? 1 : -1;
 
-function filterRecords(records, vars, varsMap) {
+function filterRecords(records, vars, varsMap = {}) {
   Object.keys(vars)
     .map(mapVariables(vars, varsMap))
     .sort(sortMappedVariables)

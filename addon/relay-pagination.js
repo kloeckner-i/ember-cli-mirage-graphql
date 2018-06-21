@@ -42,20 +42,23 @@ export function filterByRelayVars(records, relayVars) {
   return records;
 }
 
-export function maybeUnwrapRelayType(mockQueryInfo) {
-  let { type } = mockQueryInfo;
-  let hasRelay = hasRelayPagination(type);
+export function maybeUnwrapRelayType(mockInfo) {
+  let { type } = mockInfo;
+  let { name = '', _fields = {} } = type;
+  let hasRelay = hasRelayPagination(name, _fields);
 
-  mockQueryInfo.setProperties({
-    hasRelay,
-    type: hasRelay ? getRelayPaginationType(type) : type
-  });
+  if (hasRelay) {
+    mockInfo.setProperties({
+      hasRelay,
+      type: getRelayPaginationType(type)
+    });
+  }
 
-  return mockQueryInfo;
+  return mockInfo;
 }
 
-export function maybeWrapForRelay(mockQueryInfo) {
-  let { hasRelay, records, type } = mockQueryInfo;
+export function maybeWrapForRelay(mockInfo) {
+  let { hasRelay, records, returnType } = mockInfo;
 
   if (hasRelay) {
     return {
@@ -68,11 +71,11 @@ export function maybeWrapForRelay(mockQueryInfo) {
     };
   }
 
-  return type instanceof GraphQLList ? records : records[0];
+  return returnType instanceof GraphQLList ? records : records[0];
 }
 
-const hasRelayPagination = ({ name, _fields }) =>
-  TYPE_NAME_REGEX.test(name) && 'edges' in _fields && 'pageInfo' in _fields;
+const hasRelayPagination = (name, fields) =>
+  TYPE_NAME_REGEX.test(name) && 'edges' in fields && 'pageInfo' in fields;
 
 const mapRelay = (record) => ({ cursor: record.id, node: record });
 

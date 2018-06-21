@@ -5,8 +5,8 @@ import { pluralize } from 'ember-cli-mirage/utils/inflector';
 const RELATED_PROP = 'type.ofType.astNode';
 
 export const getRelatedRecords = (db, { fieldsMap } = {}) =>
-  (mockQueryInfo) => {
-    let { records, mirageType, type } = mockQueryInfo;
+  (mockInfo) => {
+    let { records, mirageType, type } = mockInfo;
     let recordsWithRelatedData = [];
     let relatedFields = getRelatedFieldsForType(type, fieldsMap);
 
@@ -14,9 +14,9 @@ export const getRelatedRecords = (db, { fieldsMap } = {}) =>
       getRelatedData(db, recordsWithRelatedData, relatedFields, mirageType)
     );
 
-    mockQueryInfo.setRecords(recordsWithRelatedData);
+    mockInfo.setRecords(recordsWithRelatedData);
 
-    return mockQueryInfo;
+    return mockInfo;
   };
 
 const filterRelatedByRecord = (table, record, type) =>

@@ -1,18 +1,17 @@
-import MockQueryInfo from './query-info';
+import MockInfo from './info';
 import {
   filterRecordsByVars,
   maybeFilterRecordsByMappedField
 } from '../filter-records';
-import { getRecordsByType, getTableName } from '../db';
+import { getRecordsByType } from '../db';
 import { getRelatedRecords } from '../related-records';
+import { maybeUnwrapRelayType, maybeWrapForRelay } from '../relay-pagination';
 import { pipe } from '../utils';
-import { maybeWrapForRelay, maybeUnwrapRelayType } from '../relay-pagination';
 
 const mockQueryFn = (db, options) =>
   (_, vars, __, { fieldName, returnType }) => {
     const mockFn = pipe(
       maybeUnwrapRelayType,
-      getTableName,
       getRecordsByType(db),
       filterRecordsByVars(vars, options),
       getRelatedRecords(db, options),
@@ -20,9 +19,9 @@ const mockQueryFn = (db, options) =>
       maybeWrapForRelay
     );
 
-    let mockQueryInfo = MockQueryInfo.create({ type: returnType });
+    let mockInfo = MockInfo.create({ returnType });
 
-    let result = mockFn(mockQueryInfo);
+    let result = mockFn(mockInfo);
 
     return result;
   };
