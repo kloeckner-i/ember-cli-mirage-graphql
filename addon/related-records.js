@@ -42,7 +42,7 @@ const getRelatedRecordsForField = (db, record, recordCopy, mirageType) =>
       ? record[mappedFieldName]
       : lookUpRelatedRecords(db, mappedFieldName, isList, record, mirageType);
 
-const mapRelatedField = (field, map) => field in map ? map[field] : field;
+const mapRelatedField = (field, map = {}) => field in map ? map[field] : field;
 
 const mapRelatedFields = (fieldsMap) => ({ name: relatedField, type }) => ({
   fieldName: relatedField,

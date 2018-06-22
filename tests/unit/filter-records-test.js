@@ -4,22 +4,16 @@ import { filterRecordsByVars, maybeFilterRecordsByMappedField } from
 import { module, test } from 'qunit';
 
 module('Unit | filter records', function() {
-  let records = [{
-    name: 'foo',
-    type: 'a'
-  }, {
-    name: 'bar',
-    type: 'a'
-  }, {
-    name: 'baz',
-    type: 'b'
-  }];
+  let records = [
+    { name: 'foo', type: 'a' },
+    { name: 'bar', type: 'a' },
+    { name: 'baz', type: 'b' }
+  ];
+  let mockInfo = MockInfo.create({ records, returnType: { name: 'Foo' } });
 
   test('it returns all records when no vars', function(assert) {
     let vars = {};
     let filterFn = filterRecordsByVars(vars);
-    let returnType = { name: 'Foo' };
-    let mockInfo = MockInfo.create({ records, returnType });
 
     assert.equal(filterFn(mockInfo).records, records);
   });
@@ -27,8 +21,6 @@ module('Unit | filter records', function() {
   test('it can filter records by vars', function(assert) {
     let vars = { type: 'a' };
     let filterFn = filterRecordsByVars(vars);
-    let returnType = { name: 'Foo' };
-    let mockInfo = MockInfo.create({ records, returnType });
     let expectedRecords = records.filter((r) => r.type === 'a');
 
     assert.deepEqual(filterFn(mockInfo).records, expectedRecords);
@@ -38,8 +30,6 @@ module('Unit | filter records', function() {
     let vars = { kind: 'a' };
     let options = { varsMap: { Foo: { kind: 'type' } } };
     let filterFn = filterRecordsByVars(vars, options);
-    let returnType = { name: 'Foo' };
-    let mockInfo = MockInfo.create({ records, returnType });
     let expectedRecords = records.filter((r) => r.type === 'a');
 
     assert.deepEqual(filterFn(mockInfo).records, expectedRecords);
@@ -53,8 +43,6 @@ module('Unit | filter records', function() {
       }
     };
     let filterFn = maybeFilterRecordsByMappedField(fieldName, options);
-    let returnType = { name: 'Foo' };
-    let mockInfo = MockInfo.create({ records, returnType });
 
     assert.deepEqual(filterFn(mockInfo).records, [records[0]]);
   });
