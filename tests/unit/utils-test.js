@@ -1,5 +1,7 @@
+import MockInfo from 'ember-cli-mirage-graphql/mock/info';
+import { GraphQLList, GraphQLObjectType } from 'graphql';
 import { module, test } from 'qunit';
-import { contextSet, isFunction, pipe } from
+import { contextSet, isFunction, maybeUnwrapSingleRecord, pipe } from
   'ember-cli-mirage-graphql/utils';
 
 module('Unit | utils', function() {
@@ -19,6 +21,23 @@ module('Unit | utils', function() {
     assert.notOk(isFunction(obj.foo), 'undefined is not a function');
 
     assert.ok(isFunction(() => {}), 'A function is a function');
+  });
+
+  test('it can unwrap a single record, if the return type is not a list', function(assert) {
+    let records = [{ id: 1, foo: 'bar' }];
+    let returnType = { name: 'Foo' };
+    let mockInfo = MockInfo.create({ records, returnType });
+
+    assert.equal(maybeUnwrapSingleRecord(mockInfo), records[0]);
+  });
+
+  test('it will not unwrap a single record, if the return type is a list', function(assert) {
+    let records = [{ id: 1, foo: 'bar' }];
+    let type = new GraphQLObjectType({ name: 'Foo' });
+    let returnType = new GraphQLList(type);
+    let mockInfo = MockInfo.create({ records, returnType });
+
+    assert.equal(maybeUnwrapSingleRecord(mockInfo), records);
   });
 
   test('pipe returns a function that pipes an argument through n functions', function(assert) {

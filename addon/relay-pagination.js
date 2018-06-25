@@ -1,11 +1,7 @@
 import { get } from '@ember/object';
-import { GraphQLList } from 'graphql';
 
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
 const TYPE_NAME_REGEX = /.+Connection$/;
-
-export const getRelayPaginationType = (type) =>
-  get(type, '_fields.edges.type.ofType._fields.node.type');
 
 export function abstractRelayVars(vars) {
   let otherVars = {};
@@ -28,7 +24,7 @@ export function filterByRelayVars(records, relayVars) {
   }
 
   if (before != null) {
-    records = records.slice(0, parseInt(before) - 1);
+    records = records.slice(0, parseInt(before) + 1);
   }
 
   if (first != null) {
@@ -58,21 +54,30 @@ export function maybeUnwrapRelayType(mockInfo) {
 }
 
 export function maybeWrapForRelay(mockInfo) {
-  let { hasRelay, records, returnType } = mockInfo;
+  let { hasRelay, records } = mockInfo;
 
   if (hasRelay) {
-    return {
+    mockInfo.setRecords([{
       edges: records.map(mapRelay),
+      // TODO: Actually compute these values
       pageInfo: {
         hasPreviousPage: false,
         hasNextPage: false
       },
+      /*
+        TODO:
+          This is a custom thing and should be made testable by mapping fields
+          for the connection type
+       */
       totalCount: records.length
-    };
+    }]);
   }
 
-  return returnType instanceof GraphQLList ? records : records[0];
+  return mockInfo;
 }
+
+const getRelayPaginationType = (type) =>
+  get(type, '_fields.edges.type.ofType._fields.node.type');
 
 const hasRelayPagination = (name, fields) =>
   TYPE_NAME_REGEX.test(name) && 'edges' in fields && 'pageInfo' in fields;
