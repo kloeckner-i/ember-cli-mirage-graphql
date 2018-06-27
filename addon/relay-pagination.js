@@ -1,3 +1,4 @@
+import { camelize } from 'ember-cli-mirage/utils/inflector';
 import { get } from '@ember/object';
 
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
@@ -44,10 +45,14 @@ export function maybeUnwrapRelayType(mockInfo) {
   let hasRelay = hasRelayPagination(name, _fields);
 
   if (hasRelay) {
+    let unwrappedType = getRelayPaginationType(type);
+
     mockInfo.setProperties({
       hasRelay,
-      type: getRelayPaginationType(type)
+      type: unwrappedType
     });
+
+    mockInfo.setMirageType(camelize(unwrappedType.name));
   }
 
   return mockInfo;

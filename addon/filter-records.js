@@ -36,8 +36,8 @@ export const maybeFilterRecordsByMappedField = (fieldName, options = {}) =>
     return mockInfo;
   };
 
-const filterBy = (records, key, value) => records.filter((record) =>
-  get(record, key) === value);
+const filterBy = (records, key, value) =>
+  records.filter((record) => get(record, key) === value);
 
 const mapVariables = (vars, varsMap) =>
   (key) => [key in varsMap ? varsMap[key] : key, key, vars[key]];
