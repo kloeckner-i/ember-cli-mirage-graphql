@@ -1,8 +1,5 @@
-import { GraphQLList } from 'graphql';
-import { get } from '@ember/object';
+import { GraphQLList, GraphQLObjectType } from 'graphql';
 import { pluralize } from 'ember-cli-mirage/utils/inflector';
-
-const RELATED_PROP = 'type.ofType.astNode';
 
 export const getRelatedRecords = (db, { fieldsMap } = {}) =>
   (mockInfo) => {
@@ -47,13 +44,17 @@ const mapRelatedField = (field, map = {}) => field in map ? map[field] : field;
 const mapRelatedFields = (fieldsMap) => ({ name: relatedField, type }) => ({
   fieldName: relatedField,
   mappedFieldName: mapRelatedField(relatedField, fieldsMap),
-  isList: type instanceof GraphQLList
+  isList: type instanceof GraphQLList,
+  type
 });
 
 const reduceFieldsToRelatedFields = (fields) => (relatedFields, fieldName) => {
   let field = fields[fieldName];
+  let { type } = field;
 
-  return get(field, RELATED_PROP) ? [...relatedFields, field] : relatedFields;
+  return type instanceof GraphQLList || type instanceof GraphQLObjectType
+    ? [...relatedFields, field]
+    : relatedFields;
 };
 
 function getRelatedFieldsForType(type, fieldsMap = {}) {
@@ -64,6 +65,7 @@ function getRelatedFieldsForType(type, fieldsMap = {}) {
 }
 
 function lookUpRelatedRecords(db, fieldName, isList, record, type) {
+  // NOTE: This assumption is wrong. Some non-list types have pluralized names.
   let relatedTable = isList ? fieldName : pluralize(fieldName);
   let relatedRecords = filterRelatedByRecord(db[relatedTable], record, type);
 

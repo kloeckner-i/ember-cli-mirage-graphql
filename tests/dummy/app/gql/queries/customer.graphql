@@ -1,0 +1,34 @@
+query($id: ID!, $after: String, $before: String, $first: Int, $last: Int) {
+  customer: node(id: $id) {
+    id
+    ... on Customer {
+      name
+      orders(after: $after, before: $before, first: $first, last: $last) {
+        categories {
+          name
+        }
+        edges {
+          cursor
+          node {
+            lineItems(first: 5) {
+              edges {
+                node {
+                  name
+                  quantity
+                }
+              }
+            }
+            number
+            total
+          }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+      }
+    }
+  }
+}

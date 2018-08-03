@@ -16,5 +16,6 @@ export function createMocksForSchema(schema, db, options) {
   addRootMock(mocks, schema._queryType, mockQueryFn, db, options);
   addRootMock(mocks, schema._mutationType, mockMutationFn, db, options);
 
-  return mocks;
-}
+const mockRootType = (rootTypes = {}, mockFn, db, schema, options) =>
+  Object.keys(rootTypes).reduce((mocks, rootType) =>
+    contextSet(mocks, rootType, mockFn(db, schema, options)), {});

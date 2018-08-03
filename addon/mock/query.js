@@ -1,30 +1,17 @@
-import MockInfo from './info';
-import {
-  filterRecordsByVars,
-  maybeFilterRecordsByMappedField
-} from '../filter-records';
+import { determineType } from '../type';
 import { getRecordsByType } from '../db';
-import { getRelatedRecords } from '../related-records';
-import { maybeUnwrapRelayType, maybeWrapForRelay } from '../relay-pagination';
-import { maybeUnwrapSingleRecord, pipe } from '../utils';
+import { filterRecords } from '../filter-records';
+import { pipe } from '../utils';
 
 const mockQueryFn = (db, options) =>
-  (_, vars, __, { fieldName, returnType }) => {
-    const mockFn = pipe(
-      maybeUnwrapRelayType,
+  (_, vars, __, { fieldNodes, returnType, schema }) => {
+    const getRecords = pipe(
+      determineType(schema._typeMap),
       getRecordsByType(db),
-      filterRecordsByVars(vars, options),
-      getRelatedRecords(db, options),
-      maybeFilterRecordsByMappedField(fieldName, options),
-      maybeWrapForRelay,
-      maybeUnwrapSingleRecord
+      filterRecords(db, vars, options)
     );
 
-    let mockInfo = MockInfo.create({ returnType });
-
-    let result = mockFn(mockInfo);
-
-    return result;
+    return getRecords(fieldNodes[0], returnType, getRecords);
   };
 
 export default mockQueryFn;

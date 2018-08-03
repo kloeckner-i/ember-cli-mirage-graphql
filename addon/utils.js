@@ -1,6 +1,25 @@
+import MockInfo from './mock/info';
 import { GraphQLList } from 'graphql';
+import { get } from '@ember/object';
 
 export const isFunction = (obj) => obj != null && typeof obj === 'function';
+
+export const maybeUnwrapInterfaceType = (fieldNodes = [], { _typeMap }) =>
+  (mockInfo) => {
+    let [node] = fieldNodes;
+
+    if (node) {
+      let { selections = [] } = node.selectionSet;
+      let selection = selections.find((s) => s.typeCondition) || {};
+      let typeName = get(selection, 'typeCondition.name.value');
+
+      if (typeName) {
+        return MockInfo.create({ returnType: _typeMap[typeName] });
+      }
+    }
+
+    return mockInfo;
+  };
 
 export const maybeUnwrapSingleRecord = ({ records, returnType }) =>
   returnType instanceof GraphQLList ? records : records[0];

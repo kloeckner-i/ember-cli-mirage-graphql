@@ -3,7 +3,12 @@ import { createMocksForSchema } from './mock/create';
 import { graphql } from 'graphql';
 
 const createGraphQLHandler = (rawSchema, options) => ({ db }, request) => {
-  let schema = makeExecutableSchema({ typeDefs: rawSchema });
+  let schema = makeExecutableSchema({
+    resolverValidationOptions: {
+      requireResolversForResolveType: false
+    },
+    typeDefs: rawSchema
+  });
   let { query, variables } = JSON.parse(request.requestBody);
 
   addMockFunctionsToSchema({

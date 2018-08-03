@@ -7,6 +7,7 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
+  this.route('customer', { path: '/customer/:customer_id' });
   this.route('people', function() {
     this.route('same-age-as-dog-years');
   });
