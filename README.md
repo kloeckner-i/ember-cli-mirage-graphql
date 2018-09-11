@@ -35,7 +35,7 @@ If you're like us, you'll want to create your handler aside from your Mirage con
 // /mirage/handlers/graphql.js or wherever you like
 
 import createGraphQLHandler from 'ember-cli-mirage-graphql/handler';
-import schmea from 'app-name/path-to-your-schema';
+import schema from 'app-name/path-to-your-schema';
 
 export default createGraphQLHandler(schema, /* options = {} */);
 ```
