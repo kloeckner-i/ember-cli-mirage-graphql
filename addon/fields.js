@@ -1,4 +1,6 @@
 import { camelize } from 'ember-cli-mirage/utils/inflector';
+import { get } from '@ember/object';
+import { isFunction } from './utils';
 
 const flattenSelection = (selections, type, fieldsMap = {}, options) =>
   (selection) => {
@@ -18,6 +20,9 @@ const flattenSelection = (selections, type, fieldsMap = {}, options) =>
       );
     }
   };
+
+const getFieldName = ({ alias = {}, name = {}}) =>
+  get(alias, 'value') || get(name, 'value');
 
 const getTypeForField = (field, { _fields }) => _fields[field].type;
 
@@ -39,6 +44,28 @@ export const mapFields = (fields, type, getRecords) => (record) => {
 
   return recordCopy;
 };
+
+export const maybeMapFieldByFunction = ({ fieldsMap = {} } = {}) =>
+  ([fieldNode, typeInfo, records]) => {
+    let fieldName = getFieldName(fieldNode);
+
+    records = fieldName in fieldsMap && isFunction(fieldsMap[fieldName])
+      ? fieldsMap[fieldName](records)
+      : records;
+
+    return [typeInfo, records];
+  };
+
+export const resolveFields = (options) =>
+  ([fieldNode, typeInfo, records, getRecords]) => {
+    let selections = get(fieldNode, 'selectionSet.selections');
+    let { type } = typeInfo;
+    let flatSelections = flattenSelections(selections, type, options);
+
+    records = records.map(mapFields(flatSelections, type, getRecords));
+
+    return [fieldNode, typeInfo, records];
+  };
 
 export function flattenSelections(selections, type, options) {
   let { fieldsMap = {} } = options;

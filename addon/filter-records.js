@@ -1,7 +1,4 @@
-// import { abstractRelayVars, filterByRelayVars } from './relay-pagination';
 import Filter from './models/filter';
-import { GraphQLList } from 'graphql';
-import { flattenSelections, mapFields } from './fields';
 import { get } from '@ember/object';
 import { isFunction } from './utils';
 
@@ -43,9 +40,6 @@ function _filterRecords(records = [], filters) {
   return records;
 }
 
-const getFieldName = ({ alias = {}, name = {}}) =>
-  get(alias, 'value') || get(name, 'value');
-
 const createParentRecordFilter = (filters, parent) =>
   filters.push(Filter.create({
     fn: (records) => records.filter((record) => parent.type in record
@@ -54,27 +48,16 @@ const createParentRecordFilter = (filters, parent) =>
   }));
 
 export const filterRecords = (db, vars, options = {}) =>
-  ([fieldNode, { returnType, type }, records, getRecords, parent]) => {
-    let { fieldsMap = {} } = options;
-    let fieldName = getFieldName(fieldNode);
-
+  ([fieldNode, typeInfo, records, getRecords, parent]) => {
     let args = get(fieldNode, 'arguments');
-    let selections = get(fieldNode, 'selectionSet.selections');
-    let flatSelections = flattenSelections(selections, type, options);
+    let { type } = typeInfo;
     let filters = createFilters(args, vars, type, options);
 
     if (parent) {
       createParentRecordFilter(filters, parent);
     }
 
-    records = _filterRecords(records, filters)
-      .map(mapFields(flatSelections, type, getRecords));
-
-    let returnValue = returnType instanceof GraphQLList ? records : records[0];
-
-    return isFunction(fieldsMap[fieldName])
-      ? fieldsMap[fieldName](returnValue)
-      : returnValue;
+    return [fieldNode, typeInfo, _filterRecords(records, filters), getRecords];
 
     /*
       Maybe this should work like this:
