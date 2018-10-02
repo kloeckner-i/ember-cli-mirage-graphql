@@ -29,6 +29,10 @@ type LineItemEdge {
   node: LineItem
 }
 
+type Mutation {
+  updatePerson(id: ID!, personAttributes: PersonAttributes!): Person
+}
+
 interface Node {
   id: ID!
 }
@@ -86,11 +90,7 @@ input PersonAttributes {
   age: Int
 }
 
-type RootMutationType {
-  updatePerson(id: ID!, personAttributes: PersonAttributes!): Person
-}
-
-type RootQueryType {
+type Query {
   node(id: ID!): Node
 
   person(id: ID!): Person
