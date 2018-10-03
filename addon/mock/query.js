@@ -15,7 +15,7 @@ const mockQueryFn = (db, options) =>
       getRecordsByType(db),
       filterRecords(db, vars, options),
       resolveFields(options),
-      maybeMapFieldByFunction(options),
+      maybeMapFieldByFunction(db, options),
       determineReturnValue
     );
 

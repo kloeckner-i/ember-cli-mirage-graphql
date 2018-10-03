@@ -24,47 +24,60 @@ const flattenSelection = (selections, type, fieldsMap = {}, options) =>
 const getFieldName = ({ alias = {}, name = {}}) =>
   get(alias, 'value') || get(name, 'value');
 
+const getRecordInfo = (record, type, parent, meta) =>
+  ({ meta, name: camelize(type.name), parent, record, type });
+
 const getTypeForField = (field, { _fields }) => _fields[field].type;
 
-export const mapFields = (fields, type, getRecords) => (record) => {
-  let parent = { record, type: camelize(type.name) };
-  let recordCopy = {};
-
-  fields.forEach(({ field, mappedField, selection }) => {
-    let mappedFieldName = field !== mappedField ? mappedField : null;
-    let value = record[mappedField];
-
-    if (value || (selection && selection.selectionSet)) {
-      recordCopy[field] = value
-        ? value
-        : getRecords(selection, getTypeForField(field, type),
-            getRecords, parent, mappedFieldName);
-    }
-  });
-
-  return recordCopy;
-};
-
-export const maybeMapFieldByFunction = ({ fieldsMap = {} } = {}) =>
-  ([fieldNode, typeInfo, records]) => {
+export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
+  ([fieldNode, typeInfo, records, parent]) => {
+    let _fieldsMap = fieldsMap;
     let fieldName = getFieldName(fieldNode);
 
-    records = fieldName in fieldsMap && isFunction(fieldsMap[fieldName])
-      ? fieldsMap[fieldName](records)
+    if (parent) {
+      _fieldsMap = fieldsMap[parent.type.name];
+    }
+
+    records = fieldName in _fieldsMap && isFunction(_fieldsMap[fieldName])
+      ? _fieldsMap[fieldName](records, db, parent)
       : records;
 
     return [typeInfo, records];
   };
 
+export const resolveField = (fields, typeInfo, getRecords, parent) =>
+  (record) => {
+    let recordCopy = {};
+
+    fields.forEach(({ field, mappedField, selection }) => {
+      if (record[mappedField]) {
+        return recordCopy[field] = record[mappedField];
+      }
+
+      if (selection && selection.selectionSet) {
+        let mappedFieldName = field !== mappedField ? mappedField : null;
+        let { meta, type } = typeInfo;
+        let recordInfo = getRecordInfo(record, type, parent, meta);
+        let typeForField = getTypeForField(field, type);
+
+        recordCopy[field] = getRecords(selection, typeForField, getRecords,
+          recordInfo, mappedFieldName);
+      }
+    });
+
+    return recordCopy;
+  };
+
 export const resolveFields = (options) =>
-  ([fieldNode, typeInfo, records, getRecords]) => {
+  ([fieldNode, typeInfo, records, getRecords, parent]) => {
     let selections = get(fieldNode, 'selectionSet.selections');
     let { type } = typeInfo;
     let flatSelections = flattenSelections(selections, type, options);
 
-    records = records.map(mapFields(flatSelections, type, getRecords));
+    records = records.map(resolveField(flatSelections, typeInfo, getRecords,
+      parent));
 
-    return [fieldNode, typeInfo, records];
+    return [fieldNode, typeInfo, records, parent];
   };
 
 export function flattenSelections(selections, type, options) {

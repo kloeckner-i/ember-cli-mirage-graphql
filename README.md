@@ -63,7 +63,7 @@ You may pass in options when creating a request handler. The options take the fo
 ```javascript
 {
   /*
-    fieldsMap is used if you need to map a field defined in your
+    `fieldsMap` is used if you need to map a field defined in your
     GraphQL schema to a different field for a record in your Mirage
     database.
 
@@ -76,9 +76,14 @@ You may pass in options when creating a request handler. The options take the fo
     String values will be used to map field names from your query to
     match those in your Mirage database.
 
-    Function values will be used to filter records and will run after
+    Method values will be used to filter records and will run after
     any variable filtering and related data fetching. This allows for
     complex record filtering that can't be done with variables alone.
+    The methods receive 3 arguments:
+
+    1. The resolved records, if any.
+    2. Mirage's database.
+    3. Its parent record, if any.
    */
   fieldsMap: {
     Person: { // fields are mapped on a per-type basis
@@ -86,19 +91,19 @@ You may pass in options when creating a request handler. The options take the fo
     }
   },
   /*
-    mutations is an object used to mock mutation functionality you might expect
-    from the server. Each method maps directly to a named mutation from your
-    schema and accepts 3 arguments:
+    `mutations` is an object used to mock mutation functionality you
+    might expect from the server. Each method maps directly to a
+    named mutation from your schema and receives 3 arguments:
 
-    1. The table from Mirage's database that corresponds to the return type of
-    the mutation.
-    2. The mutation variables. These will be mapped per the varsMap option, by
-    the return type, if appropriate.
+    1. The table from Mirage's database that corresponds to the return
+    type of the mutation.
+    2. The mutation variables. These will be mapped per the varsMap
+    option, by the return type, if appropriate.
     3. Mirage's database.
 
-    For now, this is the only way to mock mutations with this addon; however, we
-    will try to implement some form of default mutation functionality, if
-    feasible.
+    For now, this is the only way to mock mutations with this addon;
+    however, we will try to implement some form of default mutation
+    functionality, if feasible.
    */
   mutations: {
     updatePerson: (people, vars, db) => {

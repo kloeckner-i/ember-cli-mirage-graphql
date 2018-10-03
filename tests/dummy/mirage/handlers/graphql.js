@@ -3,13 +3,22 @@ import schema from 'dummy/gql/schema';
 
 const OPTIONS = {
   fieldsMap: {
+    OrderConnection: {
+      categories(_, db, orderConnection) {
+        let customerId = orderConnection.parent.record.id;
+        let categories = db.orderCategories.filter(({ order }) =>
+          order.customer.id === customerId);
+
+        return categories;
+      }
+    },
+    Person: {
+      pets: 'animals'
+    },
     peopleSameAgeAsDogYears: (people) => people.filter((person) =>
       !!person.pets
         .filter(({ type }) => type === 'dog')
-        .filter((dog) => dog.age * 7 === person.age).length),
-    Person: {
-      pets: 'animals'
-    }
+        .filter((dog) => dog.age * 7 === person.age).length)
   },
   mutations: {
     updatePerson: (people, { id, personAttributes }) =>

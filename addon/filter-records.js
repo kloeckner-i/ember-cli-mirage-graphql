@@ -1,5 +1,6 @@
 import Filter from './models/filter';
 import { get } from '@ember/object';
+import { getIsRelayConnection, parseRelayConnection } from './relay-pagination';
 import { isFunction } from './utils';
 
 const createFilters = (args = [], vars = {}, type, { varsMap = {} }) =>
@@ -8,6 +9,9 @@ const createFilters = (args = [], vars = {}, type, { varsMap = {} }) =>
 
 const filterBy = (records, key, value) =>
   records.filter((record) => get(record, key) === value);
+
+const filterByParentRecord = (parent) => (record) =>
+  parent.name in record && record[parent.name].id === parent.record.id;
 
 const mapArgToFilter = (vars, varsMapForType = {}) => ({ name, value }) => {
   let key = name.value;
@@ -26,86 +30,48 @@ const mapArgToFilter = (vars, varsMapForType = {}) => ({ name, value }) => {
   return filter;
 };
 
-function _filterRecords(records = [], filters) {
+function applyFilters(records = [], filters) {
   if (!records.length) return [{}];
 
-  filters.forEach(({ fn, hasFnValue, key, mappedKey, value }) => {
-    if (hasFnValue || value != null) {
-      records = hasFnValue
-        ? fn(records, key, value)
-        : filterBy(records, mappedKey, value);
+  filters.forEach((filter) => {
+    if (filter.hasFnValue || filter.value != null) {
+      records = filter.hasFnValue
+        ? filter.fn(records, filter.key, filter.value)
+        : filterBy(records, filter.mappedKey, filter.value);
     }
   });
 
   return records;
 }
 
-const createParentRecordFilter = (filters, parent) =>
-  filters.push(Filter.create({
-    fn: (records) => records.filter((record) => parent.type in record
-      && record[parent.type].id === parent.record.id),
-    hasFnValue: true
-  }));
+function createParentRecordFilter(filters, parent) {
+  let filter = Filter.create({
+    hasFnValue: true,
+    fn: (records) => records.filter(filterByParentRecord(parent))
+  });
+
+  filters.push(filter);
+}
 
 export const filterRecords = (db, vars, options = {}) =>
   ([fieldNode, typeInfo, records, getRecords, parent]) => {
     let args = get(fieldNode, 'arguments');
     let { type } = typeInfo;
+    let isRelayConnection = getIsRelayConnection(type, fieldNode);
+
+    if (isRelayConnection) {
+      ({ args } = parseRelayConnection(typeInfo, args));
+    }
+
     let filters = createFilters(args, vars, type, options);
 
     if (parent) {
       createParentRecordFilter(filters, parent);
     }
 
-    return [fieldNode, typeInfo, _filterRecords(records, filters), getRecords];
+    records = applyFilters(records, filters);
 
-    /*
-      Maybe this should work like this:
-
-      Try to fetch records from Mirage
-      If records
-        Filter records
-        Map records, reducing fields to those in selection set
-      End
-      // Regardless of number of records
-      For each record
-        For each object or list type in selections
-          Get records for field in record
-        End
-      End
-
-      NOTE: This is where we should probably load records. This is because we
-      want to determine if we have Relay Pagination here. If we do, we need to
-      resolve the record type differently and wrap things up when we're done.
-
-      Question: What do we do when there are no records for a type but there
-      are for its fields? I.E., a connection type that has some arbitrary
-      relationship field?
-
-      Example:
-
-      ProductConnection: {
-        edges: [{ node: {} }],
-        pageInfo: {},
-        categories: []
-      }
-
-      Basically, we want to resolve data for fields, recursively, whether that
-      field be scalar or related. To do this, we can start by looking for a
-      Mirage table. If one exists, that will fill out the scalar fields and we
-      can filter out any we don't want, later.
-
-      If no Mirage table exists, we might assume all fields are either a
-      relationship or a Relay Pagination field like edges, pageInfo, cursor or
-      node.
-
-      Since Relay Pagination implies a list, we can probably build the list
-      of nodes without iterating over the field nodes for edges and pageInfo.
-
-      NOTE: Maybe we can build up records for relay fields and then supply them
-      in place of Mirage records? This might allow us to maintain the current
-      flow where we map requested fields from records into record copies.
-     */
+    return [fieldNode, typeInfo, records, getRecords, parent];
   };
 
 // export const filterRecordsByVars = (vars, { varsMap = {} } = {}) =>

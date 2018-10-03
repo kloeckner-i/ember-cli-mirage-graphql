@@ -1,8 +1,44 @@
 import { camelize } from 'ember-cli-mirage/utils/inflector';
 import { get } from '@ember/object';
 
+const CONNECTION_FIELDS = ['edges', 'pageInfo'];
+const CONNECTION_TYPE_REGEX = /.+Connection$/;
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
-const TYPE_NAME_REGEX = /.+Connection$/;
+
+const getRelayPaginationType = (type) =>
+  get(type, '_fields.edges.type.ofType._fields.node.type');
+
+const hasRelayPagination = (name, fields) =>
+  CONNECTION_TYPE_REGEX.test(name) && 'edges' in fields && 'pageInfo' in fields;
+
+const mapRelay = (record) => ({ cursor: record.id, node: record });
+
+function getFirstOrLast(records, fn, direction, directionName) {
+  if (direction < 0) {
+    throw `Value of \`${directionName}\` cannot be less than 0`;
+  }
+
+  return fn(records);
+}
+
+function spliceRelayArgs(args) {
+  let relayArgs = [];
+
+  args = args.reduce((args, arg) => {
+    RELAY_VAR_NAMES.includes(arg.name.value)
+      ? relayArgs.push(arg)
+      : args.push(arg);
+
+    return args;
+  }, []);
+
+  return { args, relayArgs };
+}
+
+export const getIsRelayConnection = (type, fieldNode) =>
+  CONNECTION_TYPE_REGEX.test(type.name)
+    && fieldNode.selectionSet.selections.filter(({ name }) =>
+      CONNECTION_FIELDS.includes(name.value)).length === 2;
 
 export function abstractRelayVars(vars) {
   let otherVars = {};
@@ -81,18 +117,11 @@ export function maybeWrapForRelay(mockInfo) {
   return mockInfo;
 }
 
-const getRelayPaginationType = (type) =>
-  get(type, '_fields.edges.type.ofType._fields.node.type');
+export function parseRelayConnection(typeInfo, args) {
+  let splicedArgs = spliceRelayArgs(args);
 
-const hasRelayPagination = (name, fields) =>
-  TYPE_NAME_REGEX.test(name) && 'edges' in fields && 'pageInfo' in fields;
+  typeInfo.meta = typeInfo.meta || {};
+  typeInfo.meta.relayConnection = { args: splicedArgs.relayArgs };
 
-const mapRelay = (record) => ({ cursor: record.id, node: record });
-
-function getFirstOrLast(records, fn, direction, directionName) {
-  if (direction < 0) {
-    throw `Value of \`${directionName}\` cannot be less than 0`;
-  }
-
-  return fn(records);
+  return splicedArgs.args;
 }
