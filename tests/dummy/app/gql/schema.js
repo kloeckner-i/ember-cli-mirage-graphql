@@ -1,9 +1,4 @@
 export default `
-schema {
-  mutation: RootMutationType
-  query: RootQueryType
-}
-
 type Address {
   id: String!
   line1: String!
@@ -11,6 +6,10 @@ type Address {
   city: String!
   state: String!
   zip: String!
+}
+
+type Mutation {
+  updatePerson(id: ID!, personAttributes: PersonAttributes!): Person
 }
 
 type Pet {
@@ -36,11 +35,7 @@ input PersonAttributes {
   age: Int
 }
 
-type RootMutationType {
-  updatePerson(id: ID!, personAttributes: PersonAttributes!): Person
-}
-
-type RootQueryType {
+type Query {
   person(id: ID!): Person
 
   people(lastName: String, pageSize: Int): [Person]
