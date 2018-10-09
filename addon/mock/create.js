@@ -1,18 +1,20 @@
 import mockMutationFn from './mutation';
 import mockQueryFn from './query';
-import { contextSet } from '../utils';
+import { contextSet, reduceKeys } from '../utils';
+
+const addRootMock = (mocks, rootType, mockFn, db, options) =>
+  contextSet(mocks, rootType.name, () =>
+    mockRootType(rootType._fields, mockFn, db, options));
+
+const mockRootType = (fields = {}, mockFn, db, options) =>
+  reduceKeys(fields, (mocks, field) =>
+    contextSet(mocks, field, mockFn(db, options)), {});
 
 export function createMocksForSchema(schema, db, options) {
-  let { _mutationType, _queryType } = schema;
+  let mocks = {};
 
-  return {
-    RootMutationType: () =>
-      mockRootType(_mutationType._fields, mockMutationFn, db, options),
-    RootQueryType: () =>
-      mockRootType(_queryType._fields, mockQueryFn, db, options)
-  };
+  addRootMock(mocks, schema._queryType, mockQueryFn, db, options);
+  addRootMock(mocks, schema._mutationType, mockMutationFn, db, options);
+
+  return mocks;
 }
-
-const mockRootType = (rootTypes = {}, mockFn, db, options) =>
-  Object.keys(rootTypes).reduce((mocks, rootType) =>
-    contextSet(mocks, rootType, mockFn(db, options)), {});
