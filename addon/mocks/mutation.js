@@ -9,7 +9,6 @@ const mockMutationFn = (db, options = {}) => (root, vars, _, meta) => {
   let { mutations = {}, varsMap = {} } = options;
   let mappedVars = mapVars(vars, varsMap[typeName]);
 
-  // TODO: implement some default mutation functionality, if reasonable
   if (isFunction(mutations[fieldName])) {
     records = mutations[fieldName](records, mappedVars, db);
   }

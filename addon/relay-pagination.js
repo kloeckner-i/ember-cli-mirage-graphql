@@ -1,17 +1,8 @@
-import { camelize } from 'ember-cli-mirage/utils/inflector';
 import { get } from '@ember/object';
 
 const CONNECTION_FIELDS = ['edges', 'pageInfo'];
 const CONNECTION_TYPE_REGEX = /.+Connection$/;
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
-
-const getRelayPaginationType = (type) =>
-  get(type, '_fields.edges.type.ofType._fields.node.type');
-
-const hasRelayPagination = (name, fields) =>
-  CONNECTION_TYPE_REGEX.test(name) && 'edges' in fields && 'pageInfo' in fields;
-
-const mapRelay = (record) => ({ cursor: record.id, node: record });
 
 function getFirstOrLast(records, fn, direction, directionName) {
   if (direction < 0) {
@@ -21,47 +12,27 @@ function getFirstOrLast(records, fn, direction, directionName) {
   return fn(records);
 }
 
-function spliceRelayArgs(args) {
-  let relayArgs = [];
+function spliceRelayFilters(filters) {
+  let relayFilters = [];
 
-  args = args.reduce((args, arg) => {
-    RELAY_VAR_NAMES.includes(arg.name.value)
-      ? relayArgs.push(arg)
-      : args.push(arg);
+  filters = filters.reduce((filters, filter) => {
+    RELAY_VAR_NAMES.includes(filter.mappedKey)
+      ? relayFilters.push(filter)
+      : filters.push(filter);
 
-    return args;
+    return filters;
   }, []);
 
-  return { args, relayArgs };
+  return { filters, relayFilters };
 }
 
-export const getIsRelayConnection = (type, fieldNode) =>
-  CONNECTION_TYPE_REGEX.test(type.name)
-    && fieldNode.selectionSet.selections.filter(({ name }) =>
-      CONNECTION_FIELDS.includes(name.value)).length === 2;
-
-export function abstractRelayVars(vars) {
-  let otherVars = {};
-  let relayVars = {};
-
-  Object.keys(vars).forEach((key) => {
-    let newVars = RELAY_VAR_NAMES.includes(key) ? relayVars : otherVars;
-
-    newVars[key] = vars[key];
-  });
-
-  return { relayVars, vars: otherVars };
-}
-
-export function filterByRelayVars(records, relayVars) {
-  let { before, after, first, last } = relayVars;
-
+function applyRelayFilters(records, { after, before, first, last }) {
   if (after != null) {
-    records = records.slice(parseInt(after));
+    records = records.slice(after);
   }
 
   if (before != null) {
-    records = records.slice(0, parseInt(before) + 1);
+    records = records.slice(0, before + 1);
   }
 
   if (first != null) {
@@ -75,53 +46,65 @@ export function filterByRelayVars(records, relayVars) {
   return records;
 }
 
-export function maybeUnwrapRelayType(mockInfo) {
-  let { type } = mockInfo;
-  let { name = '', _fields = {} } = type;
-  let hasRelay = hasRelayPagination(name, _fields);
+function reduceRelayFilters(filters,  { key, value = {} }) {
+  let { value: val } = value;
 
-  if (hasRelay) {
-    let unwrappedType = getRelayPaginationType(type);
-
-    mockInfo.setProperties({
-      hasRelay,
-      type: unwrappedType
-    });
-
-    mockInfo.setMirageType(camelize(unwrappedType.name));
+  if (val) {
+    filters[key] = parseInt(val);
   }
 
-  return mockInfo;
+  return filters;
 }
 
-export function maybeWrapForRelay(mockInfo) {
-  let { hasRelay, records } = mockInfo;
+const mapRecordToEdge = (typeName) => (record) => ({
+  cursor: btoa(`${typeName}:${record.id}`),
+  node: record
+});
 
-  if (hasRelay) {
-    mockInfo.setRecords([{
-      edges: records.map(mapRelay),
-      // TODO: Actually compute these values
-      pageInfo: {
-        hasPreviousPage: false,
-        hasNextPage: false
-      },
-      /*
-        TODO:
-          This is a custom thing and should be made testable by mapping fields
-          for the connection type
-       */
-      totalCount: records.length
-    }]);
-  }
+function createPageInfo(records, firstRecordId, lastRecordId, typeName) {
+  let hasPreviousPage = records[0].id !== firstRecordId;
+  let hasNextPage = records[records.length - 1].id !== lastRecordId;
+  let afterCursor = hasPreviousPage
+    ? btoa(`${typeName}:${parseInt(records[0].id) - 1}`)
+    : null;
+  let beforeCursor = hasNextPage
+    ? btoa(`${typeName}:${parseInt(records[records.length - 1].id) + 1}`)
+    : null;
 
-  return mockInfo;
+  return { afterCursor, beforeCursor, hasNextPage, hasPreviousPage };
 }
 
-export function parseRelayConnection(typeInfo, args) {
-  let splicedArgs = spliceRelayArgs(args);
+export const getIsRelayConnection = (type, fieldNode) =>
+  CONNECTION_TYPE_REGEX.test(type.name)
+    && fieldNode.selectionSet.selections.filter(({ name }) =>
+      CONNECTION_FIELDS.includes(name.value)).length === 2;
+
+export const getIsRelayNode = (fieldName, parent) => fieldName === 'node'
+  && parent.fieldName === 'edges' && parent
+  && !!get(parent, 'parent.meta.relayConnection');
+
+export function handleRelayConnection(typeInfo, filters) {
+  let splicedFilters = spliceRelayFilters(filters);
 
   typeInfo.meta = typeInfo.meta || {};
-  typeInfo.meta.relayConnection = { args: splicedArgs.relayArgs };
+  typeInfo.meta.relayConnection = { filters: splicedFilters.relayFilters };
 
-  return splicedArgs.args;
+  return splicedFilters.filters;
+}
+
+export function handleRelayNode(records, parent, typeName) {
+  let connection = {};
+  let rawFilters = get(parent, 'parent.meta.relayConnection.filters');
+  let filters = rawFilters.reduce(reduceRelayFilters, {});
+  let firstRecordId = records[0].id;
+  let lastRecordId = records[records.length - 1].id;
+
+  records = applyRelayFilters(records, filters);
+
+  connection.edges = records.map(mapRecordToEdge(typeName));
+  connection.pageInfo = createPageInfo(records, firstRecordId, lastRecordId,
+    typeName);
+
+  parent.record = connection.edges;
+  parent.parent.record = connection;
 }

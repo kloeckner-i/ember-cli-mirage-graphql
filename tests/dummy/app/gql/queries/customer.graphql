@@ -17,6 +17,10 @@ query($id: ID!, $after: String, $before: String, $first: Int, $last: Int) {
                   quantity
                 }
               }
+              pageInfo {
+                hasNextPage
+                startCursor
+              }
             }
             number
             total

@@ -1,11 +1,18 @@
 import Filter from './models/filter';
 import { get } from '@ember/object';
-import { getIsRelayConnection, parseRelayConnection } from './relay-pagination';
+import { getFieldName } from './fields/field-utils';
+import {
+  getIsRelayConnection,
+  getIsRelayNode,
+  handleRelayConnection,
+  handleRelayNode
+} from './relay-pagination';
 import { isFunction } from './utils';
 
+const sortFilters = ({ hasFnValue }) => hasFnValue ? 1 : -1;
+
 const createFilters = (args = [], vars = {}, type, { varsMap = {} }) =>
-  args.map(mapArgToFilter(vars, varsMap[type.name])).sort(({ value }) =>
-    isFunction(value) ? 1 : -1);
+  args.map(mapArgToFilter(vars, varsMap[type.name])).sort(sortFilters);
 
 const filterBy = (records, key, value) =>
   records.filter((record) => get(record, key) === value);
@@ -30,21 +37,11 @@ const mapArgToFilter = (vars, varsMapForType = {}) => ({ name, value }) => {
   return filter;
 };
 
-function applyFilters(records = [], filters) {
-  if (!records.length) return [{}];
+function createParentRecordFilter(filters, parent, isRelayNode) {
+  let descendant = get(parent, 'parent.parent');
 
-  filters.forEach((filter) => {
-    if (filter.hasFnValue || filter.value != null) {
-      records = filter.hasFnValue
-        ? filter.fn(records, filter.key, filter.value)
-        : filterBy(records, filter.mappedKey, filter.value);
-    }
-  });
+  parent = isRelayNode && descendant ? descendant : parent;
 
-  return records;
-}
-
-function createParentRecordFilter(filters, parent) {
   let filter = Filter.create({
     hasFnValue: true,
     fn: (records) => records.filter(filterByParentRecord(parent))
@@ -53,45 +50,45 @@ function createParentRecordFilter(filters, parent) {
   filters.push(filter);
 }
 
+function filterReducer(records, filter) {
+  let { fn, hasFnValue, key, mappedKey, value } = filter;
+
+  if (hasFnValue || value != null) {
+    return hasFnValue
+      ? fn(records, key, value)
+      : filterBy(records, mappedKey, value);
+  }
+
+  return records;
+}
+
+export function applyFilters(records = [], filters, reducerFn) {
+  if (!records.length) return [{}];
+
+  return filters.reduce(reducerFn, records);
+}
+
 export const filterRecords = (db, vars, options = {}) =>
   ([fieldNode, typeInfo, records, getRecords, parent]) => {
-    let args = get(fieldNode, 'arguments');
     let { type } = typeInfo;
+    let args = get(fieldNode, 'arguments');
+    let filters = createFilters(args, vars, type, options);
     let isRelayConnection = getIsRelayConnection(type, fieldNode);
+    let isRelayNode = getIsRelayNode(getFieldName(fieldNode), parent);
 
     if (isRelayConnection) {
-      ({ args } = parseRelayConnection(typeInfo, args));
+      ({ filters = [] } = handleRelayConnection(typeInfo, filters));
     }
-
-    let filters = createFilters(args, vars, type, options);
 
     if (parent) {
-      createParentRecordFilter(filters, parent);
+      createParentRecordFilter(filters, parent, isRelayNode);
     }
 
-    records = applyFilters(records, filters);
+    records = applyFilters(records, filters, filterReducer);
+
+    if (isRelayNode) {
+      handleRelayNode(records, parent, type.name);
+    }
 
     return [fieldNode, typeInfo, records, getRecords, parent];
   };
-
-// export const filterRecordsByVars = (vars, { varsMap = {} } = {}) =>
-//   (mockInfo) => {
-//     let { hasRelay, records, type } = mockInfo;
-//     let relayVars;
-//
-//     if (hasRelay) {
-//       ({ relayVars, vars } = abstractRelayVars(vars));
-//     }
-//
-//     // NOTE: To do this with the vars map we need the notion of the concrete
-//     // type here
-//     records = filterRecords(records, vars, varsMap[type.name]);
-//
-//     if (hasRelay) {
-//       records = filterByRelayVars(records, relayVars);
-//     }
-//
-//     mockInfo.setRecords(records);
-//
-//     return mockInfo;
-//   };

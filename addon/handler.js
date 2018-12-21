@@ -1,5 +1,5 @@
 import { addMockFunctionsToSchema, makeExecutableSchema } from 'graphql-tools';
-import { createMocksForSchema } from './mock/create';
+import { createMocksForSchema } from './mocks/create';
 import { graphql } from 'graphql';
 
 const createGraphQLHandler = (rawSchema, options) => ({ db }, request) => {

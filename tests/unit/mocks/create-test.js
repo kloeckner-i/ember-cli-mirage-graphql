@@ -1,7 +1,7 @@
-import { createMocksForSchema } from 'ember-cli-mirage-graphql/mock/create';
+import { createMocksForSchema } from 'ember-cli-mirage-graphql/mocks/create';
 import { module, test } from 'qunit';
 
-module('Unit | Mock | create', function() {
+module('Unit | Mocks | create', function() {
   test('it creates mocking functions for root schema types', function(assert) {
     let schema = {
       _mutationType: { name: 'Mutation', _fields: { foo: 'bar' } },
