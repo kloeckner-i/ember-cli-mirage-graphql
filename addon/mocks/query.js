@@ -1,6 +1,6 @@
 import { GraphQLList } from 'graphql';
 import { determineType } from '../type';
-import { filterRecords } from '../filter-records';
+import { filterRecords } from '../filter/filter-records';
 import { getRecordsByType } from '../db';
 import { maybeMapFieldByFunction } from '../fields/map';
 import { pipe } from '../utils';
