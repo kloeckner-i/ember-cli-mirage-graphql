@@ -1,8 +1,13 @@
 import { get } from '@ember/object';
 import { getFieldName, getRecordInfo, getTypeForField } from './field-utils';
+import { getIsRelayConnectionField } from '../relay/connection';
+import { isFunction } from '../utils';
 import { normalizeSelections } from './selections';
 
-export const resolveField = (fields, typeInfo, getRecords, parent, fieldName) =>
+const getMappedFieldName = (field, mappedField) =>
+  (!isFunction(mappedField) && field !== mappedField) ? mappedField : null;
+
+const mapRecord = (fields, typeInfo, getRecords, parent, fieldName) =>
   (record) => {
     let recordCopy = {};
 
@@ -12,7 +17,7 @@ export const resolveField = (fields, typeInfo, getRecords, parent, fieldName) =>
       }
 
       if (selection && selection.selectionSet) {
-        let mappedFieldName = field !== mappedField ? mappedField : null;
+        let mappedFieldName = getMappedFieldName(field, mappedField);
         let { meta, type } = typeInfo;
         let recordInfo = getRecordInfo(record, type, fieldName, parent, meta);
         let typeForField = getTypeForField(field, type);
@@ -32,8 +37,12 @@ export const resolveFieldsForRecords = (options) =>
     let selections = normalizeSelections(selectedFields, type, options);
     let fieldName = getFieldName(fieldNode);
 
-    records = records.map(resolveField(selections, typeInfo, getRecords,
+    records = records.map(mapRecord(selections, typeInfo, getRecords,
       parent, fieldName));
+
+    if (getIsRelayConnectionField(fieldName, parent)) {
+      records = parent.record[fieldName];
+    }
 
     return [fieldNode, typeInfo, records, parent];
   };

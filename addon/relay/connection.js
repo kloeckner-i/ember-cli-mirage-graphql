@@ -1,3 +1,4 @@
+import { get } from '@ember/object';
 import { spliceRelayFilters } from './filters';
 
 const CONNECTION_FIELDS = ['edges', 'pageInfo'];
@@ -11,6 +12,10 @@ export const getIsRelayConnection = (type, { selectionSet }) =>
     && selectionSet.selections.filter(filterForConnectionFields).length
       === CONNECTION_FIELDS.length;
 
+export const getIsRelayConnectionField = (fieldName, parent) =>
+  CONNECTION_FIELDS.includes(fieldName) && get(parent, 'meta.relayConnection');
+
+// TODO: A lot could be named better here
 export function handleRelayConnection(typeInfo, filters) {
   let splicedFilters = spliceRelayFilters(filters);
 
