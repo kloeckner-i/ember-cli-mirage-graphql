@@ -1,6 +1,9 @@
 import { getFieldName } from './field-utils';
 import { isFunction } from '../utils';
 
+const getHasFieldsMapFn = (fieldsMap, fieldName) =>
+  fieldsMap && fieldName in fieldsMap && isFunction(fieldsMap[fieldName]);
+
 export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
   ([fieldNode, typeInfo, records, parent]) => {
     let _fieldsMap = fieldsMap;
@@ -10,10 +13,9 @@ export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
       _fieldsMap = fieldsMap[parent.type.name];
     }
 
-    records = _fieldsMap && fieldName in _fieldsMap
-      && isFunction(_fieldsMap[fieldName])
-        ? _fieldsMap[fieldName](records, db, parent)
-        : records;
+    records = getHasFieldsMapFn(_fieldsMap, fieldName)
+      ? _fieldsMap[fieldName](records, db, parent)
+      : records;
 
     return [typeInfo, records];
   };

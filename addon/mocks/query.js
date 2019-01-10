@@ -11,11 +11,14 @@ const determineReturnValue = ([{ returnType }, records]) =>
 
 const mockQueryFn = (db, options) =>
   (_, vars, __, { fieldNodes, returnType, schema }) => {
-    const getRecords = pipe(
+    const getAllRecordsByType = pipe(
       determineType(schema._typeMap),
-      getRecordsByType(db),
+      getRecordsByType(db)
+    );
+    const getRecords = pipe(
+      getAllRecordsByType,
       filterRecords(db, vars, options),
-      resolveFieldsForRecords(options),
+      resolveFieldsForRecords(getAllRecordsByType, options),
       maybeMapFieldByFunction(db, options),
       determineReturnValue
     );

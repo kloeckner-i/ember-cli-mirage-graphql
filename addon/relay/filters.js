@@ -1,12 +1,4 @@
-import { get } from '@ember/object';
-
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
-
-const createRelayFilters = (records, parent) =>
-  getRelayFilters(parent).reduce(reduceRelayFilters, {});
-
-const getRelayFilters = (parent) =>
-  get(parent, 'parent.meta.relayConnection.filters') || [];
 
 function reduceRelayFilters(filters,  { key, value = {} }) {
   let { value: val } = value;
@@ -18,8 +10,8 @@ function reduceRelayFilters(filters,  { key, value = {} }) {
   return filters;
 }
 
-export function applyRelayFilters(records, parent) {
-  let { after, before, first, last } = createRelayFilters(records, parent);
+export function applyRelayFilters(records, filters) {
+  let { after, before, first, last } = filters.reduce(reduceRelayFilters, {});
 
   if (after != null) {
     records = records.slice(after);

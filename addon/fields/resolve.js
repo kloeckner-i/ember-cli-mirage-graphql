@@ -1,48 +1,76 @@
 import { get } from '@ember/object';
 import { getFieldName, getRecordInfo, getTypeForField } from './field-utils';
-import { getIsRelayConnectionField } from '../relay/connection';
+import { getIsRelayConnectionField, resolveRelayConnectionField } from
+  '../relay/connection';
 import { isFunction } from '../utils';
 import { normalizeSelections } from './selections';
 
 const getMappedFieldName = (field, mappedField) =>
   (!isFunction(mappedField) && field !== mappedField) ? mappedField : null;
 
-const mapRecord = (fields, typeInfo, getRecords, parent, fieldName) =>
-  (record) => {
-    let recordCopy = {};
-
-    fields.forEach(({ field, mappedField, selection }) => {
+const fieldsReducer = (record, typeInfo, getAllRecordsByType, getRecords,
+  parent, fieldName) =>
+    (recordCopy, { field, mappedField, selection }) => {
       if (record[mappedField]) {
-        return recordCopy[field] = record[mappedField];
+        recordCopy[field] = record[mappedField];
+      } else if (selection && selection.selectionSet) {
+        recordCopy[field] = getIsRelayConnectionField(field, typeInfo.meta)
+          ? resolveRelayConnectionField({
+              field,
+              getAllRecordsByType,
+              selectionSet: selection.selectionSet,
+              typeInfo
+            })
+          : resolveRelatedField({
+              field,
+              fieldName,
+              getRecords,
+              mappedField,
+              parent,
+              record,
+              selection,
+              typeInfo
+            });
       }
 
-      if (selection && selection.selectionSet) {
-        let mappedFieldName = getMappedFieldName(field, mappedField);
-        let { meta, type } = typeInfo;
-        let recordInfo = getRecordInfo(record, type, fieldName, parent, meta);
-        let typeForField = getTypeForField(field, type);
+      return recordCopy;
+    };
 
-        recordCopy[field] = getRecords(selection, typeForField, getRecords,
-          recordInfo, mappedFieldName);
-      }
-    });
+const mapRecordBySelectedFields = (fields, typeInfo, getAllRecordsByType,
+  getRecords, parent, fieldName) =>
+    (record) =>
+      fields.reduce(fieldsReducer(record, typeInfo, getAllRecordsByType,
+        getRecords, parent, fieldName), {});
 
-    return recordCopy;
-  };
+function resolveRelatedField(options) {
+  let {
+    field,
+    fieldName,
+    getRecords,
+    mappedField,
+    parent,
+    record,
+    selection,
+    typeInfo
+  } = options;
+  let { meta, type } = typeInfo;
+  let mappedFieldName = getMappedFieldName(field, mappedField);
+  let recordInfo = getRecordInfo(record, type, fieldName, parent, meta);
+  let typeForField = getTypeForField(field, type);
 
-export const resolveFieldsForRecords = (options) =>
+  return getRecords(selection, typeForField, getRecords,
+    recordInfo, mappedFieldName);
+}
+
+export const resolveFieldsForRecords = (getAllRecordsByType, options) =>
   ([fieldNode, typeInfo, records, getRecords, parent]) => {
     let selectedFields = get(fieldNode, 'selectionSet.selections');
     let { type } = typeInfo;
     let selections = normalizeSelections(selectedFields, type, options);
     let fieldName = getFieldName(fieldNode);
 
-    records = records.map(mapRecord(selections, typeInfo, getRecords,
-      parent, fieldName));
-
-    if (getIsRelayConnectionField(fieldName, parent)) {
-      records = parent.record[fieldName];
-    }
+    records = records.map(mapRecordBySelectedFields(selections, typeInfo,
+      getAllRecordsByType, getRecords, parent, fieldName));
 
     return [fieldNode, typeInfo, records, parent];
   };
