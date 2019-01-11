@@ -1,3 +1,5 @@
+const SELECTABLE_KINDS = ['Field', 'InlineFragment'];
+
 const normalizeSelection = (fieldName, fieldsMap, selection) => ({
   field: fieldName,
   mappedField: (fieldsMap[fieldName] || fieldName),
@@ -5,7 +7,7 @@ const normalizeSelection = (fieldName, fieldsMap, selection) => ({
 });
 
 const getIsSelectable = (kind, fieldName) =>
-  (kind === 'Field' || kind === 'InlineFragment') && fieldName !== '__typename';
+  SELECTABLE_KINDS.includes(kind) && fieldName !== '__typename';
 
 const getSelectionReducer = (type, fieldsMap = {}, options) =>
   (selections, selection) => {

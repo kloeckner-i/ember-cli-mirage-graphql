@@ -12,6 +12,14 @@ function getTypeFromFieldNode(fieldNode, typeMap) {
   return typeMap[typeName];
 }
 
+function getTypeFromField(field, typeMap) {
+  let selections = get(field, 'selectionSet.selections');
+  let { typeCondition } = getInlineFragment(selections);
+  let typeName = get(typeCondition, 'name.value');
+
+  return typeMap[typeName];
+}
+
 export const determineType = (typeMap) =>
   (fieldNode, type, getRecords, parent, mappedFieldName) => {
     let typeInfo = { returnType: type, type };
@@ -26,3 +34,17 @@ export const determineType = (typeMap) =>
 
     return [fieldNode, typeInfo, getRecords, parent, mappedFieldName];
   };
+
+export const getTypeForField = (typeMap, field, type) => {
+  let typeInfo = { returnType: type, type };
+
+  if (type instanceof GraphQLInterfaceType) {
+    typeInfo.type = getTypeFromField(field, typeMap);
+  }
+
+  if (type.ofType) {
+    typeInfo.type = type.ofType;
+  }
+
+  return typeInfo;
+};
