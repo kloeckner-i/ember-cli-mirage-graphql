@@ -1,33 +1,32 @@
-const SELECTABLE_KINDS = ['Field', 'InlineFragment'];
+import { createFieldInfo } from './info';
+import { getFieldName } from './name';
 
-const normalizeSelection = (fieldName, fieldsMap, selection) => ({
-  field: fieldName,
-  mappedField: (fieldsMap[fieldName] || fieldName),
-  selection
-});
-
-const getIsSelectable = (kind, fieldName) =>
-  SELECTABLE_KINDS.includes(kind) && fieldName !== '__typename';
-
-const getSelectionReducer = (type, fieldsMap = {}, options) =>
+const getSelectedFieldsReducer = (type, getType) =>
   (selections, selection) => {
-    let { kind, name = {}, selectionSet } = selection;
-    let { value: fieldName } = name;
+    let fieldName = getFieldName(selection);
 
-    if (getIsSelectable(kind, fieldName)) {
-      selections = selections.concat(
-        kind === 'Field'
-          ? normalizeSelection(fieldName, fieldsMap, selection)
-          : normalizeSelections(selectionSet.selections, type, options)
-      );
+    if (fieldName !== '__typename') {
+      selections[fieldName] = selection.selectionSet
+        ? createFieldInfo(selection, type._fields[fieldName].type, getType)
+        : null;
     }
 
     return selections;
-  };
+  }
 
-export function normalizeSelections(selections, type, options) {
-  let { fieldsMap = {} } = options;
-  let _fieldsMap = fieldsMap[type.name];
+const inlineFragmentFieldsReducer = (selections, selection) =>
+  selections.concat(
+    selection.kind === 'InlineFragment'
+      ? selection.selectionSet.selections
+      : selection
+  );
 
-  return selections.reduce(getSelectionReducer(type, _fieldsMap, options), []);
+export function getSelectedFields({ selectionSet = {} }, type, getType) {
+  let selectedFieldsReducer = getSelectedFieldsReducer(type, getType);
+  let { selections = [] } = selectionSet;
+  let selectedFields = selections
+    .reduce(inlineFragmentFieldsReducer, [])
+    .reduce(selectedFieldsReducer, {});
+
+  return selectedFields;
 }
