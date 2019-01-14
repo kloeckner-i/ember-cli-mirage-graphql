@@ -23,10 +23,13 @@ export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
 
 const getFieldsReducer = (record, field, db, vars, options, meta) =>
   (mappedRecord, fieldName) => {
-    let fieldValue = field[fieldName];
+    let fieldValue = field.fields[fieldName];
+    let fieldInfo = { [fieldName]: fieldValue };
+
+    meta.parent = field;
 
     mappedRecord[fieldName] = fieldValue
-      ? resolveFieldInfo(fieldValue, db, vars, options, meta)
+      ? resolveFieldInfo(fieldInfo, db, vars, options, meta)[fieldName]
       : record[fieldName];
 
     return mappedRecord;

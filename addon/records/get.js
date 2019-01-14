@@ -17,7 +17,7 @@ const getTypeName = (fieldName, field, parent) =>
 export function getAllRecordsByType(fieldName, field, db, options, parent) {
   let { fieldsMap } = options || {};
   let typeName = getTypeName(fieldName, field, parent)
-  let table = db[getTableName(fieldName, typeName, fieldsMap)];
+  let table = db[getTableName(fieldName, typeName, fieldsMap)] || [{}];
 
   return table.slice(0);
 }
