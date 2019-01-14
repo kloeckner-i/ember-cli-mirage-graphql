@@ -1,4 +1,5 @@
-import { createFieldInfo, resolveFieldInfo } from '../fields/info';
+import { createFieldInfo } from '../fields/info/create';
+import { resolveFieldInfo } from '../fields/info/resolve';
 import { getFieldName } from '../fields/name';
 import { getTypeForField } from '../fields/type';
 import { partial } from '../utils';
@@ -11,7 +12,7 @@ const mockQueryFn = (db, options) =>
     let rootFieldInfo = {
       [rootFieldName]: createFieldInfo(rootField, returnType, getType)
     };
-    let records = resolveFieldInfo(rootFieldInfo, db, options);
+    let records = resolveFieldInfo(rootFieldInfo, db, vars, options);
 
     return records;
   };

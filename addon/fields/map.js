@@ -1,5 +1,6 @@
 import { getFieldName } from './field-utils';
 import { isFunction } from '../utils';
+import { resolveFieldInfo } from './info/resolve';
 
 const getHasFieldsMapFn = (fieldsMap, fieldName) =>
   fieldsMap && fieldName in fieldsMap && isFunction(fieldsMap[fieldName]);
@@ -19,3 +20,19 @@ export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
 
     return [typeInfo, records];
   };
+
+const getFieldsReducer = (record, field, db, vars, options, meta) =>
+  (mappedRecord, fieldName) => {
+    let fieldValue = field[fieldName];
+
+    mappedRecord[fieldName] = fieldValue
+      ? resolveFieldInfo(fieldValue, db, vars, options, meta)
+      : record[fieldName];
+
+    return mappedRecord;
+  };
+
+export const mapFieldsForRecords = (records, field, db, vars, options, meta) =>
+  records.map((record) =>
+    Object.keys(field.fields)
+      .reduce(getFieldsReducer(record, field, db, vars, options, meta), {}));

@@ -9,11 +9,13 @@ const CONNECTION_TYPE_REGEX = /.+Connection$/;
 const filterForConnectionFields = ({ name }) =>
   CONNECTION_FIELDS.includes(name.value);
 
-
 export const getIsRelayConnection = (type, { selectionSet }) =>
   CONNECTION_TYPE_REGEX.test(type.name)
     && selectionSet.selections.filter(filterForConnectionFields).length
       === CONNECTION_FIELDS.length;
+
+export const fieldHasConnectionType = (field) =>
+  CONNECTION_TYPE_REGEX.test(field.typeInfo.type.name);
 
 export const getIsRelayConnectionField = (fieldName, meta = {}) =>
   !!meta.relayConnection && CONNECTION_FIELDS.includes(fieldName);
@@ -49,4 +51,14 @@ export function resolveRelayConnectionField(options) {
 
     return resolvedPageInfo;
   }
+}
+
+export function getRelayConnectionField(fieldName, meta, db) {
+  if (fieldName === 'pageInfo') return meta.relayPageInfo;
+
+  let [edges, pageInfo] = getEdgesAndPageInfo(fieldName, meta.parent, db);
+
+  meta.relayPageInfo = pageInfo;
+
+  return edges;
 }

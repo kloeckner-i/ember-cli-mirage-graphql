@@ -1,4 +1,4 @@
-import { createFieldInfo } from './info';
+import { createFieldInfo } from './info/create';
 import { getFieldName } from './name';
 
 const getSelectedFieldsReducer = (type, getType) =>

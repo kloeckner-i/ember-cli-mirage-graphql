@@ -1,5 +1,5 @@
-import { getArgsForField } from './args';
-import { getSelectedFields } from './selections';
+import { getArgsForField } from '../args';
+import { getSelectedFields } from '../selections';
 
 export function createFieldInfo(field, type, getType) {
   let args = getArgsForField(field);
@@ -8,8 +8,4 @@ export function createFieldInfo(field, type, getType) {
   let fieldInfo = { args, fields, typeInfo };
 
   return fieldInfo;
-}
-
-export function resolveFieldInfo(fieldInfo, db, options) {
-  debugger;
 }
