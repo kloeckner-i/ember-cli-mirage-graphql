@@ -5,7 +5,7 @@ import { fieldHasConnectionType } from './connection';
 export const getIsEdge = (fieldName, parent) =>
   fieldName === 'edges' && fieldHasConnectionType(parent)
 
-const mapRecordToEdge = (typeName) => (record) => ({
+const getRecordToEdgeMapper = (typeName) => (record) => ({
   cursor: btoa(`${typeName}:${record.id}`),
   node: record
 });
@@ -17,10 +17,14 @@ export function getEdgesAndPageInfo(records, filters = [], typeName) {
   let lastRecordId = hasRecords && records[records.length - 1].id;
 
   if (hasRecords) {
-    edges = applyRelayFilters(records, filters).map(mapRecordToEdge(typeName));
+    edges = applyRelayFilters(records, filters)
+      .map(getRecordToEdgeMapper(typeName));
   }
 
   let pageInfo = createPageInfo(edges, firstRecordId, lastRecordId, typeName);
 
   return [edges, pageInfo];
 }
+
+export const createRelayEdges = (records, typeName) =>
+  records.map(getRecordToEdgeMapper(typeName));

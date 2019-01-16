@@ -25,11 +25,14 @@ const getFieldsReducer = (record, field, db, vars, options, meta) =>
   (mappedRecord, fieldName) => {
     let fieldValue = field.fields[fieldName];
     let fieldInfo = { [fieldName]: fieldValue };
+    let newMeta = { parent: field };
 
-    meta.parent = field;
+    if (meta.isRelayEdges && fieldName === 'node') {
+      newMeta.relayNode = record.node;
+    }
 
     mappedRecord[fieldName] = fieldValue
-      ? resolveFieldInfo(fieldInfo, db, vars, options, meta)[fieldName]
+      ? resolveFieldInfo(fieldInfo, db, vars, options, newMeta)[fieldName]
       : record[fieldName];
 
     return mappedRecord;

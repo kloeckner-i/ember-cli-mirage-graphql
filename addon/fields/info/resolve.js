@@ -1,5 +1,6 @@
 // import { filterRecords } from '../../records/filter';
 import { GraphQLList } from 'graphql';
+import { createRelayEdges } from '../../relay/edges';
 import { getAllRecordsByType} from '../../records/get';
 import { mapFieldsForRecords } from '../../fields/map';
 
@@ -12,8 +13,14 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options, meta = {}) =>
   (resolvedFields, fieldName) => {
     try {
       let field = fieldInfo[fieldName];
-      let records = getAllRecordsByType(fieldName, field, db, options,
-        meta.parent);
+      let records = meta.relayNode
+        ? [meta.relayNode]
+        : getAllRecordsByType(fieldName, field, db, options, meta);
+
+      if (meta.isRelayEdges) {
+        records = createRelayEdges(records,
+          field.fields.node.typeInfo.type.name);
+      }
 
       /*
         TODO
@@ -25,7 +32,6 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options, meta = {}) =>
         3. Filter records by mapped field, if mapped field is function
         4. Map records by selected fields ( in progress)
         5. Clean it all up by piping the records through
-
        */
       // records = filterRecords(records, field.args, vars, options);
       // records = getRecordsByMappedFieldFn(records, db, meta.parent);

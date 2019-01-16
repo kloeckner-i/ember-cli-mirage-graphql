@@ -11,13 +11,15 @@ const getTableName = (fieldName, typeName, fieldsMap) =>
   getMappedFieldName(fieldName, typeName, fieldsMap) ||
     pluralize(camelize(typeName));
 
-const getTypeName = (fieldName, field, parent) =>
-  (getEdgesNodeField(fieldName, field, parent) || field).typeInfo.type.name;
-
-export function getAllRecordsByType(fieldName, field, db, options, parent) {
+export function getAllRecordsByType(fieldName, field, db, options, meta) {
   let { fieldsMap } = options || {};
-  let typeName = getTypeName(fieldName, field, parent)
+  let edgesNodeField = getEdgesNodeField(fieldName, field, meta.parent);
+  let typeName = (edgesNodeField || field).typeInfo.type.name;
   let table = db[getTableName(fieldName, typeName, fieldsMap)] || [{}];
+
+  if (edgesNodeField) {
+    meta.isRelayEdges = true;
+  }
 
   return table.slice(0);
 }
