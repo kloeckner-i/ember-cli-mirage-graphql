@@ -8,11 +8,13 @@ const mockQueryFn = (db, options) =>
   (_, vars, __, { fieldNodes, returnType, schema }) => {
     let getType = partial(getTypeForField, schema._typeMap);
     let [rootField] = fieldNodes;
-    let rootFieldName = getFieldName(rootField);
-    let rootFieldInfo = {
-      [rootFieldName]: createFieldInfo(rootField, returnType, getType)
+    let fieldName = getFieldName(rootField);
+    let fieldInfo = {
+      [fieldName]: createFieldInfo(rootField, returnType, getType)
     };
-    let records = resolveFieldInfo(rootFieldInfo, db, vars, options);
+    let records = resolveFieldInfo(fieldInfo, db, vars, options);
+
+    debugger;
 
     return records;
   };

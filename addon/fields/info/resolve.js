@@ -1,45 +1,37 @@
-// import { filterRecords } from '../../records/filter';
-import { GraphQLList } from 'graphql';
 import { createRelayEdges } from '../../relay/edges';
+import { filterRecords } from '../../records/filter';
 import { getAllRecordsByType} from '../../records/get';
 import { mapFieldsForRecords } from '../../fields/map';
 
-const resolveReturnType = (records, returnType) =>
-  returnType instanceof GraphQLList
-    ? records
-    : records[0];
+/*
+  TODO
 
-const getResolveFieldsReducer = (fieldInfo, db, vars, options, meta = {}) =>
+  1. Filter records
+  2. Filter edges and store pageInfo, if Relay field
+  3. Filter records by mapped field, if mapped field is function
+  4. Map records by selected fields ( in progress)
+  5. Clean it all up by piping the records through
+ */
+const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
     try {
       let field = fieldInfo[fieldName];
-      let records = meta.relayNode
-        ? [meta.relayNode]
-        : getAllRecordsByType(fieldName, field, db, options, meta);
+      let records = field.relayNode
+        ? [field.relayNode]
+        : getAllRecordsByType(fieldName, field, db, options);
 
-      if (meta.isRelayEdges) {
+      records = filterRecords(records, field, fieldName, vars, options);
+
+      if (field.isRelayEdges) {
         records = createRelayEdges(records,
-          field.fields.node.typeInfo.type.name);
+          field.fields.node.type.name);
       }
 
-      /*
-        TODO
+      records = mapFieldsForRecords(records, field, db, vars, options);
 
-        1. Filter records
-           * Separate Relay vars and attach to meta
-           * Dig up concrete type for edges
-        2. Filter edges and store pageInfo, if Relay field
-        3. Filter records by mapped field, if mapped field is function
-        4. Map records by selected fields ( in progress)
-        5. Clean it all up by piping the records through
-       */
-      // records = filterRecords(records, field.args, vars, options);
       // records = getRecordsByMappedFieldFn(records, db, meta.parent);
 
-      records = mapFieldsForRecords(records, field, db, vars, options, meta);
-      records = resolveReturnType(records, field.typeInfo.returnType);
-
-      resolvedFields[fieldName] = records;
+      resolvedFields[fieldName] = field.isList ? records : records[0];
 
       return resolvedFields;
     } catch(ex) {

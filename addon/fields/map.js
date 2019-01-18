@@ -21,24 +21,30 @@ export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
     return [typeInfo, records];
   };
 
-const getFieldsReducer = (record, field, db, vars, options, meta) =>
+const getIsRelayNodeField = (fieldName, { isRelayEdges }) =>
+  fieldName === 'node' && isRelayEdges;
+
+const getFieldsReducer = (record, field, db, vars, options) =>
   (mappedRecord, fieldName) => {
     let fieldValue = field.fields[fieldName];
     let fieldInfo = { [fieldName]: fieldValue };
-    let newMeta = { parent: field };
 
-    if (meta.isRelayEdges && fieldName === 'node') {
-      newMeta.relayNode = record.node;
+    if (fieldValue) {
+      fieldValue.parent = { field, record };
+    }
+
+    if (getIsRelayNodeField(fieldName, field)) {
+      fieldValue.relayNode = record.node;
     }
 
     mappedRecord[fieldName] = fieldValue
-      ? resolveFieldInfo(fieldInfo, db, vars, options, newMeta)[fieldName]
+      ? resolveFieldInfo(fieldInfo, db, vars, options)[fieldName]
       : record[fieldName];
 
     return mappedRecord;
   };
 
-export const mapFieldsForRecords = (records, field, db, vars, options, meta) =>
+export const mapFieldsForRecords = (records, field, db, vars, options) =>
   records.map((record) =>
     Object.keys(field.fields)
-      .reduce(getFieldsReducer(record, field, db, vars, options, meta), {}));
+      .reduce(getFieldsReducer(record, field, db, vars, options), {}));

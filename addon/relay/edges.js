@@ -2,8 +2,8 @@ import { applyRelayFilters } from './filters';
 import { createPageInfo } from './page-info';
 import { fieldHasConnectionType } from './connection';
 
-export const getIsEdge = (fieldName, parent) =>
-  fieldName === 'edges' && fieldHasConnectionType(parent)
+export const getIsEdge = (fieldName, field) =>
+  fieldName === 'edges' && fieldHasConnectionType(field.parent.field.type.name);
 
 const getRecordToEdgeMapper = (typeName) => (record) => ({
   cursor: btoa(`${typeName}:${record.id}`),

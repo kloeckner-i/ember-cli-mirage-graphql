@@ -6,8 +6,10 @@ const getSelectedFieldsReducer = (type, getType) =>
     let fieldName = getFieldName(selection);
 
     if (fieldName !== '__typename') {
+      let fieldType = type._fields[fieldName].type;
+
       selections[fieldName] = selection.selectionSet
-        ? createFieldInfo(selection, type._fields[fieldName].type, getType)
+        ? createFieldInfo(selection, fieldType, getType)
         : null;
     }
 

@@ -1,4 +1,4 @@
-import { GraphQLInterfaceType } from 'graphql';
+import { GraphQLInterfaceType, GraphQLList } from 'graphql';
 import { get } from '@ember/object';
 
 const getInlineFragment = (selections) =>
@@ -14,15 +14,15 @@ function getTypeFromField(field, typeMap) {
 }
 
 export const getTypeForField = (typeMap, field, type) => {
-  let typeInfo = { returnType: type, type };
+  let isList = type instanceof GraphQLList;
 
   if (type instanceof GraphQLInterfaceType) {
-    typeInfo.type = getTypeFromField(field, typeMap);
+    type = getTypeFromField(field, typeMap);
   }
 
   if (type.ofType) {
-    typeInfo.type = type.ofType;
+    type = type.ofType;
   }
 
-  return typeInfo;
+  return [isList, type];
 };

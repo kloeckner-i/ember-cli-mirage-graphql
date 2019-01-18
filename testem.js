@@ -4,9 +4,7 @@ module.exports = {
   launch_in_ci: [
     'Chrome'
   ],
-  launch_in_dev: [
-    'Chrome'
-  ],
+  launch_in_dev: [],
   browser_args: {
     Chrome: {
       mode: 'ci',

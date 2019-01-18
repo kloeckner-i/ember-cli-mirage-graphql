@@ -6,16 +6,16 @@ import { spliceRelayFilters } from './filters';
 const CONNECTION_FIELDS = ['edges', 'pageInfo'];
 const CONNECTION_TYPE_REGEX = /.+Connection$/;
 
-const filterForConnectionFields = ({ name }) =>
-  CONNECTION_FIELDS.includes(name.value);
+export const fieldHasConnectionType = (typeName) =>
+  CONNECTION_TYPE_REGEX.test(typeName);
 
-export const getIsRelayConnection = (type, { selectionSet }) =>
-  CONNECTION_TYPE_REGEX.test(type.name)
-    && selectionSet.selections.filter(filterForConnectionFields).length
+const filterForConnectionFields = (fieldName) =>
+  CONNECTION_FIELDS.includes(fieldName);
+
+export const getIsRelayConnection = (typeName, fields) =>
+  CONNECTION_TYPE_REGEX.test(typeName)
+    && fields.filter(filterForConnectionFields).length
       === CONNECTION_FIELDS.length;
-
-export const fieldHasConnectionType = (field) =>
-  CONNECTION_TYPE_REGEX.test(field.typeInfo.type.name);
 
 export const getIsRelayConnectionField = (fieldName, meta = {}) =>
   !!meta.relayConnection && CONNECTION_FIELDS.includes(fieldName);

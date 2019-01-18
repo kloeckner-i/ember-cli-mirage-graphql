@@ -1,5 +1,19 @@
 const pipeReducer = (f, g) => (...args) => g(f(...args));
 
+export function cutKey(obj, k) {
+  let v = obj[k];
+
+  obj[k] = null;
+
+  return v;
+}
+
+export const ensureList = (item) => !item
+  ? []
+  : item instanceof Array
+    ? item
+    : [item];
+
 export const isFunction = (obj) => obj != null && typeof obj === 'function';
 
 export const partial = (fn, ...args1) => (...args2) => fn(...args1, ...args2);
