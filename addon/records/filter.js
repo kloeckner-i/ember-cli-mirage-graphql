@@ -4,12 +4,6 @@ import { camelize } from 'ember-cli-mirage/utils/inflector'
 import { ensureList, isFunction } from '../utils';
 import { get } from '@ember/object';
 
-/*
-  TODO
-
-   * Figure out why line items aren't filtering correctly for orders
- */
-
 function createFilters(field, vars, { varsMap } = {}) {
   let { args, type } = field;
   let varsMapForType = varsMap[type.name];
@@ -34,11 +28,17 @@ const filterBy = (records, key, value) =>
 function filterByParent(records, field, fieldName) {
   let [parentFieldName, parent] = getParentInfo(field.parent,
     field.isRelayEdges);
+  let { id: parentId } = parent;
 
-  return parent[fieldName]
-    ? ensureList(parent[fieldName])
-    : records.filter(getParentRecordFilter(parentFieldName));
+  return parentId == null
+    ? records
+    : parent[fieldName]
+      ? ensureList(parent[fieldName])
+      : records.filter(getParentRecordFilter(parentFieldName, parentId));
 }
+
+const getAreRecordsEmpty = ([firstRecord]) =>
+  firstRecord == null || !Object.keys(firstRecord).length;
 
 const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
   ({ kind, name, value }) => {
@@ -69,8 +69,8 @@ function getParentInfo(parent, isRelayEdges) {
   return [camelize(parentFieldName), parentRecord];
 }
 
-const getParentRecordFilter = (parentFieldName) =>
-  (record) => get(record, `${parentFieldName}.id`) === record.id
+const getParentRecordFilter = (parentFieldName, parentId) =>
+  (record) => get(record, `${parentFieldName}.id`) === parentId;
 
 function reduceRecordsByFilter(records, filter) {
   let { fn, hasFnValue, name, resolvedName, value } = filter;
@@ -94,7 +94,7 @@ function resolveFieldName(fieldName, type, { fieldsMap = {} } = {}) {
 const sortFilters = ({ hasFnValue }) => hasFnValue ? 1 : -1;
 
 export function filterRecords(records, field, fieldName, vars, options) {
-  if (!records.length) return records;
+  if (getAreRecordsEmpty(records)) return records;
 
   let filters = createFilters(field, vars, options);
   let resolvedFieldName = resolveFieldName(fieldName, field.type, options);

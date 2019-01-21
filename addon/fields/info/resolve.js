@@ -6,10 +6,8 @@ import { mapFieldsForRecords } from '../../fields/map';
 /*
   TODO
 
-  1. Filter edges and store pageInfo, if Relay field
-  2. Filter records by mapped field, if mapped field is function
-  3. Map records by selected fields ( in progress)
-  4. Clean it all up by piping the records through
+  1. Filter records by mapped field, if mapped field is function
+  2. Clean it all up by piping the records through
  */
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
@@ -32,8 +30,7 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
       }
 
       records = mapFieldsForRecords(records, field, db, vars, options);
-
-      // records = getRecordsByMappedFieldFn(records, db, meta.parent);
+      // records = getRecordsByMappedFieldFn(records, db, field, options);
 
       resolvedFields[fieldName] = field.isList ? records : records[0];
 
