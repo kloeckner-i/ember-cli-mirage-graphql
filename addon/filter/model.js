@@ -3,11 +3,11 @@ import EmObject from '@ember/object';
 export default EmObject.extend({
   fn: null,
   hasFnValue: false,
-  key: null,
-  mappedKey: null,
+  named: null,
+  resolvedName: null,
   value: null,
 
   init() {
-    this.set('mappedKey', this.key);
+    this.set('resolvedName', this.name);
   }
 });

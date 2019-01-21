@@ -4,7 +4,7 @@ import { getFieldName } from '../fields/name';
 import { getTypeForField } from '../fields/type';
 import { partial } from '../utils';
 
-const mockQueryFn = (db, options) =>
+const getMockQuery = (db, options) =>
   (_, vars, __, { fieldNodes, returnType, schema }) => {
     let getType = partial(getTypeForField, schema._typeMap);
     let [rootField] = fieldNodes;
@@ -19,4 +19,4 @@ const mockQueryFn = (db, options) =>
     return records;
   };
 
-export default mockQueryFn;
+export default getMockQuery;

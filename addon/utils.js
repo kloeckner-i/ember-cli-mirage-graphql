@@ -23,8 +23,14 @@ export const pipe = (...fns) => fns.reduce(pipeReducer);
 export const reduceKeys = (obj, reducerFn, defaultValue) =>
   Object.keys(obj).reduce(reducerFn, defaultValue);
 
-export function contextSet(obj, k, v) {
-  obj[k] = v;
+export function contextPush(context, k, v) {
+  context[k].push(v);
 
-  return obj;
+  return context;
+}
+
+export function contextSet(context, k, v) {
+  context[k] = v;
+
+  return context;
 }

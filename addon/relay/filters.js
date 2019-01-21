@@ -1,47 +1,40 @@
+import { contextPush, contextSet } from '../utils';
+import { createPageInfo } from './page-info';
+
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
 
-function reduceRelayFilters(filters,  { key, value = {} }) {
-  let { value: val } = value;
+const getFilterTypeToSet = (name) =>
+  RELAY_VAR_NAMES.includes(name) ? 'relayFilters' : 'filters';
 
-  if (val) {
-    filters[key] = parseInt(val);
+const reduceRelayFiltersToHash = (filters,  { name, value }) =>
+  value ? contextSet(filters, name, parseInt(value)) : filters;
+
+const relayFilterReducer = (filterTypes, filter) =>
+  contextPush(filterTypes, getFilterTypeToSet(filter.resolvedName), filter);
+
+const setPageInfo = (field, records, firstRecordId, lastRecordId) =>
+  field.parent.field.fields.pageInfo.relayPageInfo = createPageInfo(records,
+    firstRecordId, lastRecordId, field.type.name);
+
+export function applyRelayFilters(records, field) {
+  let hasRecords = !!records.length;
+  let firstRecordId = hasRecords && records[0].id;
+  let lastRecordId = hasRecords && records[records.length - 1].id;
+
+  if (hasRecords) {
+    let { after, before, first, last } = field.relayFilters
+      .reduce(reduceRelayFiltersToHash, {});
+
+    if (after != null) records = records.slice(after);
+    if (before != null) records = records.slice(0, before + 1);
+    if (first != null) records = records.slice(0, first);
+    if (last != null) records = records.slice(-last);
   }
 
-  return filters;
-}
-
-export function applyRelayFilters(records, filters) {
-  let { after, before, first, last } = filters.reduce(reduceRelayFilters, {});
-
-  if (after != null) {
-    records = records.slice(after);
-  }
-
-  if (before != null) {
-    records = records.slice(0, before + 1);
-  }
-
-  if (first != null) {
-    records = records.slice(0, first);
-  }
-
-  if (last != null) {
-    records = records.slice(-last);
-  }
+  setPageInfo(field, records, firstRecordId, lastRecordId);
 
   return records;
 }
 
-export function spliceRelayFilters(filters) {
-  let relayFilters = [];
-
-  filters = filters.reduce((filters, filter) => {
-    RELAY_VAR_NAMES.includes(filter.mappedKey)
-      ? relayFilters.push(filter)
-      : filters.push(filter);
-
-    return filters;
-  }, []);
-
-  return { filters, relayFilters };
-}
+export const spliceRelayFilters = (filters) =>
+  filters.reduce(relayFilterReducer, { filters: [], relayFilters: [] });

@@ -5,8 +5,8 @@ export function createPageInfo(edges, firstRecordId, lastRecordId, typeName) {
   let startCursor = null;
 
   if (edges.length) {
-    hasPreviousPage = edges[0].node.id !== firstRecordId;
-    hasNextPage = edges[edges.length - 1].node.id !== lastRecordId;
+    hasPreviousPage = edges[0].id !== firstRecordId;
+    hasNextPage = edges[edges.length - 1].id !== lastRecordId;
     startCursor = hasPreviousPage
       ? btoa(`${typeName}:${parseInt(edges[0].id) - 1}`)
       : null;

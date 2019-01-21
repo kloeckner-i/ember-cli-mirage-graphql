@@ -2,7 +2,7 @@ import { GraphQLList } from 'graphql';
 import { camelize, pluralize } from 'ember-cli-mirage/utils/inflector';
 import { contextSet, isFunction } from '../utils';
 
-const mockMutationFn = (db, options = {}) => (root, vars, _, meta) => {
+const getMockMutation = (db, options = {}) => (root, vars, _, meta) => {
   let { fieldName, returnType } = meta;
   let { name: typeName } = returnType;
   let records = db[camelize(pluralize(typeName))];
@@ -20,4 +20,4 @@ export const mapVars = (vars, varsMap = {}) =>
   Object.keys(vars).reduce((mappedVars, key) =>
     contextSet(mappedVars, key in varsMap ? varsMap[key] : key, vars[key]), {});
 
-export default mockMutationFn;
+export default getMockMutation;

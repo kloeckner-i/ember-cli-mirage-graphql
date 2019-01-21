@@ -6,21 +6,25 @@ import { mapFieldsForRecords } from '../../fields/map';
 /*
   TODO
 
-  1. Filter records
-  2. Filter edges and store pageInfo, if Relay field
-  3. Filter records by mapped field, if mapped field is function
-  4. Map records by selected fields ( in progress)
-  5. Clean it all up by piping the records through
+  1. Filter edges and store pageInfo, if Relay field
+  2. Filter records by mapped field, if mapped field is function
+  3. Map records by selected fields ( in progress)
+  4. Clean it all up by piping the records through
  */
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
     try {
       let field = fieldInfo[fieldName];
-      let records = field.relayNode
-        ? [field.relayNode]
-        : getAllRecordsByType(fieldName, field, db, options);
+      let records;
 
-      records = filterRecords(records, field, fieldName, vars, options);
+      if (field.relayNode) {
+        records = [field.relayNode];
+      } else if (field.relayPageInfo) {
+        records = [field.relayPageInfo];
+      } else {
+        records = getAllRecordsByType(fieldName, field, db, options);
+        records = filterRecords(records, field, fieldName, vars, options);
+      }
 
       if (field.isRelayEdges) {
         records = createRelayEdges(records,

@@ -1,9 +1,61 @@
+import Filter from '../filter/model';
+import { applyRelayFilters, spliceRelayFilters } from '../relay/filters';
 import { camelize } from 'ember-cli-mirage/utils/inflector'
-import { ensureList } from '../utils';
+import { ensureList, isFunction } from '../utils';
 import { get } from '@ember/object';
 
-const getHasParentRecord = ({ parent } = {}) =>
-  parent && parent.record && !!Object.keys(parent.record).length;
+/*
+  TODO
+
+   * Figure out why line items aren't filtering correctly for orders
+ */
+
+function createFilters(field, vars, { varsMap } = {}) {
+  let { args, type } = field;
+  let varsMapForType = varsMap[type.name];
+  let filters = createFiltersByArgs(args, vars, varsMapForType);
+  let relayFilters;
+
+  if (field.isRelayEdges) {
+    ({ filters, relayFilters } = spliceRelayFilters(filters));
+
+    field.relayFilters = relayFilters;
+  }
+
+  return filters;
+}
+
+const createFiltersByArgs = (args, vars, varsMap) =>
+  args.map(getArgsToFiltersMapper(vars, varsMap)).sort(sortFilters);
+
+const filterBy = (records, key, value) =>
+  records.filter((record) => get(record, key) === value);
+
+function filterByParent(records, field, fieldName) {
+  let [parentFieldName, parent] = getParentInfo(field.parent,
+    field.isRelayEdges);
+
+  return parent[fieldName]
+    ? ensureList(parent[fieldName])
+    : records.filter(getParentRecordFilter(parentFieldName));
+}
+
+const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
+  ({ kind, name, value }) => {
+    let filter = Filter.create({ name, resolvedName: name, value });
+
+    if (kind === 'Variable') {
+      let resolvedName = name in varsMapForType ? varsMapForType[name] : name;
+
+      filter.set('value', vars[name]);
+
+      isFunction(resolvedName)
+        ? filter.setProperties({ hasFnValue: true, fn: resolvedName })
+        : filter.set('resolvedName', resolvedName);
+    }
+
+    return filter;
+  };
 
 function getParentInfo(parent, isRelayEdges) {
   let parentFieldName = parent.field.type.name;
@@ -20,10 +72,17 @@ function getParentInfo(parent, isRelayEdges) {
 const getParentRecordFilter = (parentFieldName) =>
   (record) => get(record, `${parentFieldName}.id`) === record.id
 
-const filterByParent = (records, parent, parentFieldName, fieldName) =>
-  parent[fieldName]
-    ? ensureList(parent[fieldName])
-    : records.filter(getParentRecordFilter(parentFieldName));
+function reduceRecordsByFilter(records, filter) {
+  let { fn, hasFnValue, name, resolvedName, value } = filter;
+
+  if (hasFnValue || value != null) {
+    return hasFnValue
+      ? fn(records, name, value)
+      : filterBy(records, resolvedName, value);
+  }
+
+  return records;
+}
 
 function resolveFieldName(fieldName, type, { fieldsMap = {} } = {}) {
   let fieldsMapForType = fieldsMap[type.name] || {};
@@ -32,24 +91,19 @@ function resolveFieldName(fieldName, type, { fieldsMap = {} } = {}) {
   return mappedFieldName || fieldName;
 }
 
-/*
-  TODO
+const sortFilters = ({ hasFnValue }) => hasFnValue ? 1 : -1;
 
-  1. Create filters from args and vars
-   * Take special care with Relay args and find a way to build pageInfo
- */
 export function filterRecords(records, field, fieldName, vars, options) {
   if (!records.length) return records;
 
+  let filters = createFilters(field, vars, options);
   let resolvedFieldName = resolveFieldName(fieldName, field.type, options);
 
-  if (getHasParentRecord(field)) {
-    let [parentFieldName, parentRecord] = getParentInfo(field.parent,
-      field.isRelayEdges);
+  if (field.parent) records = filterByParent(records, field, resolvedFieldName);
 
-    records = filterByParent(records, parentRecord, parentFieldName,
-      resolvedFieldName);
-  }
+  records = filters.reduce(reduceRecordsByFilter, records);
+
+  if (field.relayFilters) records = applyRelayFilters(records, field);
 
   return records;
 }
