@@ -48,7 +48,9 @@ const getFieldsReducer = (record, field, db, vars, options) =>
 
     mappedRecord[fieldName] = fieldValue
       ? resolveFieldInfo(fieldInfo, db, vars, options)[fieldName]
-      : record[resolvedFieldName];
+      : fieldName === '__typename'
+        ? field.type.name
+        : record[resolvedFieldName];
 
     return mappedRecord;
   };

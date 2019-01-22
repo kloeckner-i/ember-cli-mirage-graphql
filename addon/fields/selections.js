@@ -4,14 +4,11 @@ import { getFieldName } from './name';
 const getSelectedFieldsReducer = (type, getType) =>
   (selections, selection) => {
     let fieldName = getFieldName(selection);
+    let fieldType = fieldName !== '__typename' && type._fields[fieldName].type;
 
-    if (fieldName !== '__typename') {
-      let fieldType = type._fields[fieldName].type;
-
-      selections[fieldName] = selection.selectionSet
-        ? createFieldInfo(selection, fieldType, getType)
-        : null;
-    }
+    selections[fieldName] = selection.selectionSet
+      ? createFieldInfo(selection, fieldType, getType)
+      : null;
 
     return selections;
   }

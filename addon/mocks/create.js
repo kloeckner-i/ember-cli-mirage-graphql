@@ -30,8 +30,4 @@ const mockRootType = (fields = {}, mockFn, db, options) =>
  */
 export const createMocksForSchema = (schema, db, options = {}) =>
   [[schema._queryType, getMockQuery], [schema._mutationType, getMockMutation]]
-    .reduce(getMocksReducer(db, options), {
-      Node(_, __, ___, { path }) {
-        return options.interfaceMocks.Node.fn(path.key);
-      }
-    });
+    .reduce(getMocksReducer(db, options), {});
