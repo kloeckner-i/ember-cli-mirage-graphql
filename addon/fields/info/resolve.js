@@ -1,13 +1,14 @@
+import { contextSet } from '../../utils';
 import { createRelayEdges } from '../../relay/edges';
 import { filterRecords } from '../../records/filter';
-import { getAllRecordsByType} from '../../records/get';
+import { getAllRecordsByType, getRecordsByMappedFieldFn } from
+  '../../records/get';
 import { mapFieldsForRecords } from '../../fields/map';
 
 /*
   TODO
 
-  1. Filter records by mapped field, if mapped field is function
-  2. Clean it all up by piping the records through
+  * Clean it all up by piping the records through
  */
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
@@ -30,9 +31,29 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
       }
 
       records = mapFieldsForRecords(records, field, db, vars, options);
-      // records = getRecordsByMappedFieldFn(records, db, field, options);
+      records = getRecordsByMappedFieldFn(records, field, fieldName, db,
+        options);
+      records = field.isList ? records : records[0];
 
-      resolvedFields[fieldName] = field.isList ? records : records[0];
+      resolvedFields[fieldName] = records;
+
+      if (field.type._interfaces.length) {
+        if (!options.interfaceMocks) {
+          options.interfaceMocks = {};
+        }
+
+        field.type._interfaces.forEach(({ name }) => {
+          if (!options.interfaceMocks[name]) {
+            options.interfaceMocks[name] = {};
+          }
+
+          options.interfaceMocks[name][fieldName] = records;
+
+          options.interfaceMocks[name].fn = function(key) {
+            return this[key];
+          }
+        });
+      }
 
       return resolvedFields;
     } catch(ex) {

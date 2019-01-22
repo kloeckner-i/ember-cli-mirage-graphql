@@ -4,8 +4,8 @@ import schema from 'dummy/gql/schema';
 const OPTIONS = {
   fieldsMap: {
     OrderConnection: {
-      categories(_, db, orderConnection) {
-        let customerId = orderConnection.parent.record.id;
+      categories(_, db, parent) {
+        let customerId = parent.id;
         let categories = db.orderCategories.filter(({ order }) =>
           order.customer.id === customerId);
 

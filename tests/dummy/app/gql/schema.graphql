@@ -1,4 +1,3 @@
-export default `
 type Address {
   id: ID!
   line1: String!
@@ -98,4 +97,4 @@ type Query {
   people(lastName: String, pageSize: Int): [Person]
 
   peopleSameAgeAsDogYears: [Person]
-}`;
+}

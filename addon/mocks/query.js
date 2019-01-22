@@ -14,8 +14,6 @@ const getMockQuery = (db, options) =>
     };
     let records = resolveFieldInfo(fieldInfo, db, vars, options);
 
-    debugger;
-
     return records;
   };
 
