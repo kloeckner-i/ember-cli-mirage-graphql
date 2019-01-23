@@ -28,8 +28,8 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
       records = createRelayEdges(records, field.fields.node.type.name);
     }
 
-    records = getRecordsByMappedFieldFn(records, field, fieldName, db, options);
     records = mapFieldsForRecords(records, field, db, vars, options);
+    records = getRecordsByMappedFieldFn(records, field, fieldName, db, options);
     records = field.isList ? records : records[0];
 
     return contextSet(resolvedFields, fieldName, records);
