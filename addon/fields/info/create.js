@@ -3,9 +3,9 @@ import { getArgsForField } from '../args';
 import { getIsRelayConnection } from '../../relay/connection';
 import { getSelectedFields } from '../selections';
 
-export function createFieldInfo(field, type, getType) {
+export function createFieldInfo(field, fieldName, type, getType) {
   let args = getArgsForField(field);
-  let [isList, recordType] = getType(field, type);
+  let { isList, recordType } = getType(field, type);
   let fields = getSelectedFields(field, recordType, getType);
   let isRelayConnection = false;
 

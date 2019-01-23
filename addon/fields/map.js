@@ -1,5 +1,5 @@
 import { getFieldName } from './field-utils';
-import { isFunction } from '../utils';
+import { isFunction, reduceKeys } from '../utils';
 import { resolveFieldInfo } from './info/resolve';
 
 const getHasFieldsMapFn = (fieldsMap, fieldName) =>
@@ -56,6 +56,5 @@ const getFieldsReducer = (record, field, db, vars, options) =>
   };
 
 export const mapFieldsForRecords = (records, field, db, vars, options) =>
-  records.map((record) =>
-    Object.keys(field.fields)
-      .reduce(getFieldsReducer(record, field, db, vars, options), {}));
+  records.map((record) => reduceKeys(field.fields,
+    getFieldsReducer(record, field, db, vars, options), {}));

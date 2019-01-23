@@ -10,16 +10,19 @@ query($id: ID!, $after: String, $before: String, $first: Int, $last: Int) {
         edges {
           cursor
           node {
-            lineItems(first: 5) {
-              edges {
-                node {
-                  name
-                  quantity
+            id
+            ... on Order {
+              lineItems(first: 5) {
+                edges {
+                  node {
+                    name
+                    quantity
+                  }
                 }
-              }
-              pageInfo {
-                hasNextPage
-                startCursor
+                pageInfo {
+                  hasNextPage
+                  startCursor
+                }
               }
             }
           }

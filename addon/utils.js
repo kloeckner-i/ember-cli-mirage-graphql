@@ -1,5 +1,17 @@
 const pipeReducer = (f, g) => (...args) => g(f(...args));
 
+export function contextPush(context, k, v) {
+  context[k].push(v);
+
+  return context;
+}
+
+export function contextSet(context, k, v) {
+  context[k] = v;
+
+  return context;
+}
+
 export function cutKey(obj, k) {
   let v = obj[k];
 
@@ -23,14 +35,4 @@ export const pipe = (...fns) => fns.reduce(pipeReducer);
 export const reduceKeys = (obj, reducerFn, defaultValue) =>
   Object.keys(obj).reduce(reducerFn, defaultValue);
 
-export function contextPush(context, k, v) {
-  context[k].push(v);
-
-  return context;
-}
-
-export function contextSet(context, k, v) {
-  context[k] = v;
-
-  return context;
-}
+export const getFirstKey = (obj) => Object.keys(obj)[0];

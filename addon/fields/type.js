@@ -15,14 +15,15 @@ function getTypeFromField(field, typeMap) {
 
 export const getTypeForField = (typeMap, field, type) => {
   let isList = type instanceof GraphQLList;
+  let recordType = type;
 
   if (type instanceof GraphQLInterfaceType) {
-    type = getTypeFromField(field, typeMap);
+    recordType = getTypeFromField(field, typeMap);
   }
 
   if (type.ofType) {
-    type = type.ofType;
+    recordType = type.ofType;
   }
 
-  return [isList, type];
+  return { isList, recordType };
 };

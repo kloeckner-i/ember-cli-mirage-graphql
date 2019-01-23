@@ -1,3 +1,4 @@
+import { contextSet, reduceKeys } from '../../utils';
 import { createRelayEdges } from '../../relay/edges';
 import { filterRecords } from '../../records/filter';
 import { getAllRecordsByType, getRecordsByMappedFieldFn } from
@@ -24,39 +25,16 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
     }
 
     if (field.isRelayEdges) {
-      records = createRelayEdges(records,
-        field.fields.node.type.name);
+      records = createRelayEdges(records, field.fields.node.type.name);
     }
 
+    records = getRecordsByMappedFieldFn(records, field, fieldName, db, options);
     records = mapFieldsForRecords(records, field, db, vars, options);
-    records = getRecordsByMappedFieldFn(records, field, fieldName, db,
-      options);
     records = field.isList ? records : records[0];
 
-    resolvedFields[fieldName] = records;
-
-    // if (field.type._interfaces.length) {
-    //   if (!options.interfaceMocks) {
-    //     options.interfaceMocks = {};
-    //   }
-    //
-    //   field.type._interfaces.forEach(({ name }) => {
-    //     if (!options.interfaceMocks[name]) {
-    //       options.interfaceMocks[name] = {};
-    //     }
-    //
-    //     options.interfaceMocks[name][field.type.name.toLowerCase()] = records;
-    //
-    //     options.interfaceMocks[name].fn = function(key) {
-    //       debugger;
-    //       return this[key];
-    //     }
-    //   });
-    // }
-
-    return resolvedFields;
+    return contextSet(resolvedFields, fieldName, records);
   };
 
 export const resolveFieldInfo = (fieldInfo, db, vars, options, meta) =>
-  Object.keys(fieldInfo)
-    .reduce(getResolveFieldsReducer(fieldInfo, db, vars, options, meta), {});
+  reduceKeys(fieldInfo,
+    getResolveFieldsReducer(fieldInfo, db, vars, options, meta), {});

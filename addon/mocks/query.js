@@ -10,16 +10,16 @@ import { partial } from '../utils';
 
   * Investigate GraphQL Tools' ability to get types from the schema
  */
-const getMockQuery = (db, options) =>
+const getMockQuery = (db, options, resolvers) =>
   (_, vars, __, { fieldNodes, returnType, schema }) => {
     try {
       let getType = partial(getTypeForField, schema._typeMap);
       let [rootField] = fieldNodes;
       let fieldName = getFieldName(rootField);
       let fieldInfo = {
-        [fieldName]: createFieldInfo(rootField, returnType, getType)
+        [fieldName]: createFieldInfo(rootField, fieldName, returnType, getType, resolvers)
       };
-      let records = resolveFieldInfo(fieldInfo, db, vars, options);
+      let records = resolveFieldInfo(fieldInfo, db, vars, options, resolvers);
 
       return records;
     } catch(ex) {
