@@ -17,12 +17,12 @@ module('Acceptance | customer', function(hooks) {
     this.server.createList('order-category', 5, { order });
   });
 
-  test('it displays the customer name', async function(assert) {
+  test('it displays the customer data', async function(assert) {
     await visit(`/customer/${customer.id}`);
 
     assert.dom('.customer-name').hasText(customer.name);
     assert.dom('.order').exists({ count: 2 });
     assert.dom('.order-categories option').exists({ count: 5 });
-    assert.dom('.line-items').exists({ count: 10 });
+    assert.dom('.line-items tbody tr').exists({ count: 5 });
   });
 });

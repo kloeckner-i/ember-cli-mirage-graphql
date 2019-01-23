@@ -17,13 +17,30 @@ const createGraphQLHandler = (rawSchema, options) =>
     let { query, variables } = JSON.parse(request.requestBody);
     let mocks = createMocksForSchema(schema, db, options);
 
-    addResolveFunctionsToSchema(schema, {
-      Node: {
-        __resolveType: (data, _, info) =>
-          info.schema.getType(data[info.path.key].__typename)
-      }
+    addMockFunctionsToSchema({ schema, mocks, preserveResolvers: false });
+
+    /*
+      TODO
+
+      * Dynamically generate the resolvers
+     */
+    addResolveFunctionsToSchema({
+      resolvers: {
+        Customer: {
+          id: ({ customer }) => customer.id,
+          name: ({ customer }) => customer.name,
+          orders: ({ customer }) => customer.orders
+        },
+        Node: {
+          __resolveType: (data, _, info) => {
+            let type = info.schema.getType(data[info.path.key].__typename);
+
+            return type;
+          }
+        }
+      },
+      schema
     });
-    addMockFunctionsToSchema({ schema, mocks, preserveResolvers: true });
 
     return graphql(schema, query, null, null, variables);
   };
