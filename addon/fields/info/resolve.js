@@ -35,6 +35,6 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
     return contextSet(resolvedFields, fieldName, records);
   };
 
-export const resolveFieldInfo = (fieldInfo, db, vars, options, meta) =>
+export const resolveFieldInfo = (fieldInfo, db, vars, options) =>
   reduceKeys(fieldInfo,
-    getResolveFieldsReducer(fieldInfo, db, vars, options, meta), {});
+    getResolveFieldsReducer(fieldInfo, db, vars, options), {});

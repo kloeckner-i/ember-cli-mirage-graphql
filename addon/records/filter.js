@@ -26,8 +26,7 @@ const filterBy = (records, key, value) =>
   records.filter((record) => get(record, key) === value);
 
 function filterByParent(records, field, fieldName) {
-  let [parentFieldName, parent] = getParentInfo(field.parent,
-    field.isRelayEdges);
+  let [parentFieldName, parent] = getParentInfo(field.parent, field.isRelayEdges);
   let { id: parentId } = parent;
 
   return parentId == null
@@ -84,8 +83,9 @@ function reduceRecordsByFilter(records, filter) {
   return records;
 }
 
-function resolveFieldName(fieldName, type, { fieldsMap = {} } = {}) {
-  let fieldsMapForType = fieldsMap[type.name] || {};
+function resolveFieldName(fieldName, parent, { fieldsMap = {} } = {}) {
+  let parentTypeName = parent && parent.field.type.name;
+  let fieldsMapForType = fieldsMap[parentTypeName] || {};
   let mappedFieldName = fieldsMapForType[fieldName];
 
   return mappedFieldName || fieldName;
@@ -97,13 +97,17 @@ export function filterRecords(records, field, fieldName, vars, options) {
   if (getAreRecordsEmpty(records)) return records;
 
   let filters = createFilters(field, vars, options);
-  let resolvedFieldName = resolveFieldName(fieldName, field.type, options);
+  let resolvedFieldName = resolveFieldName(fieldName, field.parent, options);
 
-  if (field.parent) records = filterByParent(records, field, resolvedFieldName);
+  if (field.parent) {
+    records = filterByParent(records, field, resolvedFieldName);
+  }
 
   records = filters.reduce(reduceRecordsByFilter, records);
 
-  if (field.relayFilters) records = applyRelayFilters(records, field);
+  if (field.relayFilters) {
+    records = applyRelayFilters(records, field);
+  }
 
   return records;
 }

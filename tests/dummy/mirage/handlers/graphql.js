@@ -15,10 +15,14 @@ const OPTIONS = {
     Person: {
       pets: 'animals'
     },
-    peopleSameAgeAsDogYears: (people) => people.filter((person) =>
-      !!person.pets
-        .filter(({ type }) => type === 'dog')
-        .filter((dog) => dog.age * 7 === person.age).length)
+    peopleSameAgeAsDogYears: (people) => {
+      let records = people.filter((person) =>
+        !!person.pets
+          .filter(({ type }) => type === 'dog')
+          .filter((dog) => dog.age * 7 === person.age).length);
+
+      return records;
+    }
   },
   mutations: {
     updatePerson: (people, { id, personAttributes }) =>
