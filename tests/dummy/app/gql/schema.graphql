@@ -92,6 +92,8 @@ input PersonAttributes {
 type Query {
   node(id: ID!): Node
 
+  numPeople: Int
+
   person(id: ID!): Person
 
   people(firstName: String, lastName: String, pageSize: Int): [Person]

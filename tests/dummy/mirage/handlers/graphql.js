@@ -21,6 +21,7 @@ const OPTIONS = {
       lastName: 'surname',
       pets: 'animals'
     },
+    numPeople: (_, db) => db.people.length,
     peopleSameAgeAsDogYears: (people) => {
       let records = people.filter((person) =>
         !!person.pets.filter(({ age, type }) =>

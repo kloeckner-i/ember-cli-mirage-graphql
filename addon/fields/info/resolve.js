@@ -3,14 +3,19 @@ import { createRelayEdges } from '../../relay/edges';
 import { getRecordsInField, getRecordsByMappedFieldFn } from '../records';
 import { mapFieldsForRecords } from '../../fields/map';
 
-const unwrapList = (records, { field }) => field.isList ? records : records[0];
+const resolveReturnValue = (records, { field }) =>
+  field.isList
+    ? records
+    : records instanceof Array
+      ? records[0]
+      : records;
 
 const recordsPipeline = pipeWithMeta(
   getRecordsInField,
   createRelayEdges,
   mapFieldsForRecords,
   getRecordsByMappedFieldFn,
-  unwrapList
+  resolveReturnValue
 );
 
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
