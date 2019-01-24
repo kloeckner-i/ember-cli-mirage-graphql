@@ -35,9 +35,6 @@ const getFieldsReducer = (record, field, db, vars, options) =>
     return mappedRecord;
   };
 
-export function mapFieldsForRecords(records, { db, field, options, vars }) {
-  records = records.map((record) => reduceKeys(field.fields,
+export const mapFieldsForRecords = (records, { db, field, options, vars }) =>
+  records.map((record) => reduceKeys(field.fields,
     getFieldsReducer(record, field, db, vars, options), {}));
-
-  return records;
-}
