@@ -1,36 +1,23 @@
-import { contextSet, reduceKeys } from '../../utils';
+import { contextSet, pipeWithMeta, reduceKeys } from '../../utils';
 import { createRelayEdges } from '../../relay/edges';
-import { filterRecords } from '../../records/filter';
-import { getAllRecordsByType, getRecordsByMappedFieldFn } from
-  '../../records/get';
+import { getRecordsInField, getRecordsByMappedFieldFn } from '../records';
 import { mapFieldsForRecords } from '../../fields/map';
 
-/*
-  TODO
+const unwrapList = (records, { field }) => field.isList ? records : records[0];
 
-  * Clean it all up by piping the records through
- */
+const recordsPipeline = pipeWithMeta(
+  getRecordsInField,
+  createRelayEdges,
+  mapFieldsForRecords,
+  getRecordsByMappedFieldFn,
+  unwrapList
+);
+
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
     let field = fieldInfo[fieldName];
-    let records;
-
-    if (field.relayNode) {
-      records = [field.relayNode];
-    } else if (field.relayPageInfo) {
-      records = [field.relayPageInfo];
-    } else {
-      records = getAllRecordsByType(fieldName, field, db, options);
-      records = filterRecords(records, field, fieldName, vars, options);
-    }
-
-    if (field.isRelayEdges) {
-      records = createRelayEdges(records, field.fields.node.type.name);
-    }
-
-    records = mapFieldsForRecords(records, field, db, vars, options);
-    records = getRecordsByMappedFieldFn(records, field, fieldName, db, options);
-    records = field.isList ? records : records[0];
+    let meta = { field, fieldName, db, vars, options };
+    let records = recordsPipeline(null, meta);
 
     return contextSet(resolvedFields, fieldName, records);
   };

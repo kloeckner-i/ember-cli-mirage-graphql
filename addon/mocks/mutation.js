@@ -1,23 +1,24 @@
-import { GraphQLList } from 'graphql';
-import { camelize, pluralize } from 'ember-cli-mirage/utils/inflector';
-import { contextSet, isFunction } from '../utils';
+import { contextSet, isFunction, reduceKeys } from '../utils';
+import { getRecords } from '../db';
 
-const getMockMutation = (db, options = {}) => (root, vars, _, meta) => {
-  let { fieldName, returnType } = meta;
-  let { name: typeName } = returnType;
-  let records = db[camelize(pluralize(typeName))];
-  let { mutations = {}, varsMap = {} } = options;
-  let mappedVars = mapVars(vars, varsMap[typeName]);
+const getMutationMocker = (db, { mutations = {}, varsMap = {} } = {}) =>
+  (_, vars, __, { fieldName, returnType }) => {
+    let mutation = mutations[fieldName];
+    let records = getRecords(db, returnType.name);
 
-  if (isFunction(mutations[fieldName])) {
-    records = mutations[fieldName](records, mappedVars, db);
-  }
+    if (isFunction(mutation)) {
+      let mappedVars = mapVars(vars, varsMap[returnType.name]);
 
-  return returnType instanceof GraphQLList ? records : records[0];
-};
+      records = mutation(records, mappedVars, db);
+    }
 
-export const mapVars = (vars, varsMap = {}) =>
-  Object.keys(vars).reduce((mappedVars, key) =>
-    contextSet(mappedVars, key in varsMap ? varsMap[key] : key, vars[key]), {});
+    return records;
+  };
 
-export default getMockMutation;
+const mapVars = (vars, varsMap = {}) =>
+  reduceKeys(vars, (mappedVars, key) =>
+    contextSet(mappedVars, resolveVarName(key, varsMap), vars[key]), {});
+
+const resolveVarName = (key, varsMap) => key in varsMap ? varsMap[key] : key;
+
+export default getMutationMocker;

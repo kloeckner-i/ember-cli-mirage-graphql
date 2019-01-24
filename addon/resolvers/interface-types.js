@@ -14,13 +14,6 @@ const getFieldResolver = (fieldName) =>
   (data) =>
     data.__typename ? data[fieldName] : data[getFirstKey(data)][fieldName];
 
-function resolveInterfaceType(data, _, { path, schema }) {
-  let { key } = path;
-  let typeName = schema.getType(data[key].__typename);
-
-  return typeName;
-}
-
 const getInterfaceTypeResolverReducer = (typeMap) =>
   (resolvers, typeName) => {
     let type = typeMap[typeName];
@@ -35,5 +28,12 @@ const getInterfaceTypeResolverReducer = (typeMap) =>
     return resolvers;
   };
 
+function resolveInterfaceType(data, _, { path, schema }) {
+  let { key } = path;
+  let typeName = schema.getType(data[key].__typename);
+
+  return typeName;
+}
+
 export const createResolversForInterfaceTypes = ({ _typeMap }) =>
-  reduceKeys(_typeMap, getInterfaceTypeResolverReducer(_typeMap), undefined);
+  reduceKeys(_typeMap, getInterfaceTypeResolverReducer(_typeMap));

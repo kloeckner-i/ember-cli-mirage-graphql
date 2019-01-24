@@ -1,25 +1,5 @@
-import { getFieldName } from './field-utils';
 import { isFunction, reduceKeys } from '../utils';
 import { resolveFieldInfo } from './info/resolve';
-
-const getHasFieldsMapFn = (fieldsMap, fieldName) =>
-  fieldsMap && fieldName in fieldsMap && isFunction(fieldsMap[fieldName]);
-
-export const maybeMapFieldByFunction = (db, { fieldsMap = {} } = {}) =>
-  ([fieldNode, typeInfo, records, parent]) => {
-    let _fieldsMap = fieldsMap;
-    let fieldName = getFieldName(fieldNode);
-
-    if (parent) {
-      _fieldsMap = fieldsMap[parent.type.name];
-    }
-
-    records = getHasFieldsMapFn(_fieldsMap, fieldName)
-      ? _fieldsMap[fieldName](records, db, parent)
-      : records;
-
-    return [typeInfo, records];
-  };
 
 const getIsRelayNodeField = (fieldName, { isRelayEdges }) =>
   fieldName === 'node' && isRelayEdges;
@@ -55,6 +35,9 @@ const getFieldsReducer = (record, field, db, vars, options) =>
     return mappedRecord;
   };
 
-export const mapFieldsForRecords = (records, field, db, vars, options) =>
-  records.map((record) => reduceKeys(field.fields,
+export function mapFieldsForRecords(records, { db, field, options, vars }) {
+  records = records.map((record) => reduceKeys(field.fields,
     getFieldsReducer(record, field, db, vars, options), {}));
+
+  return records;
+}

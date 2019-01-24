@@ -6,10 +6,9 @@ import { getTypeForField } from '../fields/type';
 import { partial } from '../utils';
 import { resolveFieldInfo } from '../fields/info/resolve';
 
-const getMockQuery = (db, options) =>
+const getQueryMocker = (db, options) =>
   (_, vars, __, { fieldNodes, returnType, schema }) => {
     try {
-      // TODO: Don't use partial, it's confusing
       let getType = partial(getTypeForField, schema._typeMap);
       let [rootField] = fieldNodes;
       let fieldName = getFieldName(rootField);
@@ -18,7 +17,6 @@ const getMockQuery = (db, options) =>
       };
       let records = resolveFieldInfo(fieldInfo, db, vars, options);
 
-      // TODO: Figure out why this is needed
       return returnType instanceof GraphQLInterfaceType
         ? records
         : records[fieldName];
@@ -27,4 +25,4 @@ const getMockQuery = (db, options) =>
     }
   };
 
-export default getMockQuery;
+export default getQueryMocker;

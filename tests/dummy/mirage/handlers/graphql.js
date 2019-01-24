@@ -1,6 +1,12 @@
 import createGraphQLHandler from 'ember-cli-mirage-graphql/handler';
 import schema from 'dummy/gql/schema';
 
+/*
+  TODO
+
+  * Add a string variable map so we can test that
+  * Fix whatever reason mutations need to return a list
+ */
 const OPTIONS = {
   fieldsMap: {
     OrderConnection: {
@@ -17,9 +23,8 @@ const OPTIONS = {
     },
     peopleSameAgeAsDogYears: (people) => {
       let records = people.filter((person) =>
-        !!person.pets
-          .filter(({ type }) => type === 'dog')
-          .filter((dog) => dog.age * 7 === person.age).length);
+        !!person.pets.filter(({ age, type }) =>
+          type === 'dog' && age * 7 === person.age).length);
 
       return records;
     }

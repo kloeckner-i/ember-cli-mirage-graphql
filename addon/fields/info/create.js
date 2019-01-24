@@ -4,8 +4,8 @@ import { getIsRelayConnection } from '../../relay/connection';
 import { getSelectedFields } from '../selections';
 
 export function createFieldInfo(field, fieldName, type, getType) {
-  let args = getArgsForField(field);
   let { isList, recordType } = getType(field, type);
+  let args = getArgsForField(field);
   let fields = getSelectedFields(field, recordType, getType);
   let isRelayConnection = false;
 
