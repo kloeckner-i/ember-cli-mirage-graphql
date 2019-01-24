@@ -10,11 +10,13 @@ export function contextSet(context, k, v) {
   return context;
 }
 
-export const ensureList = (item) => !item
+export const ensureList = (item) => item == null
   ? []
   : item instanceof Array
     ? item
     : [item];
+
+export const getFirstKey = (obj) => Object.keys(obj)[0];
 
 export const isFunction = (obj) => obj != null && typeof obj === 'function';
 
@@ -25,5 +27,3 @@ export const pipeWithMeta = (...fns) =>
 
 export const reduceKeys = (obj, reducerFn, defaultValue) =>
   Object.keys(obj).reduce(reducerFn, defaultValue);
-
-export const getFirstKey = (obj) => Object.keys(obj)[0];
