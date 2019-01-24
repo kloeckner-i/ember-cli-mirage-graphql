@@ -94,7 +94,7 @@ type Query {
 
   person(id: ID!): Person
 
-  people(lastName: String, pageSize: Int): [Person]
+  people(firstName: String, lastName: String, pageSize: Int): [Person]
 
   peopleSameAgeAsDogYears: [Person]
 }

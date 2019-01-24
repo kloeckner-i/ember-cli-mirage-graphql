@@ -1,12 +1,11 @@
 import createGraphQLHandler from 'ember-cli-mirage-graphql/handler';
 import schema from 'dummy/gql/schema';
+import { contextSet, reduceKeys } from 'ember-cli-mirage-graphql/utils';
 
-/*
-  TODO
+const adaptPersonAttrs = (attrs) =>
+  reduceKeys(attrs, (_attrs, key) =>
+    contextSet(_attrs, key === 'lastName' ? 'surname' : key, attrs[key]), {});
 
-  * Add a string variable map so we can test that
-  * Fix whatever reason mutations need to return a list
- */
 const OPTIONS = {
   fieldsMap: {
     OrderConnection: {
@@ -19,6 +18,7 @@ const OPTIONS = {
       }
     },
     Person: {
+      lastName: 'surname',
       pets: 'animals'
     },
     peopleSameAgeAsDogYears: (people) => {
@@ -31,11 +31,12 @@ const OPTIONS = {
   },
   mutations: {
     updatePerson: (people, { id, personAttributes }) =>
-      [ people.update(id, personAttributes) ]
+      people.update(id, adaptPersonAttrs(personAttributes))
   },
   varsMap: {
     Person: {
-      pageSize: (people, variableName, pageSize) => people.slice(0, pageSize)
+      pageSize: (people, variableName, pageSize) => people.slice(0, pageSize),
+      lastName: 'surname'
     }
   }
 };
