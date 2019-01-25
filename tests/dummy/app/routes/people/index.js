@@ -1,16 +1,18 @@
 import Route from '@ember/routing/route';
-import RouteQueryManager from 'ember-apollo-client/mixins/route-query-manager';
 import query from 'dummy/gql/queries/people';
+import { inject as service } from '@ember/service';
 
-export default Route.extend(RouteQueryManager, {
+export default Route.extend({
+  apollo: service(),
+
   queryParams: {
     firstName: { refreshModel: true },
     lastName: { refreshModel: true },
     pageSize: { refreshModel: true }
   },
 
-  model(params) {
-    return this.get('apollo').watchQuery({
+  async model(params) {
+    let model = await this.get('apollo').watchQuery({
       query,
       variables: {
         firstName: params.firstName,
@@ -18,5 +20,7 @@ export default Route.extend(RouteQueryManager, {
         pageSize: params.pageSize
       }
     });
+
+    return model;
   }
 });
