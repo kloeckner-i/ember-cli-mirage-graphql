@@ -7,7 +7,7 @@
   </label>
   <select id="order-categories" class="order-categories">
     {{#each model.customer.orders.categories as |category|}}
-      <option value="{{category.id}}">{{category.name}}</option>
+      <option value={{category.id}}>{{category.name}}</option>
     {{/each}}
   </select>
   <hr>

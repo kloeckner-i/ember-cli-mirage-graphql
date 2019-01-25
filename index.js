@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-cli-mirage-graphql',
+  name: require('./package').name,
   isProduction: false,
 
   included(parent) {
