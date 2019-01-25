@@ -2,30 +2,33 @@
 
 module.exports = {
   name: require('./package').name,
-  isProduction: false,
-
-  included(parent) {
-    this._super.included.apply(this, arguments);
-
-    this.isProduction = parent.env === 'production';
-
-    if (!this.isProduction) {
-      this.import('vendor/-ember-cli-mirage-graphql-bundle.js');
-      this.import('vendor/-ember-cli-mirage-graphql-shims.js');
+  options: {
+    autoImport: {
+      webpack: {
+        module: {
+          rules: [
+            /* fixes issue with graphql-js's mjs entry */
+            /* see: https://github.com/graphql/graphql-js/issues/1272#issuecomment-393903706 */
+            {
+              test: /\.mjs$/,
+              include: /node_modules\/graphql/,
+              type: 'javascript/auto'
+            }
+          ]
+        }
+      }
     }
   },
-  treeForAddon() {
-    if (!this.isProduction) {
-      return this._super.treeForAddon.apply(this, arguments);
-    }
-  },
-  treeForVendor() {
-    if (!this.isProduction) {
-      const WebpackDependencyPlugin = require('./lib/webpack-dependency-plugin');
+  setupPreprocessorRegistry(type, registry) {
+    if (type === 'parent') {
+      registry.add('js', {
+        name: require('./package').name,
+        ext: 'graphql',
+        toTree(tree) {
+          const GraphQLFilter = require('broccoli-graphql-filter');
 
-      return new WebpackDependencyPlugin({
-        outputName: 'ember-cli-mirage-graphql',
-        expose: ['graphql', 'graphql-tools']
+          return new GraphQLFilter(tree);
+        }
       });
     }
   }
