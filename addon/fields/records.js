@@ -14,7 +14,8 @@ const getMappedFieldName = (fieldName, parent, typeName, fieldsMap = {}) =>
     fieldsMap[parent.field.type.name][fieldName];
 
 const getFieldTableName = (fieldName, parent, typeName, fieldsMap) =>
-  getMappedFieldName(fieldName, parent, typeName, fieldsMap) || getTableName(typeName);
+  getMappedFieldName(fieldName, parent, typeName, fieldsMap) ||
+    getTableName(typeName);
 
 export function getRecordsByField(fieldName, field, db, options) {
   let { fieldsMap = {} } = options || {};
@@ -26,7 +27,9 @@ export function getRecordsByField(fieldName, field, db, options) {
   return table.slice(0);
 }
 
-export function getRecordsInField(records, { db, field, fieldName, options, vars }) {
+export function getRecordsInField(records, meta) {
+  let { db, field, fieldName, options, vars } = meta;
+
   if (field.relayNode) {
     records = [field.relayNode];
   } else if (field.relayPageInfo) {
@@ -39,7 +42,8 @@ export function getRecordsInField(records, { db, field, fieldName, options, vars
   return records;
 }
 
-export function getRecordsByMappedFieldFn(records, { db, field, fieldName, options = {} }) {
+export function getRecordsByMappedFieldFn(records, meta) {
+  let { db, field, fieldName, options = {} } = meta;
   let { fieldsMap = {} } = options;
   let fieldsMapForType = getFieldsMapForType(field.parent, fieldsMap);
   let resolvedFieldName = fieldsMapForType && fieldsMapForType[fieldName];
