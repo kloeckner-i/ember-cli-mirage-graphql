@@ -9,7 +9,7 @@ const createFiltersByArgs = (args, vars, varsMap) =>
 
 const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
   ({ kind, name, value }) => {
-    let filter = Filter.create({ name, resolvedName: name, value });
+    let filter = Filter.create({ name, value });
 
     if (kind === 'Variable') {
       let resolvedName = name in varsMapForType ? varsMapForType[name] : name;
@@ -24,7 +24,7 @@ const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
     return filter;
   };
 
-export function createFilters(field, vars, { varsMap } = {}) {
+export default function createFilters(field, vars, { varsMap = {} } = {}) {
   let { args, type } = field;
   let varsMapForType = varsMap[type.name];
   let filters = createFiltersByArgs(args, vars, varsMapForType);

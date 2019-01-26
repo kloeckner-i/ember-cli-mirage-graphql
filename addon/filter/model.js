@@ -8,6 +8,8 @@ export default EmObject.extend({
   value: null,
 
   init() {
-    this.set('resolvedName', this.name);
+    if (this.get('resolvedName') == null) {
+      this.set('resolvedName', this.name);
+    }
   }
 });
