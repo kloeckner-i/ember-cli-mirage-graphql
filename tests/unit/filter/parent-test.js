@@ -11,7 +11,7 @@ module('Unit | Filter | parent', function() {
     };
     let records = [];
 
-    assert.equal(filterByParent(records, field), records,
+    assert.equal(filterByParent(records, { field }), records,
       'It just returns the records');
   });
 
@@ -24,7 +24,7 @@ module('Unit | Filter | parent', function() {
       }
     };
 
-    assert.equal(filterByParent(null, field, fieldName), parent[fieldName],
+    assert.equal(filterByParent(null, { field, fieldName }), parent[fieldName],
       'It gets the records from the parent');
   });
 
@@ -41,7 +41,7 @@ module('Unit | Filter | parent', function() {
       { foo: { id: 2 } }
     ];
 
-    assert.deepEqual(filterByParent(records, field), [records[0]],
+    assert.deepEqual(filterByParent(records, { field }), [records[0]],
       'It filters out the 2nd record');
   });
 
@@ -60,7 +60,7 @@ module('Unit | Filter | parent', function() {
       }
     };
 
-    assert.equal(filterByParent(null, field, fieldName), parent[fieldName],
+    assert.equal(filterByParent(null, { field, fieldName }), parent[fieldName],
       'It gets the records from the grandparent');
   });
 });

@@ -1,7 +1,9 @@
-import { filterRecords } from '../filter/records';
+import createFilters from '../filter/create';
+import filterRecords from '../filter/records';
 import { getIsEdge } from '../relay/edges';
 import { getTableName } from '../db';
 import { isFunction } from '../utils';
+import { resolveFieldName } from './name';
 
 const getEdgesNodeField = (fieldName, field) =>
   getIsEdge(fieldName, field) && field.fields.node;
@@ -17,6 +19,16 @@ const getFieldTableName = (fieldName, parent, typeName, fieldsMap) =>
   getMappedFieldName(fieldName, parent, typeName, fieldsMap) ||
     getTableName(typeName);
 
+function getAndFilterRecords(records, field, fieldName, db, vars, options) {
+  let filters = createFilters(field, vars, options);
+  let resolvedFieldName = resolveFieldName(fieldName, field.parent, options);
+
+  records = getRecordsByField(fieldName, field, db, options);
+  records = filterRecords(records, filters, field, resolvedFieldName);
+
+  return records;
+}
+
 export function getRecordsByField(fieldName, field, db, options) {
   let { fieldsMap = {} } = options || {};
   let edgesNodeField = getEdgesNodeField(fieldName, field);
@@ -30,14 +42,11 @@ export function getRecordsByField(fieldName, field, db, options) {
 export function getRecordsInField(records, meta) {
   let { db, field, fieldName, options, vars } = meta;
 
-  if (field.relayNode) {
-    records = [field.relayNode];
-  } else if (field.relayPageInfo) {
-    records = [field.relayPageInfo];
-  } else {
-    records = getRecordsByField(fieldName, field, db, options);
-    records = filterRecords(records, field, fieldName, vars, options);
-  }
+  records = field.relayNode
+    ? [field.relayNode]
+    : field.relayPageInfo
+      ? [field.relayPageInfo]
+      : getAndFilterRecords(records, field, fieldName, db, vars, options);
 
   return records;
 }

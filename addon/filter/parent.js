@@ -17,7 +17,11 @@ function getParentInfo(parent, isRelayEdges) {
 const getParentRecordFilter = (parentFieldName, parentId) =>
   (record) => get(record, `${parentFieldName}.id`) === parentId;
 
-export function filterByParent(records, field, fieldName) {
+export function filterByParent(records, { field, fieldName }) {
+  if (!field.parent) {
+    return records;
+  }
+
   let [parentFieldName, parent] = getParentInfo(field.parent, field.isRelayEdges);
   let { id: parentId } = parent;
 

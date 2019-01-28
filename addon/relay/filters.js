@@ -16,7 +16,11 @@ const setPageInfo = (field, records, firstRecordId, lastRecordId) =>
   field.parent.field.fields.pageInfo.relayPageInfo = createPageInfo(records,
     firstRecordId, lastRecordId, field.type.name);
 
-export function applyRelayFilters(records, field) {
+export function applyRelayFilters(records, { field }) {
+  if (!field.relayFilters) {
+    return records;
+  }
+
   let hasRecords = !!records.length;
   let firstRecordId = hasRecords && records[0].id;
   let lastRecordId = hasRecords && records[records.length - 1].id;

@@ -1,11 +1,19 @@
-import createFilters from './create';
 import { applyRelayFilters } from '../relay/filters';
 import { filterByParent } from './parent';
 import { get } from '@ember/object';
-import { resolveFieldName } from '../fields/name';
+import { pipeWithMeta } from '../utils';
+
+const applyFilters = (records, { filters }) =>
+  filters.reduce(reduceRecordsByFilter, records)
 
 const filterBy = (records, key, value) =>
   records.filter((record) => get(record, key) === value);
+
+const filterPipeline = pipeWithMeta(
+  filterByParent,
+  applyFilters,
+  applyRelayFilters
+);
 
 const getAreRecordsEmpty = ([firstRecord]) =>
   firstRecord == null || !Object.keys(firstRecord).length;
@@ -22,23 +30,12 @@ function reduceRecordsByFilter(records, filter) {
   return records;
 }
 
-export function filterRecords(records, field, fieldName, vars, options) {
+export default function filterRecords(records, filters, field, fieldName) {
   if (getAreRecordsEmpty(records)) {
     return records;
   }
 
-  let filters = createFilters(field, vars, options);
-  let resolvedFieldName = resolveFieldName(fieldName, field.parent, options);
-
-  if (field.parent) {
-    records = filterByParent(records, field, resolvedFieldName);
-  }
-
-  records = filters.reduce(reduceRecordsByFilter, records);
-
-  if (field.relayFilters) {
-    records = applyRelayFilters(records, field);
-  }
+  records = filterPipeline(records, { field, fieldName, filters });
 
   return records;
 }
