@@ -1,5 +1,5 @@
+import createPageInfo from './page-info';
 import { contextPush, contextSet } from '../utils';
-import { createPageInfo } from './page-info';
 
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
 
@@ -30,7 +30,7 @@ export function applyRelayFilters(records, { field }) {
       .reduce(reduceRelayFiltersToHash, {});
 
     if (after != null) records = records.slice(after);
-    if (before != null) records = records.slice(0, before + 1);
+    if (before != null) records = records.slice(0, before - 1);
     if (first != null) records = records.slice(0, first);
     if (last != null) records = records.slice(-last);
   }
