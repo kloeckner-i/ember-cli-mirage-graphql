@@ -10,7 +10,7 @@ function getResolvedFieldName(fieldName, typeName, { fieldsMap = {} } = {}) {
   return !isFunction(resolvedFieldName) && resolvedFieldName || fieldName;
 }
 
-const getFieldsReducer = (record, field,fieldResolver, db, vars, options) =>
+const getFieldsReducer = (record, field, fieldResolver, db, vars, options) =>
   (mappedRecord, fieldName) => {
     let fieldValue = field.fields[fieldName];
     let fieldInfo = { [fieldName]: fieldValue };
@@ -35,6 +35,6 @@ const getFieldsReducer = (record, field,fieldResolver, db, vars, options) =>
   };
 
 export const getMapperForRecordFields = (fieldResolver) =>
-(records, { db, field, options, vars }) =>
-  records.map((record) => reduceKeys(field.fields,
-    getFieldsReducer(record, field, fieldResolver, db, vars, options), {}));
+  (records, { db, field, options, vars }) =>
+    records.map((record) => reduceKeys(field.fields,
+      getFieldsReducer(record, field, fieldResolver, db, vars, options), {}));
