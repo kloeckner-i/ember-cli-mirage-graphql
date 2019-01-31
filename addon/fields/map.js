@@ -1,17 +1,16 @@
 import { isFunction, reduceKeys } from '../utils';
-import { resolveFieldInfo } from './info/resolve';
 
 const getIsRelayNodeField = (fieldName, { isRelayEdges }) =>
   fieldName === 'node' && isRelayEdges;
 
-function getResolvedFieldName(fieldName, typeName, { fieldsMap } = {}) {
+function getResolvedFieldName(fieldName, typeName, { fieldsMap = {} } = {}) {
   let fieldsMapForType = fieldsMap[typeName];
   let resolvedFieldName = fieldsMapForType && fieldsMapForType[fieldName];
 
   return !isFunction(resolvedFieldName) && resolvedFieldName || fieldName;
 }
 
-const getFieldsReducer = (record, field, db, vars, options) =>
+const getFieldsReducer = (record, field,fieldResolver, db, vars, options) =>
   (mappedRecord, fieldName) => {
     let fieldValue = field.fields[fieldName];
     let fieldInfo = { [fieldName]: fieldValue };
@@ -27,7 +26,7 @@ const getFieldsReducer = (record, field, db, vars, options) =>
     }
 
     mappedRecord[fieldName] = fieldValue
-      ? resolveFieldInfo(fieldInfo, db, vars, options)[fieldName]
+      ? fieldResolver(fieldInfo, db, vars, options)[fieldName]
       : fieldName === '__typename'
         ? field.type.name
         : record[resolvedFieldName];
@@ -35,6 +34,7 @@ const getFieldsReducer = (record, field, db, vars, options) =>
     return mappedRecord;
   };
 
-export const mapFieldsForRecords = (records, { db, field, options, vars }) =>
+export const getMapperForRecordFields = (fieldResolver) =>
+(records, { db, field, options, vars }) =>
   records.map((record) => reduceKeys(field.fields,
-    getFieldsReducer(record, field, db, vars, options), {}));
+    getFieldsReducer(record, field, fieldResolver, db, vars, options), {}));

@@ -1,7 +1,7 @@
 import { contextSet, pipeWithMeta, reduceKeys } from '../../utils';
 import { createRelayEdges } from '../../relay/edges';
+import { getMapperForRecordFields } from '../../fields/map';
 import { getRecordsInField, getRecordsByMappedFieldFn } from '../records';
-import { mapFieldsForRecords } from '../../fields/map';
 
 const resolveReturnValue = (records, { field }) =>
   field.isList
@@ -9,14 +9,6 @@ const resolveReturnValue = (records, { field }) =>
     : records instanceof Array
       ? records[0]
       : records;
-
-const recordsPipeline = pipeWithMeta(
-  getRecordsInField,
-  createRelayEdges,
-  mapFieldsForRecords,
-  getRecordsByMappedFieldFn,
-  resolveReturnValue
-);
 
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
@@ -30,3 +22,13 @@ const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
 export const resolveFieldInfo = (fieldInfo, db, vars, options) =>
   reduceKeys(fieldInfo,
     getResolveFieldsReducer(fieldInfo, db, vars, options), {});
+
+const mapFieldsForRecords = getMapperForRecordFields(resolveFieldInfo);
+
+const recordsPipeline = pipeWithMeta(
+  getRecordsInField,
+  createRelayEdges,
+  mapFieldsForRecords,
+  getRecordsByMappedFieldFn,
+  resolveReturnValue
+);
