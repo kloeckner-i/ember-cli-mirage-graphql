@@ -1,8 +1,5 @@
 import { fieldHasConnectionType } from './connection';
 
-export const getIsEdge = (fieldName, field) =>
-  fieldName === 'edges' && fieldHasConnectionType(field.parent.field.type.name);
-
 const getRecordToEdgeMapper = (typeName) =>
   (record) => ({
     cursor: btoa(`${typeName}:${record.id}`),
@@ -18,3 +15,6 @@ export function createRelayEdges(records, { field }) {
 
   return records;
 }
+
+export const getIsEdge = (fieldName, field) =>
+  fieldName === 'edges' && fieldHasConnectionType(field.parent.field.type.name);
