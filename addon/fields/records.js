@@ -29,6 +29,7 @@ function getAndFilterRecords(records, field, fieldName, db, vars, options) {
   return records;
 }
 
+// TODO: Compose this function
 export function getRecordsByField(fieldName, field, db, options) {
   let { fieldsMap = {} } = options || {};
   let edgesNodeField = getEdgesNodeField(fieldName, field);
@@ -39,6 +40,7 @@ export function getRecordsByField(fieldName, field, db, options) {
   return table.slice(0);
 }
 
+// TODO: Compose this function
 export function getRecordsInField(records, meta) {
   let { db, field, fieldName, options, vars } = meta;
 
@@ -51,6 +53,7 @@ export function getRecordsInField(records, meta) {
   return records;
 }
 
+// TODO: Compose this function
 export function getRecordsByMappedFieldFn(records, meta) {
   let { db, field, fieldName, options = {} } = meta;
   let { fieldsMap = {} } = options;

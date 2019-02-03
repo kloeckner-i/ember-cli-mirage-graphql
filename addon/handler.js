@@ -5,6 +5,7 @@ import {
 } from './schema';
 import { graphql } from 'graphql';
 
+// TODO: Compose this function
 const createGraphQLHandler = (rawSchema, options) =>
   ({ db }, request) => {
     let { query, variables } = JSON.parse(request.requestBody);

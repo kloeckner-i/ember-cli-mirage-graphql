@@ -6,6 +6,7 @@ import { getTypeForField } from '../fields/type';
 import { partial } from '../utils';
 import { resolveFieldInfo } from '../fields/info/resolve';
 
+// TODO: Compose this function
 const getQueryMocker = (db, options) =>
   (_, vars, __, { fieldNodes, returnType, schema }) => {
     try {

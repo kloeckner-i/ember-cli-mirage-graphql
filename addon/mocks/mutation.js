@@ -1,6 +1,7 @@
 import { contextSet, isFunction, reduceKeys } from '../utils';
 import { getRecords } from '../db';
 
+// TODO: Compose this function
 const getMutationMocker = (db, { mutations = {}, varsMap = {} } = {}) =>
   (_, vars, __, { fieldName, returnType }) => {
     let mutation = mutations[fieldName];

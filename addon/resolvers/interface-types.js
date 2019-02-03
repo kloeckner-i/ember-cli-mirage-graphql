@@ -10,11 +10,13 @@ function addInterfaceTypesToResolvers(interfaces, resolvers = {}) {
   return resolvers;
 }
 
+// TODO: Compose this function
 const getFieldResolver = (fieldName) =>
   (data) => data.__typename
     ? data[fieldName]
     : data[getFirstKey(data)][fieldName];
 
+// TODO: Compose this function
 const getInterfaceTypeResolverReducer = (typeMap) =>
   (resolvers, typeName) => {
     let type = typeMap[typeName];

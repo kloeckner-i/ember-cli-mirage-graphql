@@ -3,6 +3,7 @@ import { getArgsForField } from '../args';
 import { getIsRelayConnection } from '../../relay/connection';
 import { getSelectedFields } from '../selections';
 
+// TODO: Compose this function
 export function createFieldInfo(field, fieldName, type, getType) {
   let { isList, recordType } = getType(field, type);
   let args = getArgsForField(field);
@@ -12,6 +13,7 @@ export function createFieldInfo(field, fieldName, type, getType) {
   if (getIsRelayConnection(recordType.name, Object.keys(fields))) {
     isRelayConnection = true;
 
+    // TODO: We're changing state here
     fields.edges.args = fields.edges.args.concat(args);
     fields.edges.isRelayEdges = true;
 

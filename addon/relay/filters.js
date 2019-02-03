@@ -12,10 +12,12 @@ const reduceRelayFiltersToHash = (filters,  { name, value }) =>
 const relayFilterReducer = (filterTypes, filter) =>
   contextPush(filterTypes, getFilterTypeToSet(filter.resolvedName), filter);
 
+// TODO: We're changing state here
 const setPageInfo = (field, records, firstRecordId, lastRecordId) =>
   field.parent.field.fields.pageInfo.relayPageInfo = createPageInfo(records,
     firstRecordId, lastRecordId, field.type.name);
 
+// TODO: Compose this function
 export function applyRelayFilters(records, { field }) {
   if (!field.relayFilters) {
     return records;
@@ -40,5 +42,6 @@ export function applyRelayFilters(records, { field }) {
   return records;
 }
 
+// TODO: Compose this function
 export const spliceRelayFilters = (filters) =>
   filters.reduce(relayFilterReducer, { filters: [], relayFilters: [] });

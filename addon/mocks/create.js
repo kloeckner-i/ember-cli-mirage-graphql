@@ -11,6 +11,7 @@ const mockRootType = (fields = {}, mockFn, db, options) =>
   reduceKeys(fields, (mocks, field) =>
     contextSet(mocks, field, mockFn(db, options)), {});
 
+// TODO: Compose this function
 export function createMocksForSchema(schema, db, options) {
   let typesAndMockFns = [
     [schema._queryType, getQueryMockFn],

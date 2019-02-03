@@ -10,6 +10,7 @@ const resolveReturnValue = (records, { field }) =>
       ? records[0]
       : records;
 
+// TODO: Compose this function
 const getResolveFieldsReducer = (fieldInfo, db, vars, options) =>
   (resolvedFields, fieldName) => {
     let field = fieldInfo[fieldName];

@@ -24,6 +24,7 @@ const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
     return filter;
   };
 
+// TODO: Compose this function
 export default function createFilters(field, vars, { varsMap = {} } = {}) {
   let { args, type } = field;
   let varsMapForType = varsMap[type.name];
@@ -33,6 +34,7 @@ export default function createFilters(field, vars, { varsMap = {} } = {}) {
     let { filters: _filters, relayFilters } = spliceRelayFilters(filters);
 
     filters = _filters;
+    // TODO: We're changing state here
     field.relayFilters = relayFilters;
   }
 

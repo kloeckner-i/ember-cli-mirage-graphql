@@ -1,6 +1,7 @@
 import { createFieldInfo } from './info/create';
 import { getFieldName } from './name';
 
+// TODO: Compose this function
 const getSelectedFieldsReducer = (type, getType) =>
   (selections, selection) => {
     let fieldName = getFieldName(selection);
@@ -20,6 +21,7 @@ const inlineFragmentFieldsReducer = (selections, selection) =>
       : selection
   );
 
+// TODO: Compose this function
 export function getSelectedFields({ selectionSet = {} }, type, getType) {
   let selectedFieldsReducer = getSelectedFieldsReducer(type, getType);
   let { selections = [] } = selectionSet;

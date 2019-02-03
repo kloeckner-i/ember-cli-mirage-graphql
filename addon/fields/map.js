@@ -17,10 +17,12 @@ const getFieldsReducer = (record, field, fieldResolver, db, vars, options) =>
     let resolvedFieldName =
       getResolvedFieldName(fieldName, field.type.name, options);
 
+    // TODO: We're changing state here
     if (fieldValue) {
       fieldValue.parent = { field, record };
     }
 
+    // TODO: We're changing state here
     if (getIsRelayNodeField(fieldName, field)) {
       fieldValue.relayNode = record.node;
     }

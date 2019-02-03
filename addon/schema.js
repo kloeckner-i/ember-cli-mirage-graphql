@@ -6,6 +6,7 @@ import {
 import { createMocksForSchema } from './mocks/create';
 import { createResolversForInterfaceTypes } from './resolvers/interface-types';
 
+// TODO: Compose this function
 export function addInterfaceTypeResolversToSchema(schema) {
   let interfaceTypeResolvers = createResolversForInterfaceTypes(schema);
 
@@ -17,6 +18,7 @@ export function addInterfaceTypeResolversToSchema(schema) {
   }
 }
 
+// TODO: Compose this function
 export const addMocksToSchema = (schema, db, options) =>
   addMockFunctionsToSchema({
     mocks: createMocksForSchema(schema, db, options),
@@ -24,6 +26,7 @@ export const addMocksToSchema = (schema, db, options) =>
     schema
   });
 
+// TODO: Compose this function
 export const createSchema = (typeDefs) => makeExecutableSchema({
   resolverValidationOptions: {
     requireResolversForResolveType: false

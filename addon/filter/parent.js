@@ -17,6 +17,7 @@ function getParentInfo(parent, isRelayEdges) {
 const getParentRecordFilter = (parentFieldName, parentId) =>
   (record) => get(record, `${parentFieldName}.id`) === parentId;
 
+// TODO: Compose this function
 export function filterByParent(records, { field, fieldName }) {
   if (!field.parent) {
     return records;

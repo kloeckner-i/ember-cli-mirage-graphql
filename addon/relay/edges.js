@@ -16,5 +16,6 @@ export function createRelayEdges(records, { field }) {
   return records;
 }
 
+// TODO: Compose this function
 export const getIsEdge = (fieldName, field) =>
   fieldName === 'edges' && fieldHasConnectionType(field.parent.field.type.name);
