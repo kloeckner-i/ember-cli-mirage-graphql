@@ -1,4 +1,4 @@
-import { getMapperForRecordFields } from 'ember-cli-mirage-graphql/fields/map';
+import mapFieldsForRecords from 'ember-cli-mirage-graphql/fields/map';
 import { module, test } from 'qunit';
 
 module('Unit | Fields | map', function() {
@@ -8,9 +8,8 @@ module('Unit | Fields | map', function() {
       fields: { foo: null, bar: null, __typename: null },
       type: { name: typeName }
     };
-    let mapper = getMapperForRecordFields();
     let records = [{ foo: 1, bar: 2, baz: 3 }];
-    let [mappedRecord] = mapper(records, { field });
+    let [mappedRecord] = mapFieldsForRecords(records, { field });
 
     assert.deepEqual(mappedRecord, { foo: 1, bar: 2, __typename: typeName },
       'It only took 2 fields from the record and typename');
@@ -27,7 +26,7 @@ module('Unit | Fields | map', function() {
     let records = [{}];
     let vars = {};
 
-    function mockFieldResolver(fieldInfo, _db, _vars, _options) {
+    function resolveFieldInfo(fieldInfo, _db, _vars, _options) {
       assert.equal(_db, db, 'Field resolver received db');
       assert.equal(_vars, vars, 'Field resolver received vars');
       assert.equal(_options, options, 'Field resolver received options');
@@ -37,9 +36,7 @@ module('Unit | Fields | map', function() {
       return {};
     }
 
-    let mapper = getMapperForRecordFields(mockFieldResolver);
-
-    mapper(records, { db, field, options, vars });
+    mapFieldsForRecords(records, { db, field, options, resolveFieldInfo, vars });
 
     assert.deepEqual(field.fields[fieldName].parent,
       {
@@ -54,11 +51,10 @@ module('Unit | Fields | map', function() {
       isRelayEdges: true,
       type: { name: 'Foo' }
     };
-    let mapper = getMapperForRecordFields(() => ({}));
     let node = {};
     let records = [{ node }];
 
-    mapper(records, { field });
+    mapFieldsForRecords(records, { field, resolveFieldInfo: () => ({}) });
 
     assert.equal(field.fields.node.relayNode, node, 'It set the node');
   });

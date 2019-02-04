@@ -1,10 +1,10 @@
 import Ember from 'ember';
+import createFieldInfo from '../fields/info/create';
+import resolveFieldInfo from '../fields/info/resolve';
 import { GraphQLInterfaceType } from 'graphql';
-import { createFieldInfo } from '../fields/info/create';
 import { getFieldName } from '../fields/name';
 import { getTypeForField } from '../fields/type';
 import { partial } from '../utils';
-import { resolveFieldInfo } from '../fields/info/resolve';
 
 // TODO: Compose this function
 const getQueryMocker = (db, options) =>

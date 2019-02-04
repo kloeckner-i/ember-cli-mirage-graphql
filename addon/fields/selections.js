@@ -1,4 +1,4 @@
-import { createFieldInfo } from './info/create';
+import createFieldInfo from './info/create';
 import { getFieldName } from './name';
 
 // TODO: Compose this function

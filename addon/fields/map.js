@@ -10,8 +10,9 @@ function getResolvedFieldName(fieldName, typeName, { fieldsMap = {} } = {}) {
   return !isFunction(resolvedFieldName) && resolvedFieldName || fieldName;
 }
 
-const getFieldsReducer = (record, field, fieldResolver, db, vars, options) =>
+const getFieldsReducer = (record, meta) =>
   (mappedRecord, fieldName) => {
+    let { db, field, options, resolveFieldInfo, vars } = meta;
     let fieldValue = field.fields[fieldName];
     let fieldInfo = { [fieldName]: fieldValue };
     let resolvedFieldName =
@@ -28,7 +29,7 @@ const getFieldsReducer = (record, field, fieldResolver, db, vars, options) =>
     }
 
     mappedRecord[fieldName] = fieldValue
-      ? fieldResolver(fieldInfo, db, vars, options)[fieldName]
+      ? resolveFieldInfo(fieldInfo, db, vars, options)[fieldName]
       : fieldName === '__typename'
         ? field.type.name
         : record[resolvedFieldName];
@@ -36,7 +37,8 @@ const getFieldsReducer = (record, field, fieldResolver, db, vars, options) =>
     return mappedRecord;
   };
 
-export const getMapperForRecordFields = (fieldResolver) =>
-  (records, { db, field, options, vars }) =>
-    records.map((record) => reduceKeys(field.fields,
-      getFieldsReducer(record, field, fieldResolver, db, vars, options), {}));
+const mapFieldsForRecords = (records, meta) =>
+  records.map((record) => reduceKeys(meta.field.fields,
+    getFieldsReducer(record, meta), {}));
+
+export default mapFieldsForRecords;
