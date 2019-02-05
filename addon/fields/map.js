@@ -1,29 +1,18 @@
+import { getIsRelayNodeField } from '../relay/node';
 import { isFunction, reduceKeys } from '../utils';
+import { resolveFieldName } from './name';
 
-const getIsRelayNodeField = (fieldName, { isRelayEdges }) =>
-  fieldName === 'node' && isRelayEdges;
-
-function getResolvedFieldName(fieldName, typeName, { fieldsMap = {} } = {}) {
-  let fieldsMapForType = fieldsMap[typeName];
-  let resolvedFieldName = fieldsMapForType && fieldsMapForType[fieldName];
-
-  return !isFunction(resolvedFieldName) && resolvedFieldName || fieldName;
-}
-
-const getFieldsReducer = (record, meta) =>
+const getFieldsReducer = (resolveFieldName, getIsRelayNodeField, record, meta) =>
   (mappedRecord, fieldName) => {
     let { db, field, options, resolveFieldInfo, vars } = meta;
     let fieldValue = field.fields[fieldName];
     let fieldInfo = { [fieldName]: fieldValue };
-    let resolvedFieldName =
-      getResolvedFieldName(fieldName, field.type.name, options);
+    let resolvedFieldName = resolveFieldName(fieldName, field.type.name, options);
 
-    // TODO: We're changing state here
     if (fieldValue) {
       fieldValue.parent = { field, record };
     }
 
-    // TODO: We're changing state here
     if (getIsRelayNodeField(fieldName, field)) {
       fieldValue.relayNode = record.node;
     }
@@ -32,13 +21,17 @@ const getFieldsReducer = (record, meta) =>
       ? resolveFieldInfo(fieldInfo, db, vars, options)[fieldName]
       : fieldName === '__typename'
         ? field.type.name
-        : record[resolvedFieldName];
+        : record[!isFunction(resolvedFieldName) && resolvedFieldName || fieldName];
 
     return mappedRecord;
   };
 
-const mapFieldsForRecords = (records, meta) =>
-  records.map((record) => reduceKeys(meta.field.fields,
-    getFieldsReducer(record, meta), {}));
+export const getFieldsForRecordsMapper = (resolveFieldName, getIsRelayNodeField) =>
+  (records, meta) =>
+    records.map((record) => reduceKeys(meta.field.fields,
+      getFieldsReducer(resolveFieldName, getIsRelayNodeField, record, meta), {}));
+
+const mapFieldsForRecords = getFieldsForRecordsMapper(resolveFieldName,
+  getIsRelayNodeField);
 
 export default mapFieldsForRecords;

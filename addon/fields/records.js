@@ -1,5 +1,6 @@
 import createFilters from '../filter/create';
 import filterRecords from '../filter/records';
+import { get } from '@ember/object';
 import { getIsEdge } from '../relay/edges';
 import { getTableName } from '../db';
 import { isFunction } from '../utils';
@@ -21,7 +22,8 @@ const getFieldTableName = (fieldName, parent, typeName, fieldsMap) =>
 
 function getAndFilterRecords(records, field, fieldName, db, vars, options) {
   let filters = createFilters(field, vars, options);
-  let resolvedFieldName = resolveFieldName(fieldName, field.parent, options);
+  let parentTypeName = get(field, 'parent.field.type.name');
+  let resolvedFieldName = resolveFieldName(fieldName, parentTypeName, options);
 
   records = getRecordsByField(fieldName, field, db, options);
   records = filterRecords(records, filters, field, resolvedFieldName);

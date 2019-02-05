@@ -1,10 +1,9 @@
 export const getFieldName = ({ alias, name }) =>
   alias && alias.value || name.value;
 
-export function resolveFieldName(fieldName, parent, { fieldsMap = {} } = {}) {
-  let parentTypeName = parent && parent.field.type.name;
-  let fieldsMapForType = fieldsMap[parentTypeName] || {};
-  let mappedFieldName = fieldsMapForType[fieldName];
+export function resolveFieldName(fieldName, typeName, { fieldsMap = {} } = {}) {
+  let fieldsMapForType = fieldsMap[typeName];
+  let resolvedFieldName = fieldsMapForType && fieldsMapForType[fieldName];
 
-  return mappedFieldName || fieldName;
+  return resolvedFieldName || fieldName;
 }

@@ -38,9 +38,8 @@ module('Unit | Fields | name', function() {
         }
       }
     };
-    let parent = { field: { type: { name: parentTypeName } } };
 
-    assert.equal(resolveFieldName(fieldName, parent, options),
+    assert.equal(resolveFieldName(fieldName, parentTypeName, options),
       resolvedFieldName, 'It resolved the mapped name');
   });
 });
