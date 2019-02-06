@@ -55,22 +55,26 @@ export function getRecordsInField(records, meta) {
   return records;
 }
 
-// TODO: Compose this function
-export function getRecordsByMappedFieldFn(records, meta) {
-  let { db, field, fieldName, options = {} } = meta;
-  let { fieldsMap = {} } = options;
-  let fieldsMapForType = getFieldsMapForType(field.parent, fieldsMap);
-  let resolvedFieldName = fieldsMapForType && fieldsMapForType[fieldName];
+export const getParentRecord = (parent) => !parent
+  ? null
+  : parent.field.isRelayConnection
+    ? parent.field.parent.record
+    : parent.record;
 
-  if (isFunction(resolvedFieldName)) {
-    let parent = !field.parent
-      ? null
-      : field.parent.field.isRelayConnection
-        ? field.parent.field.parent.record
-        : field.parent.record
+export const getRecordsByMappedFieldFnGetter = (getFieldsMapForType, getParentRecord) =>
+  (records, meta) => {
+    let { db, field, fieldName, options = {} } = meta;
+    let { fieldsMap = {} } = options;
+    let fieldsMapForType = getFieldsMapForType(field.parent, fieldsMap);
+    let resolvedFieldName = fieldsMapForType && fieldsMapForType[fieldName];
 
-    records = resolvedFieldName(records, db, parent);
-  }
+    if (isFunction(resolvedFieldName)) {
+      let parent = getParentRecord(field.parent);
 
-  return records;
-}
+      records = resolvedFieldName(records, db, parent);
+    }
+
+    return records;
+  };
+
+export const getRecordsByMappedFieldFn = getRecordsByMappedFieldFnGetter(getFieldsMapForType, getParentRecord);
