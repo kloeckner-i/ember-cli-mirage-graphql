@@ -31,6 +31,10 @@ export const getFieldsForRecordsMapper = (resolveFieldName, getIsRelayNodeField)
     records.map((record) => reduceKeys(meta.field.fields,
       getFieldsReducer(resolveFieldName, getIsRelayNodeField, record, meta), {}));
 
+// TODO: Add unit test for this
+export const getFieldsMapForType = (parent, fieldsMap) =>
+  parent ? fieldsMap[parent.field.type.name] : fieldsMap;
+
 const mapFieldsForRecords = getFieldsForRecordsMapper(resolveFieldName,
   getIsRelayNodeField);
 

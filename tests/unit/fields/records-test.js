@@ -1,11 +1,11 @@
 import {
   getRecordsByMappedFieldFnGetter
 } from 'ember-cli-mirage-graphql/fields/records';
-import { module, test } from 'qunit';
+import { module, skip } from 'qunit';
 
 module('Unit | Fields | records', function() {
  module('mapped field functions', function() {
-   test('it gets records for fields mapped to functions', function(assert) {
+   skip('it gets records for fields mapped to functions', function(assert) {
      let field = {};
      let fieldName = 'foo';
      let record = {};
@@ -17,7 +17,7 @@ module('Unit | Fields | records', function() {
      assert.equal(records, record, 'It returned result of mapped function');
    });
 
-   test('it returns records if no mapping', function(assert) {
+   skip('it returns records if no mapping', function(assert) {
      let field = {};
      let record = {};
      let getFieldsMap = () => null;
@@ -27,7 +27,7 @@ module('Unit | Fields | records', function() {
      assert.equal(records, record, 'It returned records as-is');
    });
 
-   test('it returns records if mapped field not a function', function(assert) {
+   skip('it returns records if mapped field not a function', function(assert) {
      let field = {};
      let fieldName = 'foo';
      let record = {};

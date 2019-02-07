@@ -1,7 +1,9 @@
+import filterRecords from '../../filter/records';
+import filterRecordsByMappedField from '../../filter/records/mapped-field';
 import mapFieldsForRecords from '../../fields/map';
 import { contextSet, pipeWithMeta, reduceKeys } from '../../utils';
 import { createRelayEdges } from '../../relay/edges';
-import { getRecordsInField, getRecordsByMappedFieldFn } from '../records';
+import { getRecordsByField } from '../records';
 
 const resolveReturnValue = (records, { field }) =>
   field.isList
@@ -20,10 +22,11 @@ const getFieldInfoReducer = (fieldInfo, db, vars, options, recordsPipeline) =>
   };
 
 const recordsPipeline = pipeWithMeta(
-  getRecordsInField,
+  getRecordsByField,
+  filterRecords,
   createRelayEdges,
   mapFieldsForRecords,
-  getRecordsByMappedFieldFn,
+  filterRecordsByMappedField,
   resolveReturnValue
 );
 
