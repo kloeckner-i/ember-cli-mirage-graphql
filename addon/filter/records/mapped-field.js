@@ -2,7 +2,6 @@ import { getFieldsMapForType } from '../../fields/map/type';
 import { getParentRecord } from '../../records';
 import { isFunction } from '../../utils';
 
-// TODO: Add unit test for this
 export const composeFilterRecordsByMappedField =
   (getFieldsMapForType, getParentRecord) =>
     (records, meta) => {

@@ -1,4 +1,5 @@
-import { getFieldInfoResolver } from 'ember-cli-mirage-graphql/fields/info/resolve';
+import { composeResolveFieldInfo } from
+  'ember-cli-mirage-graphql/fields/info/resolve';
 import { module, test } from 'qunit';
 
 module('Unit | Fields | Info | resolve', function() {
@@ -6,7 +7,7 @@ module('Unit | Fields | Info | resolve', function() {
     let expectedValue = 'bar';
     let fieldInfo = { foo: { bar: expectedValue } };
     let pipeline = () => fieldInfo.foo.bar;
-    let resolveFieldInfo = getFieldInfoResolver(pipeline);
+    let resolveFieldInfo = composeResolveFieldInfo(pipeline);
     let resolvedFieldInfo = resolveFieldInfo(fieldInfo);
 
     assert.deepEqual(resolvedFieldInfo, { foo: expectedValue },

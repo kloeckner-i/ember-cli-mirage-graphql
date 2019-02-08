@@ -3,7 +3,7 @@ import { getArgsForField } from '../args';
 import { getIsRelayConnection } from '../../relay/connection';
 import { getSelectedFields } from '../selections';
 
-const getFieldInfoGetter = (getArgsForField, getSelectedFields, getIsRelayConnection) =>
+const composeGetFieldInfo = (getArgsForField, getSelectedFields, getIsRelayConnection) =>
   (field, type, getType) => {
     let { isList, recordType } = getType(field, type);
     let args = getArgsForField(field);
@@ -14,10 +14,10 @@ const getFieldInfoGetter = (getArgsForField, getSelectedFields, getIsRelayConnec
     return { args, fields, isList, isRelayConnection, recordType };
   }
 
-const getFieldInfo = getFieldInfoGetter(getArgsForField, getSelectedFields,
+const getFieldInfo = composeGetFieldInfo(getArgsForField, getSelectedFields,
   getIsRelayConnection);
 
-export const getFieldInfoCreator = (getFieldInfo) =>
+export const composeCreateFieldInfo = (getFieldInfo) =>
   (field, fieldName, type, getType) => {
     let { args, fields, isList, isRelayConnection, recordType } =
       getFieldInfo(field, type, getType);
@@ -40,6 +40,6 @@ export const getFieldInfoCreator = (getFieldInfo) =>
     return fieldInfo;
   };
 
-const createFieldInfo = getFieldInfoCreator(getFieldInfo);
+const createFieldInfo = composeCreateFieldInfo(getFieldInfo);
 
 export default createFieldInfo;

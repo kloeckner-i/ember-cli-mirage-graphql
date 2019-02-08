@@ -1,7 +1,6 @@
+import resolveFieldName from './name/resolve';
 import { isFunction } from '../utils';
-import { resolveFieldName } from './name';
 
-// TODO: Add unit test for this
 export const composeResolveFieldValue = (resolveFieldName) =>
   (record, fieldName, fieldValue, meta) => {
     let { db, field, options, resolveFieldInfo, vars } = meta;

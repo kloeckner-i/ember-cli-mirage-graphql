@@ -12,7 +12,7 @@ const resolveReturnValue = (records, { field }) =>
       ? records[0]
       : records;
 
-const getFieldInfoReducer = (fieldInfo, db, vars, options, recordsPipeline) =>
+const composeFieldInfoReducer = (fieldInfo, db, vars, options, recordsPipeline) =>
   (resolvedFields, fieldName) => {
     let field = fieldInfo[fieldName];
     let meta = { db, field, fieldName, options, resolveFieldInfo, vars };
@@ -30,11 +30,11 @@ const recordsPipeline = pipeWithMeta(
   resolveReturnValue
 );
 
-export const getFieldInfoResolver = (recordsPipeline) =>
+export const composeResolveFieldInfo = (recordsPipeline) =>
   (fieldInfo, db, vars, options) =>
     reduceKeys(fieldInfo,
-      getFieldInfoReducer(fieldInfo, db, vars, options, recordsPipeline), {});
+      composeFieldInfoReducer(fieldInfo, db, vars, options, recordsPipeline), {});
 
-const resolveFieldInfo = getFieldInfoResolver(recordsPipeline);
+const resolveFieldInfo = composeResolveFieldInfo(recordsPipeline);
 
 export default resolveFieldInfo;

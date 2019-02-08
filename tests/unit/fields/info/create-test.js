@@ -1,4 +1,5 @@
-import { getFieldInfoCreator } from 'ember-cli-mirage-graphql/fields/info/create';
+import { composeCreateFieldInfo } from
+  'ember-cli-mirage-graphql/fields/info/create';
 import { module, test } from 'qunit';
 
 module('Unit | Fields | Info | create', function() {
@@ -10,7 +11,7 @@ module('Unit | Fields | Info | create', function() {
       isRelayConnection: false,
       recordType: 'Foo'
     };
-    let createFieldInfo = getFieldInfoCreator(() => mockFieldInfo);
+    let createFieldInfo = composeCreateFieldInfo(() => mockFieldInfo);
     let fieldInfo = createFieldInfo();
 
     assert.equal(fieldInfo.args, mockFieldInfo.args, 'It has args');
@@ -32,7 +33,7 @@ module('Unit | Fields | Info | create', function() {
       },
       isRelayConnection: true,
     };
-    let createFieldInfo = getFieldInfoCreator(() => mockFieldInfo);
+    let createFieldInfo = composeCreateFieldInfo(() => mockFieldInfo);
     let fieldInfo = createFieldInfo();
 
     assert.ok(fieldInfo.fields.edges.isRelayEdges, 'It marked the edges field');

@@ -1,12 +1,12 @@
 import applyFilters from '../apply';
 import createFilters from '../create';
+import resolveFieldName from '../../fields/name/resolve';
 import { applyRelayFilters } from '../../relay/filters';
 import { filterByParent } from '../parent';
 import { get } from '@ember/object';
 import { getAreRecordsEmpty } from '../../records';
 import { getIsRelayRecord } from '../../relay/record';
 import { pipeWithMeta } from '../../utils';
-import { resolveFieldName } from '../../fields/name';
 
 const filterPipeline = pipeWithMeta(
   filterByParent,
@@ -14,9 +14,8 @@ const filterPipeline = pipeWithMeta(
   applyRelayFilters
 );
 
-// TODO: Add unit test for this
 export const composeFilterRecords =
-  (getAreRecordsEmpty, getIsRelayRecord, createFilters, resolveFieldName) =>
+  (getAreRecordsEmpty, getIsRelayRecord, createFilters, resolveFieldName, pipeline) =>
     (records, { field, fieldName, options, vars }) => {
       if (getAreRecordsEmpty(records) || getIsRelayRecord(field)) {
         return records;
@@ -26,12 +25,12 @@ export const composeFilterRecords =
       let parentTypeName = get(field, 'parent.field.type.name');
 
       fieldName = resolveFieldName(fieldName, parentTypeName, options);
-      records = filterPipeline(records, { field, fieldName, filters });
+      records = pipeline(records, { field, fieldName, filters });
 
       return records;
     };
 
 const filterRecords = composeFilterRecords(getAreRecordsEmpty, getIsRelayRecord,
-  createFilters, resolveFieldName);
+  createFilters, resolveFieldName, filterPipeline);
 
 export default filterRecords;
