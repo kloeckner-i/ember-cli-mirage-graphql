@@ -1,6 +1,6 @@
 import filterRecords from '../../filter/records';
 import filterRecordsByMappedField from '../../filter/records/mapped-field';
-import mapFieldsForRecords from '../../fields/map';
+import mapFieldsForRecords from '../../fields/map/records';
 import { contextSet, pipeWithMeta, reduceKeys } from '../../utils';
 import { createRelayEdges } from '../../relay/edges';
 import { getRecordsByField } from '../records';

@@ -1,4 +1,4 @@
-import { getFieldsMapForType } from '../../fields/map';
+import { getFieldsMapForType } from '../../fields/map/type';
 import { getParentRecord } from '../../records';
 import { isFunction } from '../../utils';
 
