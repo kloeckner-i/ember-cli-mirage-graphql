@@ -1,52 +1,43 @@
-import { getFieldsForRecordsMapper } from
+import { composeFieldsReducer, composeMapFieldsForRecords } from
   'ember-cli-mirage-graphql/fields/map/records';
-import { module, skip } from 'qunit';
+import { module, test } from 'qunit';
 
 module('Unit | Fields | Map | records', function() {
-  const resolveFieldName = (fieldName) => fieldName;
-
-  skip('it maps selected fields', function(assert) {
+  test('it maps selected fields', function(assert) {
     let record = { id: 1, foo: 'bar' };
-    let typeName = 'Foo';
-    let field = {
-      fields: { id: null, __typename: null },
-      type: { name: typeName }
-    };
+    let fields = { id: null };
     let getIsRelayNodeField = () => false;
-    let map = getFieldsForRecordsMapper(resolveFieldName, getIsRelayNodeField);
-    let mappedRecords = map([record], { field });
+    let resolveFieldValue = () => record.id;
+    let reducer = composeFieldsReducer(getIsRelayNodeField, resolveFieldValue);
+    let mapper = composeMapFieldsForRecords(reducer);
+    let mappedRecords = mapper([record], { field: { fields } });
 
-    assert.deepEqual(mappedRecords, [{ id: 1, __typename: typeName }],
-      'It only maps the id and __typename fields');
+    assert.deepEqual(mappedRecords[0], { id: record.id }, 'It mapped the ID');
   });
 
-  skip('it sets the field parent', function(assert) {
+  test('it sets the field parent', function(assert) {
     let record = { foo: 'bar' };
-    let typeName = 'Foo';
-    let field = {
-      fields: { foo: {} },
-      type: { name: typeName }
-    };
+    let field = { fields: { foo: {} } };
     let getIsRelayNodeField = () => false;
-    let map = getFieldsForRecordsMapper(resolveFieldName, getIsRelayNodeField);
+    let resolveFieldValue = () => {};
+    let reducer = composeFieldsReducer(getIsRelayNodeField, resolveFieldValue);
+    let mapper = composeMapFieldsForRecords(reducer);
 
-    map([record], { field, resolveFieldInfo: () => ({}) });
+    mapper([record], { field });
 
     assert.deepEqual(field.fields.foo.parent, { field, record },
       'It sets the parent');
   });
 
-  skip('it sets the relay node on the field', function(assert) {
+  test('it sets the relay node on the field', function(assert) {
     let node = {};
-    let typeName = 'Foo';
-    let field = {
-      fields: { foo: {} },
-      type: { name: typeName }
-    };
+    let field = { fields: { foo: {} } };
     let getIsRelayNodeField = () => true;
-    let map = getFieldsForRecordsMapper(resolveFieldName, getIsRelayNodeField);
+    let resolveFieldValue = () => {};
+    let reducer = composeFieldsReducer(getIsRelayNodeField, resolveFieldValue);
+    let mapper = composeMapFieldsForRecords(reducer);
 
-    map([{ node }], { field, resolveFieldInfo: () => ({}) });
+    mapper([{ node }], { field });
 
     assert.equal(field.fields.foo.relayNode, node, 'It sets the relay node');
   });

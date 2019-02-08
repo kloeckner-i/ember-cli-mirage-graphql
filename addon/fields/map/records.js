@@ -2,8 +2,7 @@ import resolveFieldValue from '../value';
 import { getIsRelayNodeField } from '../../relay/node';
 import { partial, reduceKeys } from '../../utils';
 
-// TODO: Add unit test for this
-export const composeFieldsReducer = (getIsRelayNodeField) =>
+export const composeFieldsReducer = (getIsRelayNodeField, resolveFieldValue) =>
   (record, meta, mappedRecord, fieldName) => {
     let { field } = meta;
     let fieldValue = field.fields[fieldName];
@@ -22,9 +21,10 @@ export const composeFieldsReducer = (getIsRelayNodeField) =>
     return mappedRecord;
   };
 
-const fieldsReducer = composeFieldsReducer(getIsRelayNodeField);
+const fieldsReducer =
+  composeFieldsReducer(getIsRelayNodeField, resolveFieldValue);
 
-const composeMapFieldsForRecords = (fieldsReducer) =>
+export const composeMapFieldsForRecords = (fieldsReducer) =>
   (records, meta) =>
     records.map((record) =>
       reduceKeys(meta.field.fields, partial(fieldsReducer, record, meta), {}));
