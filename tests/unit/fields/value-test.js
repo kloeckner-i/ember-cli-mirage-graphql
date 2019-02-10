@@ -5,7 +5,7 @@ module('Unit | Field | value', function() {
   test('it resolves field values by field name', function(assert) {
     let field = { type: { name: null } };
     let record = { id: 1 };
-    let resolveFieldName = () => null;
+    let resolveFieldName = () => {};
     let resolveFieldValue = composeResolveFieldValue(resolveFieldName);
     let value = resolveFieldValue(record, 'id', null, { field });
 
@@ -24,7 +24,7 @@ module('Unit | Field | value', function() {
 
   test('it resolves field values for __typename', function(assert) {
     let field = { type: { name: 'Foo' } };
-    let resolveFieldName = () => null;
+    let resolveFieldName = () => {};
     let resolveFieldValue = composeResolveFieldValue(resolveFieldName);
     let value = resolveFieldValue(null, '__typename', null, { field });
 
@@ -50,7 +50,7 @@ module('Unit | Field | value', function() {
     let options = {};
     let vars = {};
     let meta = { db, field, options, resolveFieldInfo, vars };
-    let resolveFieldName = () => null;
+    let resolveFieldName = () => {};
     let resolveFieldValue = composeResolveFieldValue(resolveFieldName);
     let value = resolveFieldValue(null, fieldName, fieldValue, meta);
 

@@ -1,7 +1,6 @@
 import { getIsEdge } from './edges';
 
-// TODO: Add unit test for this
-const composeGetNodeField = (getIsEdge) =>
+export const composeGetNodeField = (getIsEdge) =>
   (fieldName, field) =>
     getIsEdge(fieldName, field) && field.fields.node;
 
