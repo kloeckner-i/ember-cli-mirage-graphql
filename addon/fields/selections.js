@@ -1,9 +1,16 @@
 import createFieldInfo from './info/create';
 import getFieldName from './name';
+import { partial } from '../utils';
 
-// TODO: Compose this function
-const getSelectedFieldsReducer = (type, getType) =>
-  (selections, selection) => {
+export const inlineFragmentFieldsReducer = (selections, selection) =>
+  selections.concat(
+    selection.kind === 'InlineFragment'
+      ? selection.selectionSet.selections
+      : selection
+  );
+
+export const selectedFieldsReducer =
+  (getFieldName, createFieldInfo, getType, type, selections, selection) => {
     let fieldName = getFieldName(selection);
     let fieldType = fieldName !== '__typename' && type._fields[fieldName].type;
 
@@ -12,22 +19,20 @@ const getSelectedFieldsReducer = (type, getType) =>
       : null;
 
     return selections;
-  }
+  };
 
-const inlineFragmentFieldsReducer = (selections, selection) =>
-  selections.concat(
-    selection.kind === 'InlineFragment'
-      ? selection.selectionSet.selections
-      : selection
-  );
+const composeGetSelectedFields =
+  (inlineFragmentFieldsReducer, selectedFieldsReducer) =>
+    ({ selectionSet = {} }, type, getType) => {
+      let fieldsReducer = partial(selectedFieldsReducer, getFieldName,
+        createFieldInfo, getType, type);
+      let { selections = [] } = selectionSet;
+      let selectedFields = selections
+        .reduce(inlineFragmentFieldsReducer, [])
+        .reduce(fieldsReducer, {});
 
-// TODO: Compose this function
-export function getSelectedFields({ selectionSet = {} }, type, getType) {
-  let selectedFieldsReducer = getSelectedFieldsReducer(type, getType);
-  let { selections = [] } = selectionSet;
-  let selectedFields = selections
-    .reduce(inlineFragmentFieldsReducer, [])
-    .reduce(selectedFieldsReducer, {});
+      return selectedFields;
+    };
 
-  return selectedFields;
-}
+export const getSelectedFields =
+  composeGetSelectedFields(inlineFragmentFieldsReducer, selectedFieldsReducer);
