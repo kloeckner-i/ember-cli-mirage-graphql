@@ -1,18 +1,16 @@
 import Filter from './model';
 import sortFilters from './sort';
-import { isFunction } from '../utils';
+import { isFunction, partial } from '../utils';
+import { resolveVarName } from './vars';
 import { set, setProperties } from '@ember/object';
 import { spliceRelayFilters } from '../relay/filters';
 
-const createFiltersByArgs = (args, vars, varsMap) =>
-  args.map(getArgsToFiltersMapper(vars, varsMap)).sort(sortFilters);
-
-const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
-  ({ kind, name, value }) => {
+export const composeMapArgsToFilters = (resolveVarName) =>
+  (vars, varsMapForType = {}, { kind, name, value }) => {
     let filter = Filter.create({ name, value });
 
     if (kind === 'Variable') {
-      let resolvedName = name in varsMapForType ? varsMapForType[name] : name;
+      let resolvedName = resolveVarName(name, varsMapForType);
 
       filter.set('value', vars[name]);
 
@@ -24,19 +22,31 @@ const getArgsToFiltersMapper = (vars, varsMapForType = {}) =>
     return filter;
   };
 
-// TODO: Compose this function
-export default function createFilters(field, vars, { varsMap = {} } = {}) {
-  let { args, type } = field;
-  let varsMapForType = varsMap[type.name];
-  let filters = createFiltersByArgs(args, vars, varsMapForType);
+const mapArgsToFilters = composeMapArgsToFilters(resolveVarName);
 
-  if (field.isRelayEdges) {
-    let { filters: _filters, relayFilters } = spliceRelayFilters(filters);
+const createFiltersByArgs = (args, vars, varsMap) =>
+  args.map(partial(mapArgsToFilters, vars, varsMap));
 
-    filters = _filters;
-    // TODO: We're changing state here
-    field.relayFilters = relayFilters;
-  }
+export const composeCreateFilters =
+  (createFiltersByArgs, sortFilters, spliceRelayFilters) =>
+    (field, vars, { varsMap = {} } = {}) => {
+      let { args, type } = field;
+      let varsMapForType = varsMap[type.name];
+      let filters = createFiltersByArgs(args, vars, varsMapForType)
+        .sort(sortFilters);
 
-  return filters;
-}
+      if (field.isRelayEdges) {
+        let { filters: _filters, relayFilters } = spliceRelayFilters(filters);
+
+        filters = _filters;
+
+        field.relayFilters = relayFilters;
+      }
+
+      return filters;
+    };
+
+const createFilters =
+  composeCreateFilters(createFiltersByArgs, sortFilters, spliceRelayFilters);
+
+export default createFilters;
