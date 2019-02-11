@@ -2,7 +2,8 @@ import { camelize } from 'ember-cli-mirage/utils/inflector'
 import { ensureList } from '../utils';
 import { get } from '@ember/object';
 
-function getParentInfo(parent, isRelayEdges) {
+// TODO: Add unit test for this
+export function getParentInfo(parent, isRelayEdges) {
   let parentFieldName = parent.field.type.name;
   let parentRecord = parent.record;
 
@@ -14,21 +15,27 @@ function getParentInfo(parent, isRelayEdges) {
   return [camelize(parentFieldName), parentRecord];
 }
 
-const getParentRecordFilter = (parentFieldName, parentId) =>
-  (record) => get(record, `${parentFieldName}.id`) === parentId;
+// TODO: Add unit test for this
+export const filterByParentField = (parentFieldName, parentId, records) =>
+  records.filter((record) => get(record, `${parentFieldName}.id`) === parentId);
 
-// TODO: Compose this function
-export function filterByParent(records, { field, fieldName }) {
-  if (!field.parent) {
-    return records;
-  }
+// TODO: Add unit test for this
+export const composeFilterByParent = (getParentInfo, filterByParentField) =>
+  (records, { field, fieldName }) => {
+    if (!field.parent) {
+      return records;
+    }
 
-  let [parentFieldName, parent] = getParentInfo(field.parent, field.isRelayEdges);
-  let { id: parentId } = parent;
+    let [parentFieldName, parent] = getParentInfo(field.parent, field.isRelayEdges);
+    let { id: parentId } = parent;
 
-  return parentId == null
-    ? records
-    : parent[fieldName]
-      ? ensureList(parent[fieldName])
-      : records.filter(getParentRecordFilter(parentFieldName, parentId));
-}
+    return parentId == null
+      ? records
+      : parent[fieldName]
+        ? ensureList(parent[fieldName])
+        : filterByParentField(parentFieldName, parentId, records);
+  };
+
+const filterByParent = composeFilterByParent(getParentInfo, filterByParentField);
+
+export default filterByParent;

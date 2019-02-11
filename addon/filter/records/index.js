@@ -1,8 +1,8 @@
 import applyFilters from '../apply';
 import createFilters from '../create';
+import filterByParent from '../parent';
 import resolveFieldName from '../../fields/name/resolve';
 import { applyRelayFilters } from '../../relay/filters';
-import { filterByParent } from '../parent';
 import { get } from '@ember/object';
 import { getAreRecordsEmpty } from '../../records';
 import { getIsRelayRecord } from '../../relay/record';

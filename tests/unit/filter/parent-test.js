@@ -1,66 +1,62 @@
-import { filterByParent } from 'ember-cli-mirage-graphql/filter/parent';
-import { module, test } from 'qunit';
+import { composeFilterByParent, filterByParentField, getParentInfo } from
+  'ember-cli-mirage-graphql/filter/parent';
+import { module, skip, test } from 'qunit';
 
 module('Unit | Filter | parent', function() {
-  test('it returns the records if there is no parent ID', function(assert) {
-    let field = {
-      parent: {
-        field: { type: { name: '' } },
-        record: {}
-      }
-    };
-    let records = [];
+  module('get info', function() {
+    test('it gets the parent field name and record', function(assert) {
+      let parent = { field: { type: { name: 'Foo-Bar' } }, record: {} };
+      let [fieldName, record] = getParentInfo(parent);
 
-    assert.equal(filterByParent(records, { field }), records,
-      'It just returns the records');
+      assert.equal(fieldName, 'fooBar', 'It got the field name');
+      assert.equal(record, parent.record, 'It got the record');
+    });
+
+    test('it gets relay edges parent field name and record', function(assert) {
+      let isRelayEdges = true;
+      let grandParent = { field: { type: { name: 'bar' } }, record: {} };
+      let parent = { field: { parent: grandParent, type: { name: 'Foo-Bar' } } };
+      let [fieldName, record] = getParentInfo(parent, isRelayEdges);
+
+      assert.equal(fieldName, grandParent.field.type.name, 'It got the field name');
+      assert.equal(record, grandParent.record, 'It got the record');
+    });
   });
 
-  test('it works if the parent record has a field for the child', function(assert) {
-    let fieldName = 'children';
-    let field = {
-      parent: {
-        field: { type: { name: '' } },
-        record: { [fieldName]: [] }
-      }
-    };
+  module('field', function() {
+    test('it filters records by parent field', function(assert) {
+      let parentFieldName = 'foo';
+      let records = [
+        { id: 1, [parentFieldName]: { id: 123 } },
+        { id: 2, [parentFieldName]: { id: 321 } }
+      ];
+      let filteredRecords = filterByParentField(parentFieldName, 123, records);
 
-    assert.equal(filterByParent(null, { field, fieldName }), parent[fieldName],
-      'It gets the records from the parent');
+      assert.deepEqual(filteredRecords, [records[0]], 'It filtered records');
+    });
   });
 
-  test('it works if the child record has a field for the parent', function(assert) {
-    let parentId = 1;
-    let field = {
-      parent: {
-        field: { type: { name: 'Foo' } },
-        record: { id: parentId }
-      }
-    };
-    let records = [
-      { foo: { id: parentId } },
-      { foo: { id: 2 } }
-    ];
+  module('filter by', function() {
+    skip('it returns records, if no parent', function(assert) {
+      let filterByParent = composeFilterByParent();
+      let records = [];
+      let filteredRecords = filterByParent(records, { field: {} });
 
-    assert.deepEqual(filterByParent(records, { field }), [records[0]],
-      'It filters out the 2nd record');
-  });
+      assert.equal(filteredRecords, records, 'It returned the records');
+    });
 
-  test('it gets the correct parent for relay edges', function(assert) {
-    let fieldName = 'children';
-    let field = {
-      isRelayEdges: true,
-      parent: {
-        field: {
-          parent: {
-            field: { type: { name: '' } },
-            record: { [fieldName]: [] }
-          },
-          type: { name: '' }
-        }
-      }
-    };
+    skip('it filters records, if referenced by parent', function() {
+    });
 
-    assert.equal(filterByParent(null, { field, fieldName }), parent[fieldName],
-      'It gets the records from the grandparent');
+    skip('it filters records that reference parent', function(assert) {
+      let fieldName = 'bar';
+      let records = [{ foo: 'bar' }, { foo: 'baz' }];
+      let filterByParentField = () => records[0];
+      let getParentInfo = () => ({ id: 1, [fieldName]: 'foo' });
+      let filterByParent = composeFilterByParent(getParentInfo, filterByParentField);
+      let filteredRecords = filterByParent(records, { field: {}, fieldName });
+
+      assert.deepEqual(filteredRecords, [records[0]], 'It returned the records');
+    });
   });
 });
