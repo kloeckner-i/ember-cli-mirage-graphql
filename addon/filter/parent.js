@@ -2,7 +2,6 @@ import { camelize } from 'ember-cli-mirage/utils/inflector'
 import { ensureList } from '../utils';
 import { get } from '@ember/object';
 
-// TODO: Add unit test for this
 export function getParentInfo(parent, isRelayEdges) {
   let parentFieldName = parent.field.type.name;
   let parentRecord = parent.record;
@@ -15,24 +14,23 @@ export function getParentInfo(parent, isRelayEdges) {
   return [camelize(parentFieldName), parentRecord];
 }
 
-// TODO: Add unit test for this
 export const filterByParentField = (parentFieldName, parentId, records) =>
   records.filter((record) => get(record, `${parentFieldName}.id`) === parentId);
 
-// TODO: Add unit test for this
 export const composeFilterByParent = (getParentInfo, filterByParentField) =>
   (records, { field, fieldName }) => {
     if (!field.parent) {
       return records;
     }
 
-    let [parentFieldName, parent] = getParentInfo(field.parent, field.isRelayEdges);
-    let { id: parentId } = parent;
+    let [parentFieldName, parentRecord] = getParentInfo(field.parent,
+      field.isRelayEdges);
+    let { id: parentId } = parentRecord;
 
     return parentId == null
       ? records
-      : parent[fieldName]
-        ? ensureList(parent[fieldName])
+      : parentRecord[fieldName]
+        ? ensureList(parentRecord[fieldName])
         : filterByParentField(parentFieldName, parentId, records);
   };
 
