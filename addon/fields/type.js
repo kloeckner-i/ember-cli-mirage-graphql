@@ -1,29 +1,40 @@
 import { GraphQLInterfaceType, GraphQLList } from 'graphql';
 import { get } from '@ember/object';
+import { getIsSelectionInlineFragment } from './selections';
 
-const getInlineFragment = (selections) =>
-  selections.find((selection) =>
-    selection.kind === 'InlineFragment');
+const findInlineFragment = (selections) =>
+  selections.find(getIsSelectionInlineFragment);
 
-function getTypeFromField(field, typeMap) {
-  let selections = get(field, 'selectionSet.selections');
-  let { typeCondition } = getInlineFragment(selections);
-  let typeName = get(typeCondition, 'name.value');
+const getIsInterface = (type) => type instanceof GraphQLInterfaceType;
+const getIsList = (type) => type instanceof GraphQLList;
 
-  return typeMap[typeName];
-}
+export const composeGetTypeForInterface = (findInlineFragment) =>
+  (field, typeMap) => {
+    let selections = get(field, 'selectionSet.selections');
+    let { typeCondition } = findInlineFragment(selections);
+    let typeName = get(typeCondition, 'name.value');
 
-export const getTypeForField = (typeMap, field, type) => {
-  let isList = type instanceof GraphQLList;
-  let recordType = type;
+    return typeMap[typeName];
+  };
 
-  if (type instanceof GraphQLInterfaceType) {
-    recordType = getTypeFromField(field, typeMap);
-  }
+const getTypeForInterface = composeGetTypeForInterface(findInlineFragment);
 
-  if (type.ofType) {
-    recordType = type.ofType;
-  }
+export const composeGetTypeForField =
+  (getIsList, getIsInlineFragment, getTypeForInterface) =>
+    (typeMap, field, type) => {
+      let isList = getIsList(type);
+      let recordType = type;
 
-  return { isList, recordType };
-};
+      if (getIsInterface(type)) {
+        recordType = getTypeForInterface(field, typeMap);
+      }
+
+      if (type.ofType) {
+        recordType = type.ofType;
+      }
+
+      return { isList, recordType };
+    };
+
+export const getTypeForField =
+  composeGetTypeForField(getIsList, getIsInterface, getTypeForInterface);

@@ -2,12 +2,19 @@ import createFieldInfo from './info/create';
 import getFieldName from './name';
 import { partial } from '../utils';
 
-export const inlineFragmentFieldsReducer = (selections, selection) =>
-  selections.concat(
-    selection.kind === 'InlineFragment'
-      ? selection.selectionSet.selections
-      : selection
-  );
+export const getIsSelectionInlineFragment = ({ kind }) =>
+  kind === 'InlineFragment';
+
+export const composeInlineFragmentReducer = (getIsSelectionInlineFragment) =>
+  (selections, selection) =>
+    selections.concat(
+      getIsSelectionInlineFragment(selection)
+        ? selection.selectionSet.selections
+        : selection
+    );
+
+const inlineFragmentFieldsReducer =
+  composeInlineFragmentReducer(getIsSelectionInlineFragment);
 
 export const selectedFieldsReducer =
   (getFieldName, createFieldInfo, getType, type, selections, selection) => {

@@ -1,16 +1,26 @@
-import { inlineFragmentFieldsReducer, selectedFieldsReducer } from
-  'ember-cli-mirage-graphql/fields/selections';
+import {
+  composeInlineFragmentReducer,
+  getIsSelectionInlineFragment,
+  selectedFieldsReducer
+} from 'ember-cli-mirage-graphql/fields/selections';
 import { module, test } from 'qunit';
 import { partial } from 'ember-cli-mirage-graphql/utils';
 
 module('Unit | Fields | selections', function() {
   module('inline fragment', function() {
+    test('it gets if a selection is an inline fragment', function(assert) {
+      let inlineFragmentSelection = { kind: 'InlineFragment' };
+      let selection = { kind: 'NotInlineFragment' };
+
+      assert.ok(getIsSelectionInlineFragment(inlineFragmentSelection),
+        'It returns true');
+      assert.notOk(getIsSelectionInlineFragment(selection), 'It returns false');
+    });
+
     test('it unwraps selections for inline fragments', function(assert) {
       let inlineSelection = {};
-      let selection = {
-        kind: 'InlineFragment',
-        selectionSet: { selections: [inlineSelection] }
-      };
+      let selection = { selectionSet: { selections: [inlineSelection] } };
+      let inlineFragmentFieldsReducer = composeInlineFragmentReducer(() => true);
       let reducedSelections = inlineFragmentFieldsReducer(['foo'], selection);
 
       assert.deepEqual(reducedSelections, ['foo', inlineSelection],
