@@ -5,7 +5,8 @@ import { getIsSelectionInlineFragment } from './selections';
 const findInlineFragment = (selections) =>
   selections.find(getIsSelectionInlineFragment);
 
-const getIsInterface = (type) => type instanceof GraphQLInterfaceType;
+export const getIsInterface = (type) => type instanceof GraphQLInterfaceType;
+
 const getIsList = (type) => type instanceof GraphQLList;
 
 export const composeGetTypeForInterface = (findInlineFragment) =>

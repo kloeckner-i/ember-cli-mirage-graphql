@@ -1,9 +1,19 @@
 import { contextSet, isFunction, reduceKeys } from '../utils';
 import { getRecords } from '../db';
+import { resolveVarName } from '../filter/vars';
 
-// TODO: Compose this function
-const getMutationMocker = (db, { mutations = {}, varsMap = {} } = {}) =>
-  (_, vars, __, { fieldName, returnType }) => {
+// TODO: Maybe add unit test for this
+export const composeMapVars = (resolveVarName) =>
+  (vars, varsMap = {}) =>
+    reduceKeys(vars, (mappedVars, key) =>
+      contextSet(mappedVars, resolveVarName(key, varsMap), vars[key]), {});
+
+const mapVars = composeMapVars(resolveVarName);
+
+// TODO: Add unit test for this
+export const composeMockMutation = (getRecords, mapVars) =>
+  (db, options = {}, _, vars, __, { fieldName, returnType }) => {
+    let { mutations = {}, varsMap = {} } = options;
     let mutation = mutations[fieldName];
     let records = getRecords(db, returnType.name);
 
@@ -16,10 +26,6 @@ const getMutationMocker = (db, { mutations = {}, varsMap = {} } = {}) =>
     return records;
   };
 
-const mapVars = (vars, varsMap = {}) =>
-  reduceKeys(vars, (mappedVars, key) =>
-    contextSet(mappedVars, resolveVarName(key, varsMap), vars[key]), {});
+const mockMutation = composeMockMutation(getRecords, mapVars);
 
-const resolveVarName = (key, varsMap) => key in varsMap ? varsMap[key] : key;
-
-export default getMutationMocker;
+export default mockMutation;

@@ -1,9 +1,9 @@
+import createMocksForSchema from './mocks/create';
 import {
   addMockFunctionsToSchema,
   addResolveFunctionsToSchema,
   makeExecutableSchema
 } from 'graphql-tools';
-import { createMocksForSchema } from './mocks/create';
 import { createResolversForInterfaceTypes } from './resolvers/interface-types';
 
 // TODO: Compose this function
