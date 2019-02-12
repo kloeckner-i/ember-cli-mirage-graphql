@@ -5,9 +5,8 @@ import resolveFieldInfo from '../fields/info/resolve';
 import { getIsInterface, getTypeForField } from '../fields/type';
 import { partial } from '../utils';
 
-// TODO: Add unit test for this
 export const composeMockQuery =
-  (getFieldName, createFieldInfo, resolveFieldInfo, getIsInterface) =>
+  (getTypeForField, getFieldName, createFieldInfo, resolveFieldInfo, getIsInterface, logError) =>
     (db, options, _, vars, __, { fieldNodes, returnType, schema }) => {
       try {
         let getType = partial(getTypeForField, schema._typeMap);
@@ -20,11 +19,11 @@ export const composeMockQuery =
 
         return getIsInterface(returnType) ? records : records[fieldName];
       } catch(ex) {
-        Ember.Logger.error(ex);
+        logError(ex);
       }
     };
 
-const mockQuery = composeMockQuery(getFieldName, createFieldInfo,
-  resolveFieldInfo, getIsInterface);
+const mockQuery = composeMockQuery(getTypeForField, getFieldName,
+  createFieldInfo, resolveFieldInfo, getIsInterface, Ember.Logger.error);
 
 export default mockQuery;
