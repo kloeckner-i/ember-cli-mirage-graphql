@@ -8,7 +8,6 @@ export const composeGetRecords = (getTableName) =>
 
 export const getRecords = composeGetRecords(getTableName);
 
-// TODO: Add unit test for this
 export const composeGetTableNameForField = (getMappedFieldName, getTableName) =>
   (fieldName, parent, typeName, fieldsMap) =>
     getMappedFieldName(fieldName, parent, fieldsMap) || getTableName(typeName);
