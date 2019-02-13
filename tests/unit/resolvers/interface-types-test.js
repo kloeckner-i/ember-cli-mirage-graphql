@@ -1,32 +1,81 @@
-import { createResolversForInterfaceTypes } from
+import {
+  addInterfaceTypesToResolvers,
+  composeCreateResolverByFields,
+  composeCreateResolversForInterfaceTypes,
+  resolveField,
+  resolveInterfaceType
+} from
   'ember-cli-mirage-graphql/resolvers/interface-types';
 import { module, test } from 'qunit';
 
-module('Unit | Resolvers | interface-types', function() {
-  test('it creates resolvers for interface types', function(assert) {
-    assert.expect(2);
+module('Unit | Resolvers | interface types', function() {
+  module('add resolvers', function() {
+    test('it adds resolvers for interface types', function(assert) {
+      let name = 'foo';
+      let interfaces = [{ name }];
+      let resolvers = addInterfaceTypesToResolvers(interfaces);
 
-    let bazData = { baz: 1 };
-    let data = { key: { __typename: 'Foo' } };
-    let path = { key: 'key' };
-    let schema = {
-      getType(typeName) {
-        assert.equal(typeName, 'Foo', 'It looks up the type in the schema');
-      },
-      _typeMap: {
-        Foo: {
-          name: 'Foo',
-          _fields: { baz: null },
-          _interfaces: [{ name: 'Bar' }]
-        }
-      }
-    };
-    let resolvers = createResolversForInterfaceTypes(schema);
+      assert.equal(resolvers[name].__resolveType, resolveInterfaceType,
+        'It added the resolver');
+    });
 
-    resolvers.Bar.__resolveType(data, null, { path, schema });
+    test('it can resolve and interface type', function(assert) {
+      let key = 'foo';
+      let data = { [key]: { __typename: null } };
+      let type = {};
+      let path = { key };
+      let schema = { getType: () => type };
+      let resolvedType = resolveInterfaceType(data, null, { path, schema });
 
-    let resolvedBaz = resolvers.Foo.baz({ _: bazData });
+      assert.equal(resolvedType, type, 'It resolves the type');
+    });
+  });
 
-    assert.equal(resolvedBaz, bazData.baz, 'It resolves fields');
+  module('create resolvers', function() {
+    test('it creates resolvers by field', function(assert) {
+      let data = {};
+      let fieldName = 'foo';
+      let resolveField = (_fieldName, _data) => {
+        assert.equal(_fieldName, fieldName, 'It resolves by field name');
+        assert.equal(_data, data, 'It receives the data');
+      };
+      let createByFields = composeCreateResolverByFields(resolveField);
+      let resolver = createByFields({ [fieldName]: null });
+
+      resolver[fieldName](data);
+    });
+
+    test('it creates resolvers', function(assert) {
+      let addTypes = () => ({});
+      let resolver = () => {};
+      let createResolver = () => resolver;
+      let createResolvers =
+        composeCreateResolversForInterfaceTypes(addTypes, createResolver);
+      let typeName = 'Foo';
+      let _typeMap = {
+        [typeName]: { name: typeName, _fields: {}, _interfaces: [{}] }
+      };
+      let resolvers = createResolvers({ _typeMap });
+
+      assert.equal(resolvers[typeName], resolver, 'It created the resolver');
+    });
+  });
+
+  module('field resolver', function() {
+    test('it returns the field value', function(assert) {
+      let fieldName = 'foo';
+      let record = { [fieldName]: 'bar', __typename: 'Foo' };
+      let fieldValue = resolveField(fieldName, record);
+
+      assert.equal(fieldValue, record[fieldName], 'It resolved the field');
+    });
+
+    test('it works with wrapped field data', function(assert) {
+      let fieldName = 'foo';
+      let record = { data: { [fieldName]: 'bar', __typename: 'Foo' } };
+      let fieldValue = resolveField(fieldName, record);
+
+      assert.equal(fieldValue, record.data[fieldName], 'It resolved the field');
+    });
   });
 });
