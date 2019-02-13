@@ -1,47 +1,59 @@
 import createPageInfo from './page-info';
 import { contextPush, contextSet } from '../utils';
+import { get } from '@ember/object';
 
 const RELAY_VAR_NAMES = ['after', 'before', 'first', 'last'];
 
-const getFilterTypeToSet = (name) =>
+export const composeSetRelayPageInfo = (createPageInfo) =>
+  (pageInfoField, typeName, records, firstRecordId, lastRecordId) =>
+    pageInfoField.relayPageInfo =
+      createPageInfo(records, firstRecordId, lastRecordId, typeName);
+
+const setRelayPageInfo = composeSetRelayPageInfo(createPageInfo);
+
+export const getRelayFiltersFromField = ({ relayFilters }) =>
+  relayFilters.reduce((filters, { name, value }) =>
+    value ? contextSet(filters, name, parseInt(value)) : filters, {});
+
+export const composeApplyRelayFilters =
+  (getRelayFiltersFromField, setRelayPageInfo) =>
+    (records, { field }) => {
+      if (!field.relayFilters) {
+        return records;
+      }
+
+      let hasRecords = !!records.length;
+      let firstRecordId = hasRecords && records[0].id;
+      let lastRecordId = hasRecords && records[records.length - 1].id;
+      let pageInfoField = get(field, 'parent.field.fields.pageInfo');
+      let typeName = get(field, 'type.name');
+
+      if (hasRecords) {
+        let { after, before, first, last } = getRelayFiltersFromField(field);
+
+        if (after != null) records = records.slice(after);
+        if (before != null) records = records.slice(0, before - 1);
+        if (first != null) records = records.slice(0, first);
+        if (last != null) records = records.slice(-last);
+      }
+
+      setRelayPageInfo(pageInfoField, typeName, records, firstRecordId,
+        lastRecordId);
+
+      return records;
+    };
+
+export const applyRelayFilters =
+  composeApplyRelayFilters(getRelayFiltersFromField, setRelayPageInfo);
+
+export const getFilterTypeToSet = (name) =>
   RELAY_VAR_NAMES.includes(name) ? 'relayFilters' : 'filters';
 
-const reduceRelayFiltersToHash = (filters,  { name, value }) =>
-  value ? contextSet(filters, name, parseInt(value)) : filters;
+export const composeSpliceRelayFilters = (getFilterTypeToSet) =>
+  (filters) => filters.reduce(
+    (filterTypes, filter) =>
+      contextPush(filterTypes, getFilterTypeToSet(filter.resolvedName), filter),
+    { filters: [], relayFilters: [] }
+  );
 
-const relayFilterReducer = (filterTypes, filter) =>
-  contextPush(filterTypes, getFilterTypeToSet(filter.resolvedName), filter);
-
-// TODO: We're changing state here
-const setPageInfo = (field, records, firstRecordId, lastRecordId) =>
-  field.parent.field.fields.pageInfo.relayPageInfo = createPageInfo(records,
-    firstRecordId, lastRecordId, field.type.name);
-
-// TODO: Compose this function
-export function applyRelayFilters(records, { field }) {
-  if (!field.relayFilters) {
-    return records;
-  }
-
-  let hasRecords = !!records.length;
-  let firstRecordId = hasRecords && records[0].id;
-  let lastRecordId = hasRecords && records[records.length - 1].id;
-
-  if (hasRecords) {
-    let { after, before, first, last } = field.relayFilters
-      .reduce(reduceRelayFiltersToHash, {});
-
-    if (after != null) records = records.slice(after);
-    if (before != null) records = records.slice(0, before - 1);
-    if (first != null) records = records.slice(0, first);
-    if (last != null) records = records.slice(-last);
-  }
-
-  setPageInfo(field, records, firstRecordId, lastRecordId);
-
-  return records;
-}
-
-// TODO: Compose this function
-export const spliceRelayFilters = (filters) =>
-  filters.reduce(relayFilterReducer, { filters: [], relayFilters: [] });
+export const spliceRelayFilters = composeSpliceRelayFilters(getFilterTypeToSet);

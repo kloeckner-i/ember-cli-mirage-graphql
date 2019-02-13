@@ -1,55 +1,102 @@
-import Filter from 'ember-cli-mirage-graphql/filter/model';
-import { applyRelayFilters } from 'ember-cli-mirage-graphql/relay/filters';
+import {
+  composeApplyRelayFilters,
+  composeSetRelayPageInfo,
+  composeSpliceRelayFilters,
+  getFilterTypeToSet,
+  getRelayFiltersFromField
+} from 'ember-cli-mirage-graphql/relay/filters';
 import { module, test } from 'qunit';
 
-const FIELD = {
-  isRelayEdges: true,
-  parent: { field: { fields: { pageInfo: {} } } },
-  type: { name: 'Foo' }
-};
-
 module('Unit | Relay | filters', function() {
-  test('it returns records if no relay edges', function(assert) {
-    let field = { isRelayEdges: false };
-    let records = [];
+  module('page info', function() {
+    test('it sets relay page info on a parent field', function(assert) {
+      let pageInfoField = { relayPageInfo: null };
+      let pageInfo = {};
+      let createPageInfo = () => pageInfo;
+      let setRelayPageInfo = composeSetRelayPageInfo(createPageInfo);
 
-    assert.equal(applyRelayFilters(records, { field }), records,
-      'It returned the records');
+      setRelayPageInfo(pageInfoField);
+
+      assert.equal(pageInfoField.relayPageInfo, pageInfo, 'It set the page info');
+    });
   });
 
-  test('it can filter by first/after', function(assert) {
-    let relayFilters = [
-      Filter.create({ name: 'first', value: 2 }),
-      Filter.create({ name: 'after', value: '1' })
-    ];
-    let field = Object.assign(FIELD, { relayFilters });
-    let records = [{ id: '1' }, { id: '2' }, { id: '3' }];
-    let filteredRecords = applyRelayFilters(records, { field });
-    let { relayPageInfo } = field.parent.field.fields.pageInfo;
+  module('get from field', function() {
+    test('it maps list of filters to hash', function(assert) {
+      let relayFilters = [
+        { name: 'after', value: '1' },
+        { name: 'first', value: '10' },
+        { name: 'before', value: null },
+        { name: 'last', value: null }
+      ];
+      let filtersFromField = getRelayFiltersFromField({ relayFilters });
 
-    assert.deepEqual(filteredRecords, records.slice(1),
-      'It returned the last 2 records');
-    assert.deepEqual(relayPageInfo, {
-      hasNextPage: false,
-      hasPreviousPage: true
-    }, 'It sets the pageInfo on the parent connection field');
+      assert.deepEqual(filtersFromField, { after: 1, first: 10 },
+        'It mapped filters with values');
+    });
   });
 
-  test('it can filter by last/before', function(assert) {
-    let relayFilters = [
-      Filter.create({ name: 'last', value: 2 }),
-      Filter.create({ name: 'before', value: '3' })
-    ];
-    let field = Object.assign(FIELD, { relayFilters });
-    let records = [{ id: '1' }, { id: '2' }, { id: '3' }];
-    let filteredRecords = applyRelayFilters(records, { field });
-    let { relayPageInfo } = field.parent.field.fields.pageInfo;
+  module('apply', function() {
+    test('it applies after, before, first and last filters', function(assert) {
+      let field = { relayFilters: {} };
+      let getRelayFiltersFromField = () => ({
+        after: 1,
+        before: 9,
+        first: 5,
+        last: 2
+      });
+      let records = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((r) => ({ id: r }));
+      let setRelayPageInfo = () => {};
+      let applyRelayFilters =
+        composeApplyRelayFilters(getRelayFiltersFromField, setRelayPageInfo);
+      let filteredRecords = applyRelayFilters(records, { field });
 
-    assert.deepEqual(filteredRecords, records.slice(0, 2),
-      'It returned the first 2 records');
-    assert.deepEqual(relayPageInfo, {
-      hasNextPage: true,
-      hasPreviousPage: false
-    }, 'It sets the pageInfo on the parent connection field');
+      assert.deepEqual(filteredRecords, records.slice(4, 6),
+        'It applied filters in the correct order');
+    });
+
+    test('it returns records, if no relay filters', function(assert) {
+      let field = {};
+      let noop = () => {};
+      let records = [];
+      let applyRelayFilters = composeApplyRelayFilters(noop, noop);
+      let filteredRecords = applyRelayFilters(records, { field });
+
+      assert.equal(filteredRecords, records, 'It returned the records');
+    });
+  });
+
+  module('splice', function() {
+    test('it gets the type of filter to set', function(assert) {
+      let filterType1 = getFilterTypeToSet('after');
+      let filterType2 = getFilterTypeToSet('before');
+      let filterType3 = getFilterTypeToSet('first');
+      let filterType4 = getFilterTypeToSet('last');
+      let filterType5 = getFilterTypeToSet('other');
+      let otherType = 'filters';
+      let relayType = 'relayFilters';
+
+      assert.equal(filterType1, relayType, '"after" is a relay filter');
+      assert.equal(filterType2, relayType, '"before" is a relay filter');
+      assert.equal(filterType3, relayType, '"first" is a relay filter');
+      assert.equal(filterType4, relayType, '"last" is a relay filter');
+      assert.equal(filterType5, otherType, '"other" is not a relay filter');
+    });
+
+    test('it splices relay filters', function(assert) {
+      let filters = [
+        { resolvedName: 'other' },
+        { resolvedName: 'first' }
+      ];
+      let getFilterTypeToSet = (name) =>
+        name === 'first' ? 'relayFilters' : 'filters';
+      let spliceRelayFilters = composeSpliceRelayFilters(getFilterTypeToSet);
+      let filterTypes = spliceRelayFilters(filters);
+
+      assert.deepEqual(filterTypes, {
+        filters: [filters[0]],
+        relayFilters: [filters[1]]
+      }, 'It spliced the filters');
+    });
   });
 });
