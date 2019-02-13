@@ -6,30 +6,40 @@ import {
 } from 'graphql-tools';
 import { createResolversForInterfaceTypes } from './resolvers/interface-types';
 
-// TODO: Compose this function
-export function addInterfaceTypeResolversToSchema(schema) {
-  let interfaceTypeResolvers = createResolversForInterfaceTypes(schema);
+export const composeAddInterfaceTypeResolversToSchema =
+  (createResolversForInterfaceTypes, addResolveFunctionsToSchema) =>
+    (schema) => {
+      let interfaceTypeResolvers = createResolversForInterfaceTypes(schema);
 
-  if (interfaceTypeResolvers) {
-    addResolveFunctionsToSchema({
-      resolvers: interfaceTypeResolvers,
+      if (interfaceTypeResolvers) {
+        addResolveFunctionsToSchema({
+          resolvers: interfaceTypeResolvers,
+          schema
+        });
+      }
+    };
+
+export const addInterfaceTypeResolversToSchema =
+  composeAddInterfaceTypeResolversToSchema(createResolversForInterfaceTypes,
+    addResolveFunctionsToSchema);
+
+export const composeAddMocksToSchema = (addMockFunctions, createMocks) =>
+  (schema, db, options) =>
+    addMockFunctions({
+      mocks: createMocks(schema, db, options),
+      preserveResolvers: false,
       schema
     });
-  }
-}
 
-// TODO: Compose this function
-export const addMocksToSchema = (schema, db, options) =>
-  addMockFunctionsToSchema({
-    mocks: createMocksForSchema(schema, db, options),
-    preserveResolvers: false,
-    schema
+export const addMocksToSchema =
+  composeAddMocksToSchema(addMockFunctionsToSchema, createMocksForSchema);
+
+export const composeCreateSchema = (makeExecutableSchema) =>
+  (typeDefs) => makeExecutableSchema({
+    resolverValidationOptions: {
+      requireResolversForResolveType: false
+    },
+    typeDefs
   });
 
-// TODO: Compose this function
-export const createSchema = (typeDefs) => makeExecutableSchema({
-  resolverValidationOptions: {
-    requireResolversForResolveType: false
-  },
-  typeDefs
-});
+export const createSchema = composeCreateSchema(makeExecutableSchema);
