@@ -1,21 +1,27 @@
-import { fieldHasConnectionType } from './connection';
+import { getFieldHasConnectionType } from './connection';
+import { get } from '@ember/object';
 
-const getRecordToEdgeMapper = (typeName) =>
-  (record) => ({
+export const mapRelayEdges = (records, typeName) =>
+  records.map((record) => ({
     cursor: btoa(`${typeName}:${record.id}`),
     node: record
-  });
+  }));
 
-export function createRelayEdges(records, { field }) {
-  let { fields, isRelayEdges } = field;
+export const composeCreateRelayEdges = (mapRelayEdges) =>
+  (records, { field }) => {
+    let { fields, isRelayEdges } = field;
 
-  if (isRelayEdges) {
-    records = records.map(getRecordToEdgeMapper(fields.node.type.name));
-  }
+    if (isRelayEdges) {
+      records = mapRelayEdges(records, get(fields, 'node.type.name'));
+    }
 
-  return records;
-}
+    return records;
+  };
 
-// TODO: Compose this function
-export const getIsEdge = (fieldName, field) =>
-  fieldName === 'edges' && fieldHasConnectionType(field.parent.field.type.name);
+export const createRelayEdges = composeCreateRelayEdges(mapRelayEdges);
+
+export const composeGetIsEdge = (getFieldHasConnectionType) =>
+  (fieldName, field) => fieldName === 'edges' &&
+    getFieldHasConnectionType(get(field, 'parent.field.type.name'));
+
+export const getIsEdge = composeGetIsEdge(getFieldHasConnectionType);
