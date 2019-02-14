@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = {
+  appEnv: null,
+  mirageConfig: null,
   name: require('./package').name,
   options: {
     autoImport: {
@@ -18,5 +20,31 @@ module.exports = {
         }
       }
     }
+  },
+  included(app) {
+    let config = this.app.project.config(app.env);
+
+    this.appEnv = app.env;
+    this.mirageConfig = config['ember-cli-mirage'] || {};
+
+    this._super.included.apply(this, arguments);
+  },
+  treeForAddon() {
+    if (this._getShouldIncludeFiles()) {
+      return this._super.treeForAddon.apply(this, arguments);
+    }
+  },
+  _getShouldIncludeFiles() {
+    if (process.env.EMBER_CLI_FASTBOOT) {
+      return false;
+    }
+
+    let environment = this.appEnv;
+    let enabledInProd = environment === 'production' && this.mirageConfig.enabled;
+    let explicitExcludeFiles = this.mirageConfig.excludeFilesFromBuild;
+    let shouldIncludeFiles = enabledInProd || (environment &&
+      environment !== 'production' && explicitExcludeFiles !== true);
+
+    return shouldIncludeFiles;
   }
 };
