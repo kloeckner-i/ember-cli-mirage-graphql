@@ -41,6 +41,7 @@ jobs:
         - npm run lint:hbs
         - npm run lint:js
         - npm test
+        - cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js
 
     # we recommend new addons test the current and previous LTS
     # as well as latest stable release (bonus points to beta/canary)
