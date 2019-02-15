@@ -37,8 +37,10 @@ export const composeApplyRelayFilters =
         if (last != null) records = records.slice(-last);
       }
 
-      setRelayPageInfo(pageInfoField, typeName, records, firstRecordId,
-        lastRecordId);
+      if (pageInfoField) {
+        setRelayPageInfo(pageInfoField, typeName, records, firstRecordId,
+          lastRecordId);
+      }
 
       return records;
     };

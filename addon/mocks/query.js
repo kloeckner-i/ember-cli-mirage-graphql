@@ -7,13 +7,14 @@ import { partial } from '../utils';
 
 export const composeMockQuery =
   (getTypeForField, getFieldName, createFieldInfo, resolveFieldInfo, getIsInterface, logError) =>
-    (db, options, _, vars, __, { fieldNodes, returnType, schema }) => {
+    (db, options, _, vars, __, { fieldNodes, fragments, returnType, schema }) => {
       try {
         let getType = partial(getTypeForField, schema._typeMap);
         let [rootField] = fieldNodes;
         let fieldName = getFieldName(rootField);
         let fieldInfo = {
-          [fieldName]: createFieldInfo(rootField, fieldName, returnType, getType)
+          [fieldName]: createFieldInfo(rootField, fieldName, returnType,
+            fragments, getType)
         };
         let records = resolveFieldInfo(fieldInfo, db, vars, options);
 

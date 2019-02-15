@@ -1,0 +1,9 @@
+#import 'dummy/gql/fragments/line-item'
+
+fragment lineItemConnection on LineItemConnection {
+  edges {
+    node {
+      ...lineItem
+    }
+  }
+}

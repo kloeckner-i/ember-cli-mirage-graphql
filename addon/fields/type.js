@@ -1,9 +1,8 @@
 import { GraphQLInterfaceType, GraphQLList } from 'graphql';
 import { get } from '@ember/object';
-import { getIsSelectionInlineFragment } from './selections';
+import { getIsInlineFragment } from './selections/fragments';
 
-const findInlineFragment = (selections) =>
-  selections.find(getIsSelectionInlineFragment);
+const findInlineFragment = (selections) => selections.find(getIsInlineFragment);
 
 export const getIsInterface = (type) => type instanceof GraphQLInterfaceType;
 
