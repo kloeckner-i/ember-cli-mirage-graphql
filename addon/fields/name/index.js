@@ -1,4 +1,6 @@
-const getFieldName = ({ alias, name }) =>
-  alias && alias.value || name.value;
+import { get } from '@ember/object';
 
-export default getFieldName;
+export const getFieldNameAndAlias = (field) => ({
+  fieldAlias: get(field, 'alias.value'),
+  fieldName: get(field, 'name.value')
+});

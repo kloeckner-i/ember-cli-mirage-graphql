@@ -4,7 +4,7 @@ query($id: ID!, $after: String, $before: String, $first: Int, $last: Int) {
   customer: node(id: $id) {
     id
     ... on Customer {
-      name
+      customerName: name
       orders(after: $after, before: $before, first: $first, last: $last) {
         categories {
           name

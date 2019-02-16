@@ -6,7 +6,7 @@ module('Unit | Mocks | query', function() {
   let createFieldInfo = noop;
   let getTypeForField = noop;
   let fieldName = 'foo';
-  let getFieldName = () => fieldName;
+  let getFieldName = () => ({ fieldName });
   let meta = { fieldNodes: [], returnType: {}, schema: {} };
   let record = { [fieldName]: 'bar' };
   let resolveFieldInfo = () => record;

@@ -1,19 +1,20 @@
 import Ember from 'ember';
 import createFieldInfo from '../fields/info/create';
-import getFieldName from '../fields/name';
 import resolveFieldInfo from '../fields/info/resolve';
+import { getFieldNameAndAlias } from '../fields/name';
 import { getIsInterface, getTypeForField } from '../fields/type';
 import { partial } from '../utils';
 
 export const composeMockQuery =
-  (getTypeForField, getFieldName, createFieldInfo, resolveFieldInfo, getIsInterface, logError) =>
+  (getTypeForField, getFieldNameAndAlias, createFieldInfo, resolveFieldInfo, getIsInterface, logError) =>
     (db, options, _, vars, __, { fieldNodes, fragments, returnType, schema }) => {
       try {
         let getType = partial(getTypeForField, schema._typeMap);
         let [rootField] = fieldNodes;
-        let fieldName = getFieldName(rootField);
+        let { fieldAlias, fieldName } = getFieldNameAndAlias(rootField);
+        let fieldInfoName = fieldAlias || fieldName;
         let fieldInfo = {
-          [fieldName]: createFieldInfo(rootField, fieldName, returnType,
+          [fieldInfoName]: createFieldInfo(rootField, fieldInfoName, returnType,
             fragments, getType)
         };
         let records = resolveFieldInfo(fieldInfo, db, vars, options);
@@ -24,7 +25,7 @@ export const composeMockQuery =
       }
     };
 
-const mockQuery = composeMockQuery(getTypeForField, getFieldName,
+const mockQuery = composeMockQuery(getTypeForField, getFieldNameAndAlias,
   createFieldInfo, resolveFieldInfo, getIsInterface, Ember.Logger.error);
 
 export default mockQuery;

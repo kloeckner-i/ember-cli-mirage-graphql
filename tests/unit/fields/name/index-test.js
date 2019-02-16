@@ -1,19 +1,16 @@
-import getFieldName from 'ember-cli-mirage-graphql/fields/name';
+import { getFieldNameAndAlias } from 'ember-cli-mirage-graphql/fields/name';
 import { module, test } from 'qunit';
 
 module('Unit | Fields | name', function() {
-  test('it can get a field name or alias', function(assert) {
+  test('it can get a field name and alias', function(assert) {
+    let fieldAlias = 'bar';
     let fieldName = 'foo';
     let field = {
+      alias: { value: fieldAlias },
       name: { value: fieldName }
     };
-    let fieldAlias = 'baz';
-    let fieldWithAlias = {
-      alias: { value: fieldAlias },
-      name: { value: 'bar' }
-    };
 
-    assert.equal(getFieldName(field), fieldName, 'It can get a name');
-    assert.equal(getFieldName(fieldWithAlias), fieldAlias, 'It can get an alias');
+    assert.deepEqual(getFieldNameAndAlias(field), { fieldAlias, fieldName },
+      'It can get the field name and alias');
   });
 });
