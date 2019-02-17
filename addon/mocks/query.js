@@ -13,13 +13,15 @@ export const composeMockQuery =
         let [rootField] = fieldNodes;
         let { fieldAlias, fieldName } = getFieldNameAndAlias(rootField);
         let fieldInfoName = fieldAlias || fieldName;
+        let isInterface = getIsInterface(returnType)
+        let rootFieldName = isInterface ? fieldInfoName : fieldName;
         let fieldInfo = {
-          [fieldInfoName]: createFieldInfo(rootField, fieldInfoName, returnType,
+          [rootFieldName]: createFieldInfo(rootField, fieldInfoName, returnType,
             fragments, getType)
         };
         let records = resolveFieldInfo(fieldInfo, db, vars, options);
 
-        return getIsInterface(returnType) ? records : records[fieldName];
+        return isInterface ? records : records[fieldName];
       } catch(ex) {
         logError(ex);
       }
