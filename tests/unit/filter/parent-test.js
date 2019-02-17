@@ -21,6 +21,23 @@ module('Unit | Filter | parent', function() {
       assert.equal(fieldName, grandParent.field.type.name, 'It got the field name');
       assert.equal(record, grandParent.record, 'It got the record');
     });
+
+    test('it works if not parent', function(assert) {
+      let parent = {};
+      let [fieldName, record] = getParentInfo(parent);
+
+      assert.equal(fieldName, null, 'It returned no parent name');
+      assert.equal(record, null, 'It returned no parent record');
+    });
+
+    test('it works if no grandparent', function(assert) {
+      let isRelayEdges = true;
+      let parent = {};
+      let [fieldName, record] = getParentInfo(parent, isRelayEdges);
+
+      assert.equal(fieldName, null, 'It returned no parent name');
+      assert.equal(record, null, 'It returned no parent record');
+    });
   });
 
   module('field', function() {

@@ -3,15 +3,15 @@ import { ensureList } from '../utils';
 import { get } from '@ember/object';
 
 export function getParentInfo(parent, isRelayEdges) {
-  let parentFieldName = parent.field.type.name;
+  let parentFieldName = get(parent, 'field.type.name');
   let parentRecord = parent.record;
 
   if (isRelayEdges) {
-    parentFieldName = parent.field.parent.field.type.name;
-    parentRecord = parent.field.parent.record;
+    parentFieldName = get(parent, 'field.parent.field.type.name');
+    parentRecord = get(parent, 'field.parent.record');
   }
 
-  return [camelize(parentFieldName), parentRecord];
+  return [parentFieldName && camelize(parentFieldName), parentRecord];
 }
 
 export const filterByParentField = (parentFieldName, parentId, records) =>
@@ -23,7 +23,7 @@ export const composeFilterByParent = (getParentInfo, filterByParentField) =>
       return records;
     }
 
-    let [parentFieldName, parentRecord] = getParentInfo(field.parent,
+    let [parentFieldName, parentRecord = {}] = getParentInfo(field.parent,
       field.isRelayEdges);
     let { id: parentId } = parentRecord;
 
