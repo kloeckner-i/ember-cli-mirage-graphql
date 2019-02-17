@@ -24,6 +24,8 @@ export const composeMockQuery =
         return isInterface ? records : records[fieldName];
       } catch(ex) {
         logError(ex);
+
+        return ex;
       }
     };
 
