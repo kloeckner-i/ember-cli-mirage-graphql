@@ -1,3 +1,5 @@
+const sortEdgesKeysBeforePageInfo = (list) => list.sort();
+
 export function contextPush(context, k, v) {
   context[k].push(v);
 
@@ -25,5 +27,8 @@ export const partial = (fn, ...args1) => (...args2) => fn(...args1, ...args2);
 export const pipeWithMeta = (...fns) =>
   fns.reduce((fn1, fn2) => (arg, meta) => fn2(fn1(arg, meta), meta));
 
-export const reduceKeys = (obj, reducerFn, defaultValue) =>
-  Object.keys(obj).reduce(reducerFn, defaultValue);
+export const composeReduceKeys = (sortKeys) =>
+  (obj, reducerFn, defaultValue) =>
+    sortKeys(Object.keys(obj)).reduce(reducerFn, defaultValue);
+
+export const reduceKeys = composeReduceKeys(sortEdgesKeysBeforePageInfo);

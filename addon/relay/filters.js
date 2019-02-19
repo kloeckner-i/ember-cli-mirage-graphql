@@ -18,17 +18,13 @@ export const getRelayFiltersFromField = ({ relayFilters }) =>
 export const composeApplyRelayFilters =
   (getRelayFiltersFromField, setRelayPageInfo) =>
     (records, { field }) => {
-      if (!field.relayFilters) {
-        return records;
-      }
-
       let hasRecords = !!records.length;
       let firstRecordId = hasRecords && records[0].id;
       let lastRecordId = hasRecords && records[records.length - 1].id;
       let pageInfoField = get(field, 'parent.field.fields.pageInfo');
       let typeName = get(field, 'type.name');
 
-      if (hasRecords) {
+      if (hasRecords && field.relayFilters) {
         let { after, before, first, last } = getRelayFiltersFromField(field);
 
         if (after != null) records = records.slice(after);
