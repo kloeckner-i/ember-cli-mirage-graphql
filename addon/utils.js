@@ -22,6 +22,9 @@ export const getFirstKey = (obj) => Object.keys(obj)[0];
 
 export const isFunction = (obj) => obj != null && typeof obj === 'function';
 
+export const objectOfType = (obj, typeName) =>
+  Object.assign({ __typename: typeName }, obj);
+
 export const partial = (fn, ...args1) => (...args2) => fn(...args1, ...args2);
 
 export const pipeWithMeta = (...fns) =>

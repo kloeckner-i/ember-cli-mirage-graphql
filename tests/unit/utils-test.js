@@ -5,6 +5,7 @@ import {
   ensureList,
   getFirstKey,
   isFunction,
+  objectOfType,
   partial,
   pipeWithMeta
 } from 'ember-cli-mirage-graphql/utils';
@@ -96,5 +97,17 @@ module('Unit | utils', function() {
       `${str}|${key}:${context[key]}`, '');
 
     assert.equal(result, '|foo:bar|bar:baz', 'It formats keys and values');
+  });
+
+  test('it can add a type name to an object', function(assert) {
+    let key = 'foo';
+    let value = 'bar';
+    let obj = { [key]: value };
+    let typeName = 'Foo';
+
+    assert.deepEqual(objectOfType(obj, typeName), {
+      [key]: value,
+      __typename: typeName
+    }, 'It added the type name');
   });
 });
