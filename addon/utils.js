@@ -1,28 +1,37 @@
-import { camelize, pluralize } from 'ember-cli-mirage/utils/inflector';
-import { get } from '@ember/object';
+const sortEdgesKeysBeforePageInfo = (list) => list.sort();
 
-const PROP_FOR_TYPE = 'returnType';
-const PROP_FOR_LIST_TYPE = `${PROP_FOR_TYPE}.ofType`;
+export function contextPush(context, k, v) {
+  context[k].push(v);
 
-export function contextSet(obj, k, v) {
-  obj[k] = v;
-
-  return obj;
+  return context;
 }
 
-export const getIsList = (meta) => !!get(meta, PROP_FOR_LIST_TYPE);
+export function contextSet(context, k, v) {
+  context[k] = v;
 
-export function getTableByType(db, { name }) {
-  let recordType = camelize(name);
-  let records = db[pluralize(recordType)];
-
-  return { recordType, records };
+  return context;
 }
 
-export const getTypeFromMeta = (meta, isList) =>
-  get(meta, isList ? PROP_FOR_LIST_TYPE : PROP_FOR_TYPE);
+export const ensureList = (item) => item == null
+  ? []
+  : item instanceof Array
+    ? item
+    : [item];
+
+export const getFirstKey = (obj) => Object.keys(obj)[0];
 
 export const isFunction = (obj) => obj != null && typeof obj === 'function';
 
-export const reduceKeys = (obj, reducerFn, defaultValue) =>
-  Object.keys(obj).reduce(reducerFn, defaultValue);
+export const objectOfType = (obj, typeName) =>
+  Object.assign({ __typename: typeName }, obj);
+
+export const partial = (fn, ...args1) => (...args2) => fn(...args1, ...args2);
+
+export const pipeWithMeta = (...fns) =>
+  fns.reduce((fn1, fn2) => (arg, meta) => fn2(fn1(arg, meta), meta));
+
+export const composeReduceKeys = (sortKeys) =>
+  (obj, reducerFn, defaultValue) =>
+    sortKeys(Object.keys(obj)).reduce(reducerFn, defaultValue);
+
+export const reduceKeys = composeReduceKeys(sortEdgesKeysBeforePageInfo);

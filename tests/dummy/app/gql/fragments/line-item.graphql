@@ -1,0 +1,4 @@
+fragment lineItem on LineItem {
+  name,
+  quantity
+}

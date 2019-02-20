@@ -18,23 +18,44 @@ module('Acceptance | people', function(hooks) {
     assert.equal(tableRows.length, 5, 'There are 5 people displayed');
   });
 
-  test('it can filter records with vars (lastName)', async function(assert) {
-    this.server.createList('person', 10, { lastName: 'Thomas' });
+  test('it can filter records with vars (firstName)', async function(assert) {
+    this.server.createList('person', 10, { firstName: 'Joe' });
 
-    let numSmiths = 4;
+    let numToms = 4;
+    let firstName = 'Tom';
 
-    this.server.createList('person', numSmiths, { lastName: 'Smith' });
+    this.server.createList('person', numToms, { firstName });
 
-    await visit('/people?lastName=Smith');
+    await visit(`/people?firstName=${firstName}`);
 
     let tableRows = getTableRows(this);
     let smiths = [...tableRows].filter((row) =>
-      row.querySelector('.people-last-name', row).textContent === 'Smith');
+      row.querySelector('.people-first-name', row).textContent === firstName);
+
+    assert.equal(tableRows.length, numToms,
+      `There are ${numToms} people displayed`);
+    assert.equal(smiths.length, numToms,
+      `Only people having the first name "${firstName}" are displayed`);
+  });
+
+  test('it can filter records with mapped vars (lastName)', async function(assert) {
+    this.server.createList('person', 10, { surname: 'Thomas' });
+
+    let surname = 'Smith';
+    let numSmiths = 4;
+
+    this.server.createList('person', numSmiths, { surname });
+
+    await visit(`/people?lastName=${surname}`);
+
+    let tableRows = getTableRows(this);
+    let smiths = [...tableRows].filter((row) =>
+      row.querySelector('.people-last-name', row).textContent === surname);
 
     assert.equal(tableRows.length, numSmiths,
-      'There are `${numSmiths}` people displayed');
+      `There are ${numSmiths} people displayed`);
     assert.equal(smiths.length, numSmiths,
-      'Only people having the last name "Smith" are displayed');
+      `Only people having the last name "${surname}" are displayed`);
   });
 
   async function testBelongsTo(context, assert, address) {

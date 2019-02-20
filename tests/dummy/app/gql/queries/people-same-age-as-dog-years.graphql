@@ -1,11 +1,12 @@
 query {
   peopleSameAgeAsDogYears {
-    age,
-    firstName,
-    lastName,
+    age
+    firstName
+    lastName
     pets {
-      age,
+      age
       name
+      type
     }
   }
 }

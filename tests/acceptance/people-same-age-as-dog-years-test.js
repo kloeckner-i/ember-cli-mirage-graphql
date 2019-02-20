@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { visit } from '@ember/test-helpers';
 
-module('Acceptance | people', function(hooks) {
+module('Acceptance | people same age as dog years', function(hooks) {
   setupApplicationTest(hooks);
 
   function createPeopleWithOneYearOldDogs(server) {

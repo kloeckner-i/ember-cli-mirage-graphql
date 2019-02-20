@@ -6,14 +6,14 @@ module('Acceptance | edit person', function(hooks) {
   setupApplicationTest(hooks);
 
   test('it can update a person via mutation', async function(assert) {
-    let person = server.create('person', { lastName: 'Smith' });
+    let person = server.create('person', { surname: 'Smith' });
     let newLastName = 'Jones';
 
     await visit(`/person/${person.id}/edit`);
 
     let lastNameInput = this.element.querySelector('.person-last-name');
 
-    assert.equal(lastNameInput.value, person.lastName, 'It has last name');
+    assert.equal(lastNameInput.value, person.surname, 'It has last name');
 
     await fillIn(lastNameInput, newLastName);
     await click('.person-save');

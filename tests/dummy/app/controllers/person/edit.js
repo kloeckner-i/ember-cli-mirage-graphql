@@ -13,7 +13,7 @@ function getAttrsFromForm(form) {
 
 export default Controller.extend({
   apollo: service(),
-  lastName: oneWay('model.person.lastName'),
+  lastName: oneWay('model.human.lastName'),
 
   actions: {
     savePerson(id, e) {

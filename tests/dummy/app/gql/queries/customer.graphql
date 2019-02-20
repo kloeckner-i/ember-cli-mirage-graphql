@@ -1,0 +1,30 @@
+#import 'dummy/gql/fragments/line-item-connection'
+
+query($id: ID!, $after: String, $before: String, $first: Int, $last: Int) {
+  customer: node(id: $id) {
+    id
+    ... on Customer {
+      customerName: name
+      orders(after: $after, before: $before, first: $first, last: $last) {
+        categories {
+          name
+        }
+        edges {
+          cursor
+          node {
+            id
+            ... on Order {
+              lineItems(first: 5) {
+                ...lineItemConnection
+              }
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+  }
+}
