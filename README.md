@@ -1,6 +1,7 @@
 # Mock GraphQL with Ember CLI Mirage
 
 [![Build Status](https://travis-ci.org/kloeckner-i/ember-cli-mirage-graphql.svg?branch=master)](https://travis-ci.org/kloeckner-i/ember-cli-mirage-graphql)
+[![Coverage Status](https://coveralls.io/repos/github/kloeckner-i/ember-cli-mirage-graphql/badge.svg?branch=master)](https://coveralls.io/github/kloeckner-i/ember-cli-mirage-graphql?branch=master)
 
 This addon is for mocking GraphQL with Ember CLI Mirage.
 
