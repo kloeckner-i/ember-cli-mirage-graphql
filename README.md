@@ -24,7 +24,7 @@ ember install ember-cli-mirage-graphql
 
 ## How It Works
 
-This addon creates a request handler for use with Mirage that takes your GraphQL scehma and creates mocks accordingly. In its simplest form, the mocks query data from Mirage's database, by type, and optionally filter records by matching query variables.
+This addon creates a request handler for use with Mirage that takes your GraphQL schema and creates mocks accordingly. In its simplest form, the mocks query data from Mirage's database, by type, and optionally filter records by matching query variables.
 
 ## Example Usage
 
