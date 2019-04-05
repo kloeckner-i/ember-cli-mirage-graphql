@@ -23,6 +23,21 @@ module('Unit | Mocks | create', function() {
 
       createMocksForSchema(schema, db, options);
     });
+
+    test('it creates mocks for query type, if no mutation type', function(assert) {
+      assert.expect(1);
+
+      let schema = { _queryType: {} };
+      let createMocks = (typesAndMockFns) => {
+        assert.deepEqual(typesAndMockFns, [
+          [schema._queryType, null]
+        ], 'It received the query and mutation types to mock');
+      };
+      let createMocksForSchema =
+        composeCreateMocksForSchema(createMocks, null, null);
+
+      createMocksForSchema(schema);
+    });
   });
 
   module('reduce mocks', function() {
