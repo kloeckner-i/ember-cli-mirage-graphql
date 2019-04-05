@@ -9,9 +9,13 @@ export const composeCreateMocksForSchema =
   (createMocks, mockQuery, mockMutation) =>
     (schema, db, options) => {
       let typesAndMockFns = [
-        [schema._queryType, mockQuery],
-        [schema._mutationType, mockMutation]
+        [schema._queryType, mockQuery]
       ];
+
+      if (schema._mutationType) {
+        typesAndMockFns.push([schema._mutationType, mockMutation]);
+      }
+
       let mocks = createMocks(typesAndMockFns, db, options);
 
       return mocks;
