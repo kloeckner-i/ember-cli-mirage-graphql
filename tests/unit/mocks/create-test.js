@@ -31,7 +31,7 @@ module('Unit | Mocks | create', function() {
       let createMocks = (typesAndMockFns) => {
         assert.deepEqual(typesAndMockFns, [
           [schema._queryType, null]
-        ], 'It received the query and mutation types to mock');
+        ], 'It received the query type to mock');
       };
       let createMocksForSchema =
         composeCreateMocksForSchema(createMocks, null, null);
