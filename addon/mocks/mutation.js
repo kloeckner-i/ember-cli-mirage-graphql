@@ -1,4 +1,4 @@
-import { contextSet, isFunction, reduceKeys } from '../utils';
+import { contextSet, isFunction, reduceKeys, unwrapNonNull } from '../utils';
 import { getRecords } from '../db';
 import { resolveVarName } from '../filter/vars';
 
@@ -11,6 +11,8 @@ const mapVars = composeMapVars(resolveVarName);
 
 export const composeMockMutation = (getRecords, mapVars) =>
   (db, options = {}, _, vars, __, { fieldName, returnType }) => {
+    returnType = unwrapNonNull(returnType);
+
     let { mutations = {}, varsMap = {} } = options;
     let mutation = mutations[fieldName];
     let records = getRecords(db, returnType.name);
