@@ -1,3 +1,5 @@
+import { GraphQLNonNull } from 'graphql';
+
 const sortEdgesKeysBeforePageInfo = (list) => list.sort();
 
 export function contextPush(context, k, v) {
@@ -35,3 +37,5 @@ export const composeReduceKeys = (sortKeys) =>
     sortKeys(Object.keys(obj)).reduce(reducerFn, defaultValue);
 
 export const reduceKeys = composeReduceKeys(sortEdgesKeysBeforePageInfo);
+
+export const unwrapNonNull = (type) => type instanceof GraphQLNonNull ? type.ofType : type;

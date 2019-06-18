@@ -19,7 +19,7 @@ type LineItem {
 }
 
 type LineItemConnection {
-  edges: [LineItemEdge]
+  edges: [LineItemEdge!]!
   pageInfo: PageInfo!
 }
 
