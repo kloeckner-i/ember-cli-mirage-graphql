@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.0.8 (June 11th, 2019)
+
+* [#20](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/20) [BUGFIX] Unwrap non-null types
+
 ### v0.0.7 (April 5th, 2019)
 
 * [#17](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/17) [BUGFIX] Allow for no mutation type in schema

@@ -47,7 +47,7 @@ import schema from 'app-name/path-to-your-schema';
 export default createGraphQLHandler(schema, /* options = {} */);
 ```
 
-Note: We use a simple command line tool to download our schema and then we wrap it in a template string and save it as a JavaScript module. The tool can be found here: [get-graphql-schema](https://www.npmjs.com/package/get-graphql-schema).
+Note: We use a simple command line tool to download our schema: [get-graphql-schema](https://www.npmjs.com/package/get-graphql-schema).
 
 ---
 
