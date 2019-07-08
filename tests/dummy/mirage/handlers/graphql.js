@@ -37,7 +37,7 @@ const OPTIONS = {
   varsMap: {
     Person: {
       pageSize: (people, variableName, pageSize) => people.slice(0, pageSize),
-      lastName: 'surname'
+      lname: 'surname'
     }
   }
 };

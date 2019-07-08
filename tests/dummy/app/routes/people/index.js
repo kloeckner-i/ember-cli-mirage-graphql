@@ -16,7 +16,7 @@ export default Route.extend({
       query,
       variables: {
         firstName: params.firstName,
-        lastName: params.lastName,
+        lname: params.lastName,
         pageSize: params.pageSize
       }
     });

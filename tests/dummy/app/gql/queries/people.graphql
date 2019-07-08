@@ -1,5 +1,5 @@
-query($firstName: String, $lastName: String, $pageSize: Int) {
-  people(firstName: $firstName, lastName: $lastName, pageSize: $pageSize) {
+query($firstName: String, $lname: String, $pageSize: Int) {
+  people(firstName: $firstName, lastName: $lname, pageSize: $pageSize) {
     id
     address {
       line1
