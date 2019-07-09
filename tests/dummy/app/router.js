@@ -10,6 +10,7 @@ Router.map(function() {
   this.route('customer', { path: '/customer/:customer_id' });
   this.route('people', function() {
     this.route('same-age-as-dog-years');
+    this.route('same-name-as-pets');
   });
   this.route('person', { path: '/person/:person_id' }, function() {
     this.route('edit');

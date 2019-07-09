@@ -80,7 +80,7 @@ type Person {
   age: Int!
   firstName: String!
   lastName: String!
-  pets: [Pet]
+  pets(name: String): [Pet]
 }
 
 input PersonAttributes {
