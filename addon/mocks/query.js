@@ -7,7 +7,7 @@ import { partial } from '../utils';
 
 export const composeMockQuery =
   (getTypeForField, getFieldNameAndAlias, createFieldInfo, resolveFieldInfo, getIsInterface, logError) =>
-    (db, options, _, vars, __, info) => {
+    (db, options, _, __, ___, info) => {
       const { fieldNodes, fragments, returnType, schema, variableValues } = info;
 
       try {

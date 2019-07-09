@@ -1,4 +1,4 @@
-import { getArgsForField } from 'ember-cli-mirage-graphql/fields/args';
+import { getArgsForField, resolveArgName } from 'ember-cli-mirage-graphql/fields/args';
 import { module, test } from 'qunit';
 
 module('Unit | Fields | args', function() {
@@ -11,6 +11,7 @@ module('Unit | Fields | args', function() {
     };
     let fieldWithVariableArgs = {
       arguments: [{
+        name: { value: 'foo' },
         value: { kind: 'Variable', name: { value: 'bar' } }
       }]
     };
@@ -19,10 +20,21 @@ module('Unit | Fields | args', function() {
     assert.deepEqual(getArgsForField(noArgsField), [],
       'It can handle a field with no args');
     assert.deepEqual(getArgsForField(fieldWithStaticArgs),
-      [{ kind: 'Int', name: 'foo', value: 1 }],
+      [{ kind: 'Int', name: 'foo', value: 1, variableName: undefined }],
       'It works with static value args');
     assert.deepEqual(getArgsForField(fieldWithVariableArgs),
-      [{ kind: 'Variable', name: 'bar', value: undefined }],
+      [{ kind: 'Variable', name: 'foo', value: undefined, variableName: 'bar' }],
       'It works with variable value args');
+  });
+
+  test('it can get a mapped arg name', function(assert) {
+    let argsMap = { foo: 'bar' };
+
+    assert.equal(resolveArgName('foo', argsMap), argsMap.foo,
+      'It resolved the mapped name');
+  });
+
+  test('it resolves arg name, if not mapped', function(assert) {
+    assert.equal(resolveArgName('foo'), 'foo', 'It resolved the name');
   });
 });

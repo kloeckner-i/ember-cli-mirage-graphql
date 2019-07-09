@@ -1,38 +1,37 @@
 import Filter from './model';
 import sortFilters from './sort';
 import { isFunction, partial } from '../utils';
-import { resolveVarName } from './vars';
+import { resolveArgName } from '../fields/args';
 import { set, setProperties } from '@ember/object';
 import { spliceRelayFilters } from '../relay/filters';
 
-export const composeMapArgsToFilters = (resolveVarName) =>
-  (vars, varsMapForType = {}, { kind, name, value }) => {
+export const composeMapArgsToFilters = (resolveArgName) =>
+  (vars, argsMapForType = {}, { kind, name, value, variableName }) => {
     let filter = Filter.create({ name, value });
+    let resolvedName = resolveArgName(name, argsMapForType);
+
+    isFunction(resolvedName)
+      ? setProperties(filter, { hasFnValue: true, fn: resolvedName })
+      : set(filter, 'resolvedName', resolvedName);
 
     if (kind === 'Variable') {
-      let resolvedName = resolveVarName(name, varsMapForType);
-
-      filter.set('value', vars[name]);
-
-      isFunction(resolvedName)
-        ? setProperties(filter, { hasFnValue: true, fn: resolvedName })
-        : set(filter, 'resolvedName', resolvedName);
+      filter.set('value', vars[variableName]);
     }
 
     return filter;
   };
 
-const mapArgsToFilters = composeMapArgsToFilters(resolveVarName);
+const mapArgsToFilters = composeMapArgsToFilters(resolveArgName);
 
-const createFiltersByArgs = (args, vars, varsMap) =>
-  args.map(partial(mapArgsToFilters, vars, varsMap));
+const createFiltersByArgs = (args, vars, argsMap) =>
+  args.map(partial(mapArgsToFilters, vars, argsMap));
 
 export const composeCreateFilters =
   (createFiltersByArgs, sortFilters, spliceRelayFilters) =>
-    (field, vars, { varsMap = {} } = {}) => {
+    (field, vars, { argsMap = {} } = {}) => {
       let { args, type } = field;
-      let varsMapForType = varsMap[type.name];
-      let filters = createFiltersByArgs(args, vars, varsMapForType)
+      let argsMapForType = argsMap[type.name];
+      let filters = createFiltersByArgs(args, vars, argsMapForType)
         .sort(sortFilters);
 
       if (field.isRelayEdges) {

@@ -3,6 +3,7 @@ import {
   addInterfaceTypeResolversToSchema,
   createSchema
 } from './schema';
+import { deprecate } from '@ember/debug';
 import { graphql } from 'graphql';
 
 export const composeCreateGraphQLHandler =
@@ -11,6 +12,20 @@ export const composeCreateGraphQLHandler =
       ({ db }, request) => {
         let { query, variables } = parseRequest(request.requestBody);
         let schema = createSchema(rawSchema);
+
+        if (options.varsMap) {
+          deprecate('ember-cli-mirage-graphql varsMap is deprecated, please use argsMap instead', false, {
+            id: 'ember-cli-mirage-graphql.vars-map',
+            until: '1.0.0',
+            url: 'https://github.com/kloeckner-i/ember-cli-mirage-graphql/blob/master/DEPRECATIONS.md'
+          });
+
+          if (!options.argsMap) {
+            options.argsMap = options.varsMap;
+          }
+
+          delete options.varsMap;
+        }
 
         addMocksToSchema(schema, db, options);
         addInterfaceTypeResolversToSchema(schema);

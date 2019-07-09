@@ -34,7 +34,7 @@ const OPTIONS = {
     updatePerson: (people, { id, personAttributes }) =>
       people.update(id, adaptPersonAttrs(personAttributes))
   },
-  varsMap: {
+  argsMap: {
     Person: {
       pageSize: (people, variableName, pageSize) => people.slice(0, pageSize),
       lastName: 'surname'

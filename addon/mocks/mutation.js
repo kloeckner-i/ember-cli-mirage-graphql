@@ -1,31 +1,31 @@
 import { contextSet, isFunction, reduceKeys, unwrapNonNull } from '../utils';
 import { getRecords } from '../db';
-import { resolveVarName } from '../filter/vars';
+import { resolveArgName } from '../fields/args';
 
-export const composeMapVars = (resolveVarName) =>
-  (vars, varsMap = {}) =>
-    reduceKeys(vars, (mappedVars, key) =>
-      contextSet(mappedVars, resolveVarName(key, varsMap), vars[key]), {});
+export const composeMapArgs = (resolveArgName) =>
+  (args, argsMap = {}) =>
+    reduceKeys(args, (mappedArgs, key) =>
+      contextSet(mappedArgs, resolveArgName(key, argsMap), args[key]), {});
 
-const mapVars = composeMapVars(resolveVarName);
+const mapArgs = composeMapArgs(resolveArgName);
 
-export const composeMockMutation = (getRecords, mapVars) =>
-  (db, options = {}, _, vars, __, { fieldName, returnType }) => {
+export const composeMockMutation = (getRecords, mapArgs) =>
+  (db, options = {}, _, args, __, { fieldName, returnType }) => {
     returnType = unwrapNonNull(returnType);
 
-    let { mutations = {}, varsMap = {} } = options;
+    let { mutations = {}, argsMap = {} } = options;
     let mutation = mutations[fieldName];
     let records = getRecords(db, returnType.name);
 
     if (isFunction(mutation)) {
-      let mappedVars = mapVars(vars, varsMap[returnType.name]);
+      let mappedArgs = mapArgs(args, argsMap[returnType.name]);
 
-      records = mutation(records, mappedVars, db);
+      records = mutation(records, mappedArgs, db);
     }
 
     return records;
   };
 
-const mockMutation = composeMockMutation(getRecords, mapVars);
+const mockMutation = composeMockMutation(getRecords, mapArgs);
 
 export default mockMutation;
