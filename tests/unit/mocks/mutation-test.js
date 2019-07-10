@@ -1,4 +1,4 @@
-import { composeMapVars, composeMockMutation } from
+import { composeMapArgs, composeMockMutation } from
   'ember-cli-mirage-graphql/mocks/mutation';
 import { module, test } from 'qunit';
 
@@ -37,8 +37,8 @@ module('Unit | Mocks | mutation', function() {
       let mappedKey = 'bar';
       let value = 'baz';
       let vars = { [key]: value };
-      let resolveVarName = () => mappedKey;
-      let mapVars = composeMapVars(resolveVarName);
+      let resolveArgName = () => mappedKey;
+      let mapVars = composeMapArgs(resolveArgName);
       let mappedVars = mapVars(vars);
 
       assert.deepEqual(mappedVars, { [mappedKey]: value }, 'It mapped the vars');

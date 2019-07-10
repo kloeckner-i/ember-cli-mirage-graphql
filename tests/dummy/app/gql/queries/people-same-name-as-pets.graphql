@@ -1,0 +1,9 @@
+query PeopleSameNameAsPets($name: String!) {
+  people(firstName: $name) {
+    firstName
+    lastName
+    pets(name: $name) {
+      name
+    }
+  }
+}

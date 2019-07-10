@@ -104,7 +104,7 @@ You may pass in options when creating a request handler. The options take the fo
 
     1. The table from Mirage's database that corresponds to the return
     type of the mutation.
-    2. The mutation variables. These will be mapped per the varsMap
+    2. The mutation arguments. These will be mapped per the argsMap
     option, by the return type, if appropriate.
     3. Mirage's database.
 
@@ -113,28 +113,29 @@ You may pass in options when creating a request handler. The options take the fo
     functionality, if feasible.
    */
   mutations: {
-    updatePerson: (people, vars, db) => {
-      let { id, personAttributes } = vars;
+    updatePerson: (people, args, db) => {
+      let { id, personAttributes } = args;
 
       return [ people.update(id, personAttributes) ];
     }
   },
   /*
-    varsMap is used if you need to map request variables defined
-    in your GraphQL queries. The value you specify in the map can
-    be a string or a function.
+    argsMap is used if you need to map arguments defined in your GraphQL
+    queries to something other than the corresponding field name on the
+    mirage record. The value you specify in the map can be a string or a
+    function.
 
     The addon uses the variables to filter records of the given
     type from Mirage's database.
 
-    String values will be used to map variable names to field names
-    in case the variable name differs.
+    String values will be used to map argument names to field names
+    in case the argument name differs.
 
     Function values will be used to filter records. The function
-    will be passed an array of records, the variable name (key)
-    and the variable value.
+    will be passed an array of records, the argument name (key)
+    and the argument value.
    */
-  varsMap: {
+  argsMap: {
     Person: { // variables are mapped on a per-type basis
       pageSize: (records, _, pageSize) => records.slice(0, pageSize)
     }

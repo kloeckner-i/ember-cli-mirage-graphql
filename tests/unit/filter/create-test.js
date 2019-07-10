@@ -6,7 +6,7 @@ module('Unit | Filter | create', function() {
   module('args', function() {
     test('it creates a filter', function(assert) {
       let arg = { name: 'foo', value: 'bar' };
-      let mapArgsToFilters = composeMapArgsToFilters();
+      let mapArgsToFilters = composeMapArgsToFilters(x => x);
       let filter = mapArgsToFilters(null, null, arg);
 
       assert.equal(filter.name, arg.name, 'It mapped the name');
@@ -14,7 +14,7 @@ module('Unit | Filter | create', function() {
     });
 
     test('it creates a filter with a function value', function(assert) {
-      let arg = { kind: 'Variable', name: 'foo' };
+      let arg = { kind: 'Variable', name: 'foo', variableName: 'foo' };
       let fn = () => {};
       let mapArgsToFilters = composeMapArgsToFilters(() => fn);
       let vars = { foo: 'bar' };

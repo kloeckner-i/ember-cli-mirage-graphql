@@ -1,0 +1,8 @@
+{{#each this.model.people as |person|}}
+  <h2>{{person.firstName}} {{person.lastName}}</h2>
+  <ul>
+    {{#each person.pets as |pet|}}
+      <li>{{pet.name}}</li>
+    {{/each}}
+  </ul>
+{{/each}}
