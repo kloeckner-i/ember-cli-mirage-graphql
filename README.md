@@ -122,10 +122,10 @@ You may pass in options when creating a request handler. The options take the fo
   /*
     argsMap is used if you need to map arguments defined in your GraphQL
     queries to something other than the corresponding field name on the
-    mirage record. The value you specify in the map can be a string or a
+    Mirage record. The value you specify in the map can be a string or a
     function.
 
-    The addon uses the variables to filter records of the given
+    The addon uses the arguments to filter records of the given
     type from Mirage's database.
 
     String values will be used to map argument names to field names
@@ -136,7 +136,7 @@ You may pass in options when creating a request handler. The options take the fo
     and the argument value.
    */
   argsMap: {
-    Person: { // variables are mapped on a per-type basis
+    Person: { // arguments are mapped on a per-type basis
       pageSize: (records, _, pageSize) => records.slice(0, pageSize)
     }
   }
