@@ -1,11 +1,12 @@
 import { getNodeField } from '../relay/node';
 import { getTableNameForField } from '../db';
+import { unwrapNonNull } from '../utils';
 
 export const composeGetRecordsByFieldName = (getNodeField, getTableNameForField) =>
   (fieldName, field, db, options = {}) => {
     let { fieldsMap = {} } = options;
     let nodeField = getNodeField(fieldName, field);
-    let typeName = (nodeField || field).type.name;
+    let typeName = unwrapNonNull((nodeField || field).type).name;
     let tableName = getTableNameForField(fieldName, field.parent, typeName, fieldsMap);
     let table = db[tableName] || [{}];
 
