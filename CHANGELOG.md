@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.1.1 (August 1st, 2019)
+
+* [#24](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/24) [BUGFIX] Unwrap non-null types when computing table name
+
 ### v0.1.0 (July 10th, 2019)
 
 * [#23](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/23) [BUGFIX] Rename varsMap to argsMap
