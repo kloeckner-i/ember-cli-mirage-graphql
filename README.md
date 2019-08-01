@@ -8,8 +8,9 @@ This addon is for mocking GraphQL with Ember CLI Mirage.
 
 ## Compatibility
 
-* Ember.js v2.16 or above
+* Ember.js v3.4 or above
 * Ember CLI v2.13 or above
+* Node.js v8 or above
 
 ## Note
 
