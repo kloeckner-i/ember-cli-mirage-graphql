@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.1.2 (October 18th, 2019)
+
+* [#28](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/28) [BUGFIX] Allow createGraphQLHandler() to be used without options
+
 ### v0.1.1 (August 1st, 2019)
 
 * [#24](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/24) [BUGFIX] Unwrap non-null types when computing table name
