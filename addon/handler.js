@@ -13,7 +13,7 @@ export const composeCreateGraphQLHandler =
         let { query, variables } = parseRequest(request.requestBody);
         let schema = createSchema(rawSchema);
 
-        if (options.varsMap) {
+        if (options && options.varsMap) {
           deprecate('ember-cli-mirage-graphql varsMap is deprecated, please use argsMap instead', false, {
             id: 'ember-cli-mirage-graphql.vars-map',
             until: '1.0.0',
