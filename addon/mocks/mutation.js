@@ -18,7 +18,13 @@ export const composeMockMutation = (getRecords, mapArgs) =>
     let records = getRecords(db, returnType.name);
 
     if (isFunction(mutation)) {
-      let mappedArgs = mapArgs(args, argsMap[returnType.name]);
+      let stringArgsMap = Object.keys(argsMap[returnType.name]).reduce((returnTypeArgsMap, arg) => {
+        if(typeof argsMap[returnType.name][arg] === "string") {
+          returnTypeArgsMap[arg] = argsMap[returnType.name][arg]
+        }
+        return returnTypeArgsMap
+      }, {})
+      let mappedArgs = mapArgs(args, stringArgsMap);
 
       records = mutation(records, mappedArgs, db);
     }
