@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.1.3 (November 3rd, 2019)
+
+* [#31](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/31) [BUGFIX] Unwrap type for non-null lists of non null items
+
 ### v0.1.2 (October 18th, 2019)
 
 * [#28](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/28) [BUGFIX] Allow createGraphQLHandler() to be used without options
