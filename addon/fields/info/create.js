@@ -2,6 +2,7 @@ import FieldInfo from './model';
 import { getArgsForField } from '../args';
 import { getIsRelayConnection } from '../../relay/connection';
 import { getSelectedFields } from '../selections';
+import { unwrapNonNull } from '../../utils';
 
 const composeGetFieldInfo = (getArgsForField, getSelectedFields, getIsRelayConnection) =>
   (field, type, fragments, getType) => {
@@ -19,6 +20,7 @@ const getFieldInfo = composeGetFieldInfo(getArgsForField, getSelectedFields,
 
 export const composeCreateFieldInfo = (getFieldInfo) =>
   (field, fieldName, type, fragments, getType) => {
+    type = unwrapNonNull(type);
     let { args, fields, isList, isRelayConnection, recordType } =
       getFieldInfo(field, type, fragments, getType);
 

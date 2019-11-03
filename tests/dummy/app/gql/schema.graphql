@@ -99,4 +99,6 @@ type Query {
   people(firstName: String, lastName: String, pageSize: Int): [Person]
 
   peopleSameAgeAsDogYears: [Person]
+
+  nonNullListOfPeople: [Person!]!
 }
