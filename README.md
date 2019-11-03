@@ -56,7 +56,7 @@ Then import your handler for use in your Mirage config:
 ```javascript
 // /mirage/config.js
 
-import graphQLHandler from './handlers/grapqhl';
+import graphQLHandler from './handlers/graphql';
 
 export default function() {
   this.post('/path-to-graphql', graphQLHandler);
