@@ -18,6 +18,10 @@ export const composeCreateMocksForSchema =
 
       let mocks = createMocks(typesAndMockFns, db, options);
 
+      if (options && options.scalarMocks) {
+        mocks = Object.assign({}, mocks, options.scalarMocks)
+      }
+
       return mocks;
     };
 

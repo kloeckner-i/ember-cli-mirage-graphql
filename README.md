@@ -139,6 +139,15 @@ You may pass in options when creating a request handler. The options take the fo
     Person: { // arguments are mapped on a per-type basis
       pageSize: (records, _, pageSize) => records.slice(0, pageSize)
     }
+  },
+  /*
+  `scalarMocks` is used if you have custom scalars and you need to mock them to
+   return a default value
+  */
+  scalarMocks: {
+    MyCustomScalar: () => {
+      return 'some custom value'
+    }
   }
 }
 ```
