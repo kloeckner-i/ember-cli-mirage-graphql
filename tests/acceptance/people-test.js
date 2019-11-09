@@ -106,7 +106,7 @@ module('Acceptance | people', function(hooks) {
 
   test('it can display hasMany related data 2', async function(assert) {
     let person = this.server.create('person');
-    let animals = this.server.createList('animals', 3, { person });
+    let animals = this.server.createList('animal', 3, { person });
 
     await visit('/people');
 

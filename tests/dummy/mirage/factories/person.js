@@ -1,9 +1,10 @@
-import { Factory, faker } from 'ember-cli-mirage';
+import { Factory } from 'ember-cli-mirage';
+import faker from 'faker';
 
-const { list, name } = faker;
+const { name, random } = faker;
 
 export default Factory.extend({
-  age: (i) => list.random(1, 10, 20, 30, 40, 50, 60, 70, 80, 90)(i),
+  age: () => random.arrayElement([1, 10, 20, 30, 40, 50, 60, 70, 80, 90]),
   firstName: name.firstName,
   surname: name.lastName
 });

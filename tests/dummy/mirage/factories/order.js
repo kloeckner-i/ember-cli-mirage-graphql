@@ -1,8 +1,9 @@
-import { Factory, faker } from 'ember-cli-mirage';
+import { Factory } from 'ember-cli-mirage';
+import faker from 'faker';
 
-const { list } = faker;
+const { random } = faker;
 
 export default Factory.extend({
   number: (i) => i,
-  total: list.random(100, 200, 400, 500, 800, 1000)
+  total: random.arrayElement([100, 200, 400, 500, 800, 1000])
 });
