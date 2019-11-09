@@ -12,8 +12,7 @@ addons:
   chrome: stable
 
 cache:
-  directories:
-    - $HOME/.npm
+  yarn: true
 
 env:
   global:
@@ -37,10 +36,12 @@ jobs:
 
     - stage: "Tests"
       name: "Tests"
+      install:
+      - yarn install --non-interactive
       script:
-        - npm run lint:hbs
-        - npm run lint:js
-        - npm test
+        - yarn lint:hbs
+        - yarn lint:js
+        - yarn test
         - cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js
 
     # we recommend new addons test the current and previous LTS
