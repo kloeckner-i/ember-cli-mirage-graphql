@@ -16,5 +16,6 @@ query($id: ID!) {
       name
       weight
     }
+    createdAt
   }
 }
