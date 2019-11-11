@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.2.1 (November 11th, 2019)
+
+* [#32](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/32) [FEATURE] Custom scalar support
+
 ### v0.2.0 (November 9th, 2019)
 
 * [#33](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/33) [MAINTENANCE] Upgrade Ember (3.14)
