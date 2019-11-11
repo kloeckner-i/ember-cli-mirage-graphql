@@ -15,12 +15,14 @@ module('Acceptance | person', function(hooks) {
     let city = element.querySelector('.person-address-city').textContent;
     let state = element.querySelector('.person-address-state').textContent;
     let zip = element.querySelector('.person-address-zip').textContent;
+    let createdAt = element.querySelector('.person-created-at').textContent;
 
     assert.equal(line1, address.line1, 'It displays address line 1');
     assert.equal(line2, address.line2, 'It displays address line 2');
     assert.equal(city, address.city, 'It displays address city');
     assert.equal(state, address.state, 'It displays address state');
     assert.equal(zip, address.zip, 'It displays address zip');
+    assert.equal(createdAt, person.createdAt, 'It displays person created at');
   }
 
   test('it can display belongsTo related data 1', async function(assert) {

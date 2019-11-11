@@ -39,6 +39,11 @@ const OPTIONS = {
       pageSize: (people, variableName, pageSize) => people.slice(0, pageSize),
       lastName: 'surname'
     }
+  },
+  scalarMocks: {
+    Date: () => {
+      return '2019-01-01'
+    }
   }
 };
 

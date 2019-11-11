@@ -1,3 +1,5 @@
+scalar Date
+
 type Address {
   id: ID!
   line1: String!
@@ -81,6 +83,7 @@ type Person {
   firstName: String!
   lastName: String!
   pets(name: String): [Pet]
+  createdAt: Date!
 }
 
 input PersonAttributes {
