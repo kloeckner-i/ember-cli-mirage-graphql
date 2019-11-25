@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.2.2 (November 25h, 2019)
+
+* [#35](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/35) [MAINTENANCE] Update clean-css dependency
+
 ### v0.2.1 (November 11th, 2019)
 
 * [#32](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/32) [FEATURE] Custom scalar support
