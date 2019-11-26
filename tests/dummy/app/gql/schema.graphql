@@ -32,6 +32,7 @@ type LineItemEdge {
 
 type Mutation {
   updatePerson(id: ID!, personAttributes: PersonAttributes!): Person!
+  updatePersonByName(lastName: String!, personAttributes: PersonAttributes!): Person!
 }
 
 interface Node {

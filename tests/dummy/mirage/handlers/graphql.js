@@ -38,7 +38,15 @@ const OPTIONS = {
     updatePerson: (people, { id, personAttributes }) =>
       adaptPersonAttrsFrom(
         people.update(id, adaptPersonAttrsTo(personAttributes))
+      ),
+    updatePersonByName: (people, args) => {
+      const { surname, personAttributes } = args
+      const peopleWithName = people.filter(person => person.surname === surname)
+      const personId = peopleWithName[0].id
+      return adaptPersonAttrsFrom(
+        people.update(personId, adaptPersonAttrsTo(personAttributes))
       )
+    }
   },
   argsMap: {
     Person: {
