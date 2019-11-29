@@ -39,6 +39,12 @@ const OPTIONS = {
       adaptPersonAttrsFrom(
         people.update(id, adaptPersonAttrsTo(personAttributes))
       ),
+    updatePersonWhere: (people, { where, personAttributes }) => {
+      const { id } = where
+      return adaptPersonAttrsFrom(
+        people.update(id, adaptPersonAttrsTo(personAttributes))
+      )
+    },
     updatePersonByName: (people, args) => {
       const { surname, personAttributes } = args
       const peopleWithName = people.filter(person => person.surname === surname)

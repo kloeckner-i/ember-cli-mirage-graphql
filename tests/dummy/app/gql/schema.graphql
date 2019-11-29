@@ -32,6 +32,7 @@ type LineItemEdge {
 
 type Mutation {
   updatePerson(id: ID!, personAttributes: PersonAttributes!): Person!
+  updatePersonWhere(where: PersonWhereUniqueInput!, personAttributes: PersonAttributes!): Person!
   updatePersonByName(lastName: String!, personAttributes: PersonAttributes!): Person!
 }
 
@@ -91,6 +92,10 @@ input PersonAttributes {
   firstName: String
   lastName: String
   age: Int
+}
+
+input PersonWhereUniqueInput {
+  id: ID
 }
 
 type Query {

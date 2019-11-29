@@ -1,5 +1,5 @@
 import Controller from '@ember/controller';
-import mutation from 'dummy/gql/mutations/update-person-by-name';
+import mutation from 'dummy/gql/mutations/update-person-where';
 import { contextSet } from 'ember-cli-mirage-graphql/utils';
 import { inject as service } from '@ember/service';
 import { oneWay } from '@ember/object/computed';
@@ -22,7 +22,7 @@ export default Controller.extend({
       let { updatePerson } = await this.get('apollo').mutate({
         mutation,
         variables: {
-          name: this.model.human.lastName,
+          id: id,
           personAttributes: getAttrsFromForm(e.target)
         }
       });
