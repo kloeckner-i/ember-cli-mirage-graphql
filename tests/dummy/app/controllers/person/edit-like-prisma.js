@@ -1,5 +1,5 @@
 import Controller from '@ember/controller';
-import mutation from 'dummy/gql/mutations/update-person';
+import mutation from 'dummy/gql/mutations/update-person-where';
 import { contextSet } from 'ember-cli-mirage-graphql/utils';
 import { inject as service } from '@ember/service';
 import { oneWay } from '@ember/object/computed';
@@ -16,18 +16,16 @@ export default Controller.extend({
   lastName: oneWay('model.human.lastName'),
 
   actions: {
-    async savePerson(id, e) {
+    savePerson(id, e) {
       e.preventDefault();
 
-      let { updatePerson } = await this.get('apollo').mutate({
+      this.get('apollo').mutate({
         mutation,
         variables: {
           id,
           personAttributes: getAttrsFromForm(e.target)
         }
       });
-
-      this.transitionToRoute('person', updatePerson.id);
     }
   }
 });

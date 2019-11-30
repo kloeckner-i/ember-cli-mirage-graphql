@@ -15,6 +15,8 @@ Router.map(function() {
   });
   this.route('person', { path: '/person/:person_id' }, function() {
     this.route('edit');
+    this.route('edit-by-name');
+    this.route('edit-like-prisma');
   });
 });
 

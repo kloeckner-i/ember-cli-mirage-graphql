@@ -22,4 +22,42 @@ module('Acceptance | edit person', function(hooks) {
 
     assert.equal(lastName.textContent, newLastName, 'The last name changed');
   });
+
+  test('it can update a person by name', async function(assert) {
+    let person = server.create('person', { surname: 'Smith' });
+    let newLastName = 'Jones';
+
+    await visit(`/person/${person.id}/edit-by-name`);
+
+    let lastNameInput = this.element.querySelector('.person-last-name');
+
+    assert.equal(lastNameInput.value, person.surname, 'It has last name');
+
+    await fillIn(lastNameInput, newLastName);
+    await click('.person-save');
+    await visit('/people');
+
+    let lastName = this.element.querySelector('.people-last-name');
+
+    assert.equal(lastName.textContent, newLastName, 'The last name changed');
+  });
+
+  test('it can update a person like Prisma would', async function(assert) {
+    let person = server.create('person', { surname: 'Smith' });
+    let newLastName = 'Jones';
+
+    await visit(`/person/${person.id}/edit-like-prisma`);
+
+    let lastNameInput = this.element.querySelector('.person-last-name');
+
+    assert.equal(lastNameInput.value, person.surname, 'It has last name');
+
+    await fillIn(lastNameInput, newLastName);
+    await click('.person-save');
+    await visit('/people');
+
+    let lastName = this.element.querySelector('.people-last-name');
+
+    assert.equal(lastName.textContent, newLastName, 'The last name changed');
+  });
 });
