@@ -54,7 +54,7 @@ module('Acceptance | edit person', function(hooks) {
     ];
     let newLastName = 'Jones';
 
-    await visit(`/person/${people[1].id}/edit-like-prisma`);
+    await visit(`/person-like-prisma/${people[1].id}/edit`);
 
     let lastNameInput = this.element.querySelector('.person-last-name');
 
@@ -62,7 +62,7 @@ module('Acceptance | edit person', function(hooks) {
 
     await fillIn(lastNameInput, newLastName);
     await click('.person-save');
-    await visit(`/person/${people[1].id}`);
+    await visit(`/person-like-prisma/${people[1].id}`);
 
     let lastName = this.element.querySelector('.person-last-name');
 

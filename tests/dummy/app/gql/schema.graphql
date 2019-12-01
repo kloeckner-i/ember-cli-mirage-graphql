@@ -104,6 +104,7 @@ type Query {
   numPeople: Int
 
   person(id: ID!): Person
+  personLikePrisma(where: PersonWhereUniqueInput!): Person
 
   people(firstName: String, lastName: String, pageSize: Int): [Person]
 

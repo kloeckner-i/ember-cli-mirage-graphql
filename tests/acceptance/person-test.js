@@ -25,6 +25,22 @@ module('Acceptance | person', function(hooks) {
     assert.equal(createdAt, person.createdAt, 'It displays person created at');
   }
 
+  async function testShowsPerson(context, assert, path, person) {
+    await visit(path);
+
+    let { element } = context;
+
+    let firstName = element.querySelector('.person-first-name').textContent;
+    let lastName = element.querySelector('.person-last-name').textContent;
+    let age = element.querySelector('.person-age').textContent;
+    let createdAt = element.querySelector('.person-created-at').textContent;
+
+    assert.equal(firstName, person.firstName, 'It displays the first name');
+    assert.equal(lastName, person.surname, 'It displays the last name');
+    assert.equal(age, person.age.toString(), 'It displays the age');
+    assert.equal(createdAt, person.createdAt, 'It displays when it was created');
+  }
+
   test('it can display belongsTo related data 1', async function(assert) {
     let address = server.create('address');
     let person = server.create('person', { address });
@@ -63,4 +79,22 @@ module('Acceptance | person', function(hooks) {
 
     assert.equal(petRows.length, numPets, `${numPets} pets are displayed`);
   });
+
+  test('it can display data from the second person in a collection', async function(assert) {
+    let numPeople = 3;
+    let people = this.server.createList('person', numPeople);
+    let person = people[1]
+    let path = `/person/${person.id}`
+
+    testShowsPerson(this, assert, path, person)
+  })
+
+  test('it can display data from the second person in a collection as Prisma would query it', async function(assert) {
+    let numPeople = 3;
+    let people = this.server.createList('person', numPeople);
+    let person = people[1]
+    let path = `/person-like-prisma/${person.id}`
+
+    testShowsPerson(this, assert, path, person)
+  })
 });
