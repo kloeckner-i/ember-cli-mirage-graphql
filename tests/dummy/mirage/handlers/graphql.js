@@ -57,7 +57,16 @@ const OPTIONS = {
   argsMap: {
     Person: {
       pageSize: (people, variableName, pageSize) => people.slice(0, pageSize),
-      lastName: 'surname'
+      lastName: 'surname',
+      where: (records, _key, value) => {
+        if(value !== undefined) {
+          return records.filter((person) => {
+            return person.id === value.id
+          })
+        } else {
+          return records
+        }
+      }
     }
   },
   scalarMocks: {
