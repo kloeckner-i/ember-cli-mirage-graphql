@@ -17,7 +17,6 @@ module('Acceptance | edit person', function(hooks) {
 
     await fillIn(lastNameInput, newLastName);
     await click('.person-save');
-    await visit(`/person/${person.id}`);
 
     let lastName = this.element.querySelector('.person-last-name');
 
