@@ -32,6 +32,8 @@ type LineItemEdge {
 
 type Mutation {
   updatePerson(id: ID!, personAttributes: PersonAttributes!): Person!
+  updatePersonWhere(where: PersonWhereUniqueInput!, personAttributes: PersonAttributes!): Person!
+  updatePersonByName(lastName: String!, personAttributes: PersonAttributes!): Person!
 }
 
 interface Node {
@@ -92,12 +94,17 @@ input PersonAttributes {
   age: Int
 }
 
+input PersonWhereUniqueInput {
+  id: ID
+}
+
 type Query {
   node(id: ID!): Node
 
   numPeople: Int
 
   person(id: ID!): Person
+  personLikePrisma(where: PersonWhereUniqueInput!): Person
 
   people(firstName: String, lastName: String, pageSize: Int): [Person]
 

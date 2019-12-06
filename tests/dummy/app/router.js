@@ -15,6 +15,10 @@ Router.map(function() {
   });
   this.route('person', { path: '/person/:person_id' }, function() {
     this.route('edit');
+    this.route('edit-by-name');
+  });
+  this.route('person-like-prisma', { path: '/person-like-prisma/:person_id' }, function() {
+    this.route('edit');
   });
 });
 

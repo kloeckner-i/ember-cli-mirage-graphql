@@ -1,0 +1,23 @@
+query($id: ID!) {
+  human: personLikePrisma(where: {
+    id: $id
+  }) {
+    id
+    address {
+      line1
+      line2
+      city
+      state
+      zip
+    }
+    age
+    firstName
+    lastName
+    pets {
+      age
+      name
+      weight
+    }
+    createdAt
+  }
+}

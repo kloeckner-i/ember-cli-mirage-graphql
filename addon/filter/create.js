@@ -17,6 +17,9 @@ export const composeMapArgsToFilters = (resolveArgName) =>
     if (kind === 'Variable') {
       filter.set('value', vars[variableName]);
     }
+    if (kind === 'ObjectValue') {
+      filter.set('value', vars);
+    }
 
     return filter;
   };

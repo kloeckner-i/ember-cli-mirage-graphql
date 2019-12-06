@@ -1,0 +1,8 @@
+mutation UpdatePersonWhere($id: ID!, $personAttributes: PersonAttributes!) {
+  updatePersonWhere(where: { id: $id }, personAttributes: $personAttributes) {
+    id
+    firstName
+    lastName
+    age
+  }
+}
