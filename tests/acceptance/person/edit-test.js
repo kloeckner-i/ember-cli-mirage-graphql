@@ -17,9 +17,8 @@ module('Acceptance | edit person', function(hooks) {
 
     await fillIn(lastNameInput, newLastName);
     await click('.person-save');
-    await visit('/people');
 
-    let lastName = this.element.querySelector('.people-last-name');
+    let lastName = this.element.querySelector('.person-last-name');
 
     assert.equal(lastName.textContent, newLastName, 'The last name changed');
   });

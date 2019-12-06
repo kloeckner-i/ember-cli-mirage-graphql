@@ -1,5 +1,6 @@
 mutation UpdatePerson($id: ID!, $personAttributes: PersonAttributes!) {
   updatePerson(id: $id, personAttributes: $personAttributes) {
+    id
     firstName
     lastName
     age

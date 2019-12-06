@@ -2,7 +2,11 @@ import createGraphQLHandler from 'ember-cli-mirage-graphql/handler';
 import schema from 'dummy/gql/schema';
 import { contextSet, reduceKeys } from 'ember-cli-mirage-graphql/utils';
 
-const adaptPersonAttrs = (attrs) =>
+const adaptPersonAttrsFrom = (attrs) =>
+  reduceKeys(attrs, (_attrs, key) =>
+    contextSet(_attrs, key === 'surname' ? 'lastName' : key, attrs[key]), {});
+
+const adaptPersonAttrsTo = (attrs) =>
   reduceKeys(attrs, (_attrs, key) =>
     contextSet(_attrs, key === 'lastName' ? 'surname' : key, attrs[key]), {});
 
@@ -32,7 +36,9 @@ const OPTIONS = {
   },
   mutations: {
     updatePerson: (people, { id, personAttributes }) =>
-      people.update(id, adaptPersonAttrs(personAttributes))
+      adaptPersonAttrsFrom(
+        people.update(id, adaptPersonAttrsTo(personAttributes))
+      )
   },
   argsMap: {
     Person: {

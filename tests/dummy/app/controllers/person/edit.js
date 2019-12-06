@@ -16,16 +16,18 @@ export default Controller.extend({
   lastName: oneWay('model.human.lastName'),
 
   actions: {
-    savePerson(id, e) {
+    async savePerson(id, e) {
       e.preventDefault();
 
-      this.get('apollo').mutate({
+      let { updatePerson } = await this.get('apollo').mutate({
         mutation,
         variables: {
           id,
           personAttributes: getAttrsFromForm(e.target)
         }
       });
+
+      this.transitionToRoute('person', updatePerson.id);
     }
   }
 });
