@@ -16,6 +16,7 @@ Router.map(function() {
   this.route('person', { path: '/person/:person_id' }, function() {
     this.route('edit');
   });
+  this.route('pets-and-people');
 });
 
 export default Router;

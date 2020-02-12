@@ -32,6 +32,12 @@ const OPTIONS = {
           type === 'dog' && age * 7 === person.age).length);
 
       return records;
+    },
+    petsAndPeople(_, db) {
+      let pets = db.animals.map(a => ({ ...a, __typename: 'Pet' }));
+      let people = db.people.map(p => ({ ...p, __typename: 'Person' }));
+
+      return [...pets, ...people];
     }
   },
   mutations: {

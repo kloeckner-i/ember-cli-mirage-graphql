@@ -1,0 +1,11 @@
+{{#each model.petsAndPeople as |p|}}
+  {{#if (eq p.__typename "Pet")}}
+    <div class="pet-id">{{p.id}}</div>
+    <div class="pet-name">{{p.name}}</div>
+    <div class="pet-age">{{p.age}}</div>
+  {{else}}
+    <div class="person-id">{{p.id}}</div>
+    <div class="person-name">{{p.firstName}} {{p.lastName}}</div>
+    <div class="person-age">{{p.age}}</div>
+  {{/if}}
+{{/each}}
