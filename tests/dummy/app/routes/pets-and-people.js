@@ -1,9 +1,9 @@
 import Route from '@ember/routing/route';
 import query from 'dummy/gql/queries/pets-and-people';
-import { inject as service } from '@ember/service';
+import { queryManager } from "ember-apollo-client";
 
 export default Route.extend({
-  apollo: service(),
+  apollo: queryManager(),
 
   model() {
     const apollo = this.get('apollo');

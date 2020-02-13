@@ -15,7 +15,7 @@ const introspectionQueryResultData = {
   }
 };
 
-export default ApolloService.extend({
+export default class extends ApolloService {
   cache() {
     const fragmentMatcher = new IntrospectionFragmentMatcher({
       introspectionQueryResultData
@@ -23,4 +23,4 @@ export default ApolloService.extend({
 
     return new InMemoryCache({ fragmentMatcher });
   }
-});
+}
