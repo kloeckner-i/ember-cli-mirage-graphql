@@ -22,6 +22,14 @@ export const ensureList = (item) => item == null
 
 export const getFirstKey = (obj) => Object.keys(obj)[0];
 
+export const getUnionField = (type, fieldName) => {
+  for (const t of type._types) {
+    if (t._fields[fieldName]) {
+      return t._fields[fieldName];
+    }
+  }
+}
+
 export const isFunction = (obj) => obj != null && typeof obj === 'function';
 
 export const objectOfType = (obj, typeName) =>

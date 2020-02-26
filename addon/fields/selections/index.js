@@ -1,7 +1,8 @@
+import { GraphQLUnionType } from 'graphql';
 import createFieldInfo from '../info/create';
 import { getFieldNameAndAlias } from '../name';
 import { fragmentFieldsReducer, inlineFragmentFieldsReducer } from './fragments';
-import { partial, unwrapNonNull } from '../../utils';
+import { getUnionField, partial, unwrapNonNull } from '../../utils';
 
 const getFieldType = (type, fieldName) => {
   if (fieldName === '__typename') {
@@ -10,7 +11,12 @@ const getFieldType = (type, fieldName) => {
 
   type = unwrapNonNull(type);
 
-  let field = type._fields[fieldName];
+  let field;
+  if (type instanceof GraphQLUnionType) {
+    field = getUnionField(type, fieldName);
+  } else {
+    field = type._fields[fieldName];
+  }
   let fieldType = unwrapNonNull(field.type);
 
   return fieldType;

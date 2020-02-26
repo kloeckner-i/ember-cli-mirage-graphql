@@ -92,6 +92,8 @@ input PersonAttributes {
   age: Int
 }
 
+union PetOrPerson = Pet | Person
+
 type Query {
   node(id: ID!): Node
 
@@ -104,4 +106,6 @@ type Query {
   peopleSameAgeAsDogYears: [Person]
 
   nonNullListOfPeople: [Person!]!
+
+  petsAndPeople: [PetOrPerson!]!
 }

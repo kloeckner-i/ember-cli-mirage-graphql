@@ -1,0 +1,15 @@
+query {
+  petsAndPeople {
+    ... on Pet {
+      id
+      age
+      name
+    }
+    ... on Person {
+      id
+      age
+      firstName
+      lastName
+    }
+  }
+}
