@@ -22,9 +22,9 @@ module.exports = {
     }
   },
   included(app) {
-    let config = this.app.project.config(app.env);
+    let config = app.project.config();
 
-    this.appEnv = app.env;
+    this.appEnv = config.environment;
     this.mirageConfig = config['ember-cli-mirage'] || {};
 
     this._super.included.apply(this, arguments);
