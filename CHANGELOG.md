@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### V0.3.1 (April 14th, 2020)
+
+* [#43](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/43)[BUGFIX] Fix using the addon as a runtime dependency of another addon
+
 ### v0.3.0 (February 26th, 2020)
 
 * [#41](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/41) [FEATURE] Union type check
