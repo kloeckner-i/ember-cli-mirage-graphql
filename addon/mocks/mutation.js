@@ -1,4 +1,5 @@
 import { contextSet, isFunction, reduceKeys, unwrapNonNull } from '../utils';
+import { GraphQLList } from 'graphql';
 import { getRecords } from '../db';
 import { resolveArgName } from '../fields/args';
 
@@ -12,6 +13,10 @@ const mapArgs = composeMapArgs(resolveArgName);
 export const composeMockMutation = (getRecords, mapArgs) =>
   (db, options = {}, _, args, __, { fieldName, returnType }) => {
     returnType = unwrapNonNull(returnType);
+
+    if (returnType instanceof GraphQLList) {
+      returnType = returnType.ofType
+    }
 
     let { mutations = {}, argsMap = {} } = options;
     let mutation = mutations[fieldName];
