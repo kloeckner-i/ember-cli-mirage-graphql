@@ -1,6 +1,12 @@
 # Ember CLI Mirage GraphQL Changelog
 
-### V0.3.1 (April 14th, 2020)
+### v0.3.2 (May the 4th Be with You, 2020)
+
+* [#44](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/44)[MAINTENANCE] Bump jquery from 3.4.1 to 3.5.0
+* [#45](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/45)[BUGFIX] Handle mutation that returns an array
+* [#46](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/46)[MAINTENANCE] Update acorn, kind-of, minimist and serialize-javascript dependencies
+
+### v0.3.1 (April 14th, 2020)
 
 * [#43](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/43)[BUGFIX] Fix using the addon as a runtime dependency of another addon
 
