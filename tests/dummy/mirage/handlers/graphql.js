@@ -44,7 +44,9 @@ const OPTIONS = {
     updatePerson: (people, { id, personAttributes }) =>
       adaptPersonAttrsFrom(
         people.update(id, adaptPersonAttrsTo(personAttributes))
-      )
+      ),
+    createPerson: (people, { personAttributes }) => [people.insert(adaptPersonAttrsTo(personAttributes))]
+
   },
   argsMap: {
     Person: {
