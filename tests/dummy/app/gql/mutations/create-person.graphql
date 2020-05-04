@@ -1,0 +1,8 @@
+mutation CreatePerson($personAttributes: PersonAttributes!) {
+  createPerson(personAttributes: $personAttributes) {
+    id
+    firstName
+    lastName
+    age
+  }
+}
