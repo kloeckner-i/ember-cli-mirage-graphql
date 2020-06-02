@@ -46,7 +46,9 @@ import schema from 'app-name/path-to-your-schema';
 export default createGraphQLHandler(schema, /* options = {} */);
 ```
 
-Note: We use a simple command line tool to download our schema: [get-graphql-schema](https://www.npmjs.com/package/get-graphql-schema).
+Notes:
+* We use a simple command line tool to download our schema: [get-graphql-schema](https://www.npmjs.com/package/get-graphql-schema).
+* You can import and pass in your raw schema directly, as shown above, or you can pass in an instance of a `GraphQLSchema`, e.g., a case where you might merge multiple schemas.
 
 ---
 

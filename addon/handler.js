@@ -4,14 +4,17 @@ import {
   createSchema
 } from './schema';
 import { deprecate } from '@ember/debug';
-import { graphql } from 'graphql';
+import { GraphQLSchema, graphql } from 'graphql';
 
 export const composeCreateGraphQLHandler =
   (parseRequest, createSchema, addMocksToSchema, addInterfaceTypeResolversToSchema, graphql) =>
-    (rawSchema, options) =>
+    (schema, options) =>
       ({ db }, request) => {
         let { query, variables } = parseRequest(request.requestBody);
-        let schema = createSchema(rawSchema);
+
+        if (!(schema instanceof GraphQLSchema)) {
+          schema = createSchema(schema);
+        }
 
         if (options && options.varsMap) {
           deprecate('ember-cli-mirage-graphql varsMap is deprecated, please use argsMap instead', false, {
