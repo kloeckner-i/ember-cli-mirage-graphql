@@ -1,5 +1,9 @@
 # Ember CLI Mirage GraphQL Changelog
 
+### v0.3.3 (June 2nd, 2020)
+
+* [#49](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/49) [FEATURE] Allow GraphQLSchema instances to be passed to handlers
+
 ### v0.3.2 (May the 4th Be with You, 2020)
 
 * [#44](https://github.com/kloeckner-i/ember-cli-mirage-graphql/pull/44) [MAINTENANCE] Bump jquery from 3.4.1 to 3.5.0
