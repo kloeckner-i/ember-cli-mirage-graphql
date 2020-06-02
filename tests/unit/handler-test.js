@@ -1,6 +1,5 @@
 import { composeCreateGraphQLHandler } from 'ember-cli-mirage-graphql/handler';
-import gql from 'graphql-tag';
-import { mergeSchemas } from 'graphql-tools';
+import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { module, test } from 'qunit';
 
 module('Unit | handler', function() {
@@ -60,24 +59,28 @@ module('Unit | handler', function() {
     test('it parses the request, creates mocks and resolvers for schema and returns GraphQL', function(assert) {
       assert.expect(7);
       
-      const fooSchema = gql`
-        type Foo {
-          name: String
-        }
+      const fooSchema = makeExecutableSchema({
+        typeDefs: `
+          type Foo {
+            name: String
+          }
 
-        type Query {
-          foos: [Foo]
-        }
-      `;
-      const barSchema = gql`
-        type Bar {
-          name: String
-        }
+          type Query {
+            foos: [Foo]
+          }
+        `
+      });
+      const barSchema = makeExecutableSchema({
+        typeDefs: `
+          type Bar {
+            name: String
+          }
 
-        type Query {
-          bars: [Bar]
-        }
-      `;
+          type Query {
+            bars: [Bar]
+          }
+        `
+      });
       const createSchema = () => assert.equal(0, 1); // This should not be called
       const schema = mergeSchemas({ schemas: [fooSchema, barSchema] });
       const createHandler = composeCreateHandler(createSchema, schema, assert);
