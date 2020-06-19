@@ -1,4 +1,4 @@
 fragment lineItem on LineItem {
-  name,
+  name
   quantity
 }

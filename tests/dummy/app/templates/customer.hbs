@@ -2,15 +2,6 @@
   <div class="customer-name">
     {{model.customer.customerName}}
   </div>
-  <label for="order-categories">
-    Filter orders by category:
-  </label>
-  <select id="order-categories" class="order-categories">
-    {{#each model.customer.orders.categories as |category|}}
-      <option value={{category.id}}>{{category.name}}</option>
-    {{/each}}
-  </select>
-  <hr>
   {{#each model.customer.orders.edges as |order|}}
     <div class="order">
       <span class="order-number">{{order.node.number}}</span>

@@ -1,9 +1,11 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 import { visit } from '@ember/test-helpers';
 
 module('Acceptance | person', function(hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   async function testBelongsTo(context, assert, person, address) {
     await visit(`/person/${person.id}`);
@@ -25,37 +27,18 @@ module('Acceptance | person', function(hooks) {
     assert.equal(createdAt, person.createdAt, 'It displays person created at');
   }
 
-  test('it can display belongsTo related data 1', async function(assert) {
-    let address = server.create('address');
-    let person = server.create('person', { address });
+  test('it can display belongsTo related data', async function(assert) {
+    let address = this.server.create('address');
+    let person = this.server.create('person', { address });
 
     testBelongsTo(this, assert, person, address);
   });
 
-  test('it can display belongsTo related data 2', async function(assert) {
-    let person = server.create('person');
-    let address = server.create('address', { person });
-
-    testBelongsTo(this, assert, person, address);
-  });
-
-  test('it can display hasMany related data 1', async function(assert) {
+  test('it can display hasMany related data', async function(assert) {
     let numPets = 3;
-    let animals = this.server.createList('animal', numPets);
-    let person = this.server.create('person', { animals });
-
-    await visit(`/person/${person.id}`);
-
-    let petRows = this.element.querySelectorAll('.person-pets tbody tr');
-
-    assert.equal(petRows.length, numPets, `${numPets} pets are displayed`);
-  });
-
-  test('it can display hasMany related data 2', async function(assert) {
-    let numPets = 3;
-    let person = this.server.create('person');
-
-    this.server.createList('animal', numPets, { person });
+    let address = this.server.create('address');
+    let pets = this.server.createList('pet', numPets);
+    let person = this.server.create('person', { address, pets });
 
     await visit(`/person/${person.id}`);
 

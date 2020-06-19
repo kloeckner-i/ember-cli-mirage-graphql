@@ -47,18 +47,12 @@ type Order implements Node {
   total: Float
 }
 
-type OrderCategory {
-  id: ID!
-  name: String!
-}
-
 type OrderEdge {
   cursor: String!
   node: Order
 }
 
 type OrderConnection {
-  categories: [OrderCategory]
   edges: [OrderEdge]
   pageInfo: PageInfo!
 }
@@ -103,9 +97,7 @@ type Query {
 
   person(id: ID!): Person
 
-  people(firstName: String, lastName: String, pageSize: Int): [Person]
-
-  peopleSameAgeAsDogYears: [Person]
+  people(firstName: String, lastName: String): [Person!]
 
   nonNullListOfPeople: [Person!]!
 

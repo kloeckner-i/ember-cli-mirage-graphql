@@ -1,17 +1,21 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 import { visit } from '@ember/test-helpers';
 
 module('Acceptance | union', function(hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   test('it is able to resolve union types', async function(assert) {
-    let person = this.server.create('person', {
+    const address = this.server.create('address');
+    const person = this.server.create('person', {
+      address,
       firstName: 'Alice',
       lastName: 'Example',
       age: 30
     });
-    let pet = this.server.create('animal', {
+    const pet = this.server.create('pet', {
       name: 'Beanie',
       age: 10
     });

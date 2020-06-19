@@ -23,9 +23,6 @@ module.exports = function(environment) {
     },
     apollo: {
       apiURL: '/graph'
-    },
-    'ember-cli-mirage': {
-      autostart: true
     }
   };
 

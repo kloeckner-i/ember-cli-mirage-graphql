@@ -1,9 +1,11 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 import { visit } from '@ember/test-helpers';
 
-module('Acceptance | person', function(hooks) {
+module('Acceptance | index', function(hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   test('it displays the number of people in the db', async function(assert) {
     this.server.createList('person', 2);
