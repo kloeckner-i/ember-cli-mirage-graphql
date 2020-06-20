@@ -1,13 +1,15 @@
 import {
-  defaultFieldResolver,
-  defaultTypeResolver,
-  isObjectType
-} from 'graphql';
-import {
   RelayConnection,
   isRelayConnectionType,
   isRelayEdgeType
 } from './relay-pagination';
+import { cloneRecord } from './models';
+import {
+  defaultFieldResolver,
+  defaultTypeResolver,
+  isInterfaceType,
+  isObjectType
+} from 'graphql';
 import { unwrapType } from '../graphql-auto-resolve/type-utils';
 
 const RELAY_ARGS = ['after', 'before', 'first', 'last'];
@@ -65,7 +67,7 @@ function getUserResolver(info, resolvers) {
 }
 
 function resolveList(obj, args, context, info, type) {
-  if (isRelayEdgeType(info.returnType.ofType)) {
+  if (isRelayEdgeType(type)) {
     return resolveRelayEdges(obj, info);
   }
 
@@ -88,10 +90,15 @@ function resolveObject(obj, args, context, info, type) {
     return obj[info.fieldName];
   }
 
-  const collectionName =
-    context.mirageSchema.toCollectionName(type.name);
+  const collectionName = context.mirageSchema.toCollectionName(type.name);
+  let record = context.mirageSchema[collectionName].findBy(args);
 
-  return context.mirageSchema[collectionName].findBy(args);
+  if (record) {
+    record = cloneRecord(record, info);
+    record.__typename = type.name;
+  }
+
+  return record;
 }
 
 function resolveRelayConnection(obj, args, info) {
@@ -114,6 +121,18 @@ function resolveRelayEdges(connection, info) {
   connection.setRecords(filteredRecords).setEdges().setPageInfo();
 
   return connection.edges;
+}
+
+function unwrapInterfaceType(info) {
+  const selection = info.fieldNodes[0].selectionSet.selections.find(
+    ({ kind }) => kind === 'InlineFragment'
+  );
+  
+  if (selection) {
+    const { typeCondition: { name: { value: typeName } } } = selection;
+    
+    return info.schema.getTypeMap()[typeName];
+  }
 }
 
 export function createFieldResolver(resolvers) {
@@ -141,11 +160,15 @@ export function createFieldResolver(resolvers) {
    *     default resolver
    */
   return function fieldResolver(obj, args, context, info) {
-    const { isList, type } = unwrapType(info.returnType);
+    let { isList, type } = unwrapType(info.returnType);
     const userResolver = getUserResolver(info, resolvers);
 
     if (userResolver) {
       return userResolver(...arguments);
+    }
+
+    if (isInterfaceType(type)) {
+      type = unwrapInterfaceType(info);
     }
 
     if (isObjectType(type)) {
@@ -156,28 +179,17 @@ export function createFieldResolver(resolvers) {
       return resolveObject(obj, args, context, info, type);
     }
 
-    // TODO: Deal with interface types
-
     return defaultFieldResolver(...arguments);
   };
 }
 
 export function createTypeResolver(resolvers) {
-  /**
-   * TODO:
-   *   - Figure out how to delegate to user resolvers
-   *   - Is the abstract type argument used?
-   */
-  return function typeResolver(obj, context, info) {
-    debugger;
-
+  return function typeResolver(_obj, _context, info) {
     const userResolver = getUserResolver(info, resolvers);
 
     if (userResolver) {
       return userResolver(...arguments);
     }
-
-    // TODO: Do we need to do anything other than the default?
 
     return defaultTypeResolver(...arguments);
   };

@@ -59,6 +59,21 @@ function ensureModel({ graphQLSchema, mirageSchema, type }) {
   }
 }
 
+function getFieldsFromSelections(selections, { deep = false } = {}) {
+  return selections.reduce(function(fields, selection) {
+    const subSelections = !deep && selection.selectionSet?.selections;
+
+    if (subSelections) {
+      return [
+        ...fields,
+        ...getFieldsFromSelections(subSelections, { deep: true })
+      ];
+    }
+
+    return [...fields, selection.name.value];
+  }, []);
+}
+
 function shouldAddModel(mirageSchema, graphQLSchema, type) {
   return (
     !mirageSchema.hasModelForModelName(type.name) &&
@@ -70,12 +85,12 @@ function shouldAddModel(mirageSchema, graphQLSchema, type) {
 }
 
 // Test: it can clone a record from Mirage's database
-export function cloneRecord({ record, resolverInfo }) {
-  const [{ selectionSet: { selections } }] = resolverInfo.fieldNodes;
-  const keys = selections.map(({ alias, name }) => alias || name.value);
+export function cloneRecord(record, info) {
+  const [{ selectionSet: { selections } }] = info.fieldNodes;
+  const fields = getFieldsFromSelections(selections);
 
-  return keys.reduce(function(clonedRecord, key) {
-    clonedRecord[key] = record[key];
+  return fields.reduce(function(clonedRecord, field) {
+    clonedRecord[field] = record[field];
 
     return clonedRecord;
   }, {});
