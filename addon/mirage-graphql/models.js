@@ -1,4 +1,5 @@
 import { isInterfaceType, isUnionType, isObjectType } from 'graphql';
+// TODO: Only use public imports
 import {
   Model,
   belongsTo,
@@ -59,21 +60,6 @@ function ensureModel({ graphQLSchema, mirageSchema, type }) {
   }
 }
 
-function getFieldsFromSelections(selections, { deep = false } = {}) {
-  return selections.reduce(function(fields, selection) {
-    const subSelections = !deep && selection.selectionSet?.selections;
-
-    if (subSelections) {
-      return [
-        ...fields,
-        ...getFieldsFromSelections(subSelections, { deep: true })
-      ];
-    }
-
-    return [...fields, selection.name.value];
-  }, []);
-}
-
 function shouldAddModel(mirageSchema, graphQLSchema, type) {
   return (
     !mirageSchema.hasModelForModelName(type.name) &&
@@ -84,19 +70,29 @@ function shouldAddModel(mirageSchema, graphQLSchema, type) {
   );
 }
 
-// Test: it can clone a record from Mirage's database
-export function cloneRecord(record, info) {
-  const [{ selectionSet: { selections } }] = info.fieldNodes;
-  const fields = getFieldsFromSelections(selections);
+/**
+ * TODO:
+ *   - Document this
+ *   - Test: it can clone a record with associations
+ * 
+ * @param {Object} record 
+ */
+export function cloneRecord(record) {
+  const { attrs, associations } = record;
+  const clone = { ...attrs };
 
-  return fields.reduce(function(clonedRecord, field) {
-    clonedRecord[field] = record[field];
+  for (let field in associations) {
+    clone[field] = record[field];
+  }
 
-    return clonedRecord;
-  }, {});
+  return clone;
 }
 
-// Test: it adds appopriate models to the schema with associations
+/**
+ * TODO:
+ *   - Document this
+ *   - Test: it adds appopriate models to the schema with associations
+ */
 export function ensureModels({ graphQLSchema, mirageSchema }) {
   const typeMap = graphQLSchema.getTypeMap();
 

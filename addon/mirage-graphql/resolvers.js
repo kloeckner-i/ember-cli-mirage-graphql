@@ -8,7 +8,8 @@ import {
   defaultFieldResolver,
   defaultTypeResolver,
   isInterfaceType,
-  isObjectType
+  isObjectType,
+  isUnionType
 } from 'graphql';
 import { unwrapType } from '../graphql-auto-resolve/type-utils';
 
@@ -50,6 +51,15 @@ function getArgsForCollection(args, type) {
   }, {});
 }
 
+function getRecords(type, args, mirageSchema) {
+  const collectionArgs = getArgsForCollection(args, type);
+  const collectionName = mirageSchema.toCollectionName(type.name);
+  const records = mirageSchema[collectionName].where(collectionArgs).models;
+
+  return records.map((record) =>
+    setTypename(cloneRecord(record), type.name));
+}
+
 function getRelayArgs(args) {
   return Object.keys(args).reduce(function(separatedArgs, arg) {
     const argsSet = RELAY_ARGS.includes(arg) ? 'relayArgs' : 'nonRelayArgs';
@@ -68,17 +78,14 @@ function getUserResolver(info, resolvers) {
 
 function resolveList(obj, args, context, info, type) {
   if (isRelayEdgeType(type)) {
-    return resolveRelayEdges(obj, info);
+    return resolveRelayEdges(obj, context.mirageSchema, type);
   }
 
   if (obj) {
     return obj[info.fieldName].models;
   }
 
-  const collectionArgs = getArgsForCollection(args, type);
-  const collectionName = context.mirageSchema.toCollectionName(type.name);
-
-  return context.mirageSchema[collectionName].where(collectionArgs).models;
+  return getRecords(type, args, context.mirageSchema);
 }
 
 function resolveObject(obj, args, context, info, type) {
@@ -91,14 +98,9 @@ function resolveObject(obj, args, context, info, type) {
   }
 
   const collectionName = context.mirageSchema.toCollectionName(type.name);
-  let record = context.mirageSchema[collectionName].findBy(args);
+  const record = context.mirageSchema[collectionName].findBy(args);
 
-  if (record) {
-    record = cloneRecord(record, info);
-    record.__typename = type.name;
-  }
-
-  return record;
+  return record && setTypename(cloneRecord(record), type.name);
 }
 
 function resolveRelayConnection(obj, args, info) {
@@ -112,15 +114,34 @@ function resolveRelayConnection(obj, args, info) {
   return new RelayConnection(options);
 }
 
-function resolveRelayEdges(connection, info) {
+function resolveRelayEdges(connection, mirageSchema, type) {
   const { relayArgs, nonRelayArgs } = getRelayArgs(connection.args);
+  const { type: nodeType } = unwrapType(type.getFields().node.type);
   const records = connection.records ||
-    this._getRecordsForType(info.returnType.ofType, nonRelayArgs);
+    getRecords(nodeType, nonRelayArgs, mirageSchema);
   const filteredRecords = filterEdges(records, relayArgs);
 
   connection.setRecords(filteredRecords).setEdges().setPageInfo();
 
   return connection.edges;
+}
+
+function resolveUnion(_obj, args, context, _info, type) {
+  const types = type.getTypes();
+  const recordsForTypes = types.reduce(function(records, type) {
+    return [
+      ...records,
+      ...getRecords(type, args, context.mirageSchema)
+    ];
+  }, []);
+
+  return recordsForTypes;
+}
+
+function setTypename(record, typename) {
+  record.__typename = typename;
+
+  return record;
 }
 
 function unwrapInterfaceType(info) {
@@ -135,30 +156,15 @@ function unwrapInterfaceType(info) {
   }
 }
 
+/**
+ * TODO:
+ *   - Document this function
+ *   - Make this usable in user resolvers
+ *   - Rename userResolver to something like optionalResolver or similar
+ * 
+ * @param {Object} resolvers
+ */
 export function createFieldResolver(resolvers) {
-  /**
-   * TODO:
-   *   - Test delegating to user resolvers
-   *   - Do some generic type unwrapping
-   *   - Delegate to different types of resolvers
-   *   - Determine how to deal with resolving fields on the parent
-   * 
-   *   What is the resolver algorithm?
-   *     unwrap type
-   *     if user resolver
-   *       resolve via user resolver
-   * 
-   *     if object type
-   *       if list type
-   *         resolve list type (maybe relay edge, maybe union)
-   *       else
-   *         resolve object type (maybe relay connection)
-   *     
-   *     if interface type
-   *       resolve interface type
-   * 
-   *     default resolver
-   */
   return function fieldResolver(obj, args, context, info) {
     let { isList, type } = unwrapType(info.returnType);
     const userResolver = getUserResolver(info, resolvers);
@@ -177,6 +183,10 @@ export function createFieldResolver(resolvers) {
       }
 
       return resolveObject(obj, args, context, info, type);
+    }
+
+    if (isUnionType(type)) {
+      return resolveUnion(obj, args, context, info, type);
     }
 
     return defaultFieldResolver(...arguments);
