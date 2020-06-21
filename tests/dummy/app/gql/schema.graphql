@@ -33,7 +33,7 @@ type LineItemEdge {
 type Mutation {
   updatePerson(id: ID!, personAttributes: PersonAttributes!): Person!
 
-  createPerson(personAttributes: PersonAttributes!): [Person]
+  createPerson(personAttributes: PersonAttributes!): Person
 }
 
 interface Node {
@@ -83,6 +83,7 @@ type Person {
 }
 
 input PersonAttributes {
+  addressId: ID
   firstName: String
   lastName: String
   age: Int

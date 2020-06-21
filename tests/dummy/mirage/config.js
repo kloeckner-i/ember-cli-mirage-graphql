@@ -1,4 +1,3 @@
-// import graphqlHandler from './handlers/graphql';
 import { createGraphQLHandler } from 'ember-cli-mirage-graphql/mirage-graphql';
 import graphQLSchema from 'dummy/gql/schema';
 
@@ -7,8 +6,23 @@ export default function() {
     graphQLSchema,
     mirageSchema: this.schema,
     resolvers: {
+      Mutation: {
+        createPerson(_obj, args, context) {
+          return context.mirageSchema.db.people.insert(
+            { ...args.personAttributes, createdAt: new Date() }
+          );
+        },
+        updatePerson(_obj, args, context) {
+          return context.mirageSchema.db.people.update(
+            args.id,
+            args.personAttributes
+          );
+        }
+      },
       Query: {
-        numPeople: () => this.schema.people.all().length
+        numPeople(_obj, _args, context) {
+          return context.mirageSchema.people.all().length;
+        }
       }
     }
   });

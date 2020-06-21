@@ -4,8 +4,6 @@ import { createFieldResolver, createTypeResolver } from './resolvers';
 import { ensureModels } from './models';
 import { makeExecutableSchema } from 'graphql-tools';
 
-// TODO: Why were we caching the GraphQL schema before...?
-
 function setupHandler({ context, graphQLSchema, mirageSchema, resolvers }) {
   const fieldResolver = createFieldResolver(resolvers);
   const typeResolver = createTypeResolver(resolvers);

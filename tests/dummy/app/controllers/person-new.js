@@ -30,7 +30,7 @@ export default Controller.extend({
         }
       });
 
-      this.transitionToRoute('person', createPerson[0].id);
+      this.transitionToRoute('person', createPerson.id);
     }
   }
 });
